@@ -46,10 +46,10 @@
     <!-- תמונת המפה – מוקטן וממורכז -->
     <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
       <div class="w-full flex items-center justify-center">
-        <img id="schemaImage"
-             src="skytrain-map.png"
-             alt="מפת קווי הסקייטריין"
-             class="block mx-auto w-full h-auto max-w-[780px] max-h-[460px] object-contain rounded-lg border border-gray-200"
+       <img id="schemaImage"
+     src="skytrain-map.png"
+     alt="מפת קווי הסקייטריין"
+     class="block mx-auto w-full h-auto max-w-[780px] max-h-[460px] object-contain rounded-lg border border-gray-200" />
       </div>
     </section>
 
@@ -352,13 +352,6 @@ function overlap(a,b){
       gPaths.appendChild(pth);
     }
 
-    // מנגנון למניעת חפיפות תוויות
-    const placedBoxes = [];
-    function intersects(a,b){
-      return !(a.x+a.width < b.x || b.x+b.width < a.x || a.y+a.height < b.y || b.y+b.height < a.y);
-    }
-    function pushBox(b){ placedBoxes.push(b); }
-
     function addStation(x,y,id,color,label,preferred='right'){
   const g=document.createElementNS('http://www.w3.org/2000/svg','g');
   g.classList.add('taparea');
@@ -392,7 +385,7 @@ function overlap(a,b){
     for (const side of sides){
       tx.setAttribute('text-anchor', side==='right' ? 'start' : 'end');
       const baseX = side==='right' ? x+12 : x-12;
-      let dyList = [0,12,-12,24,-24,36,-36,48,-48];  // למעלה/למטה
+     let dyList = [0,12,-12,24,-24,36,-36,48,-48,60,-60,72,-72];  // למעלה/למטה
       for (const dy of dyList){
         tx.setAttribute('x', baseX);
         tx.setAttribute('y', y + 4 + dy);
@@ -464,7 +457,7 @@ function overlap(a,b){
     canadaAir.forEach(id=>addStation(X.canadaAir,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
     canadaRich.forEach(id=>addStation(X.canadaRich,Y(row[id]),id,lines.canada.color,findLabel(id),'right'));
     expoMain.forEach(id=>addStation(X.expoMain,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
-    ['sapperton','braid','lougheed','production-way'].forEach(id=>addStation(X.expoBranch,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
+    ['sapperton','braid','lougheed','production-way'].forEach(id=>addStation(X.expoBranch,Y(row[id]),id,lines.expo.color,findLabel(id),'left'));
     milli.forEach(id=>addStation(X.millennium,Y(row[id]),id,lines.millennium.color,findLabel(id),'right'));
 
     renderLines();
