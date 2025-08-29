@@ -1,116 +1,187 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>הסקייטריין לילדים – ונקובר</title>
-  <meta name="description" content="אפליקציה ידידותית לילדים על סקייטריין ונקובר: היסטוריה קצרה, קווים וצבעים, רעיונות לטיולים, עובדות מגניבות ותוכניות לעתיד.">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>הסקייטריין לילדים – גרסת סופר</title>
+  <meta name="description" content="אפליקציה ידידותית לילדים על סקייטריין ונקובר: היסטוריה, קווים וצבעים, טיימליין, איך זה עובד, רעיונות לטיולים, עובדות מגניבות ותוכניות לעתיד." />
+
+  <!-- ערכת צבעים בסגנון TransLink -->
   <style>
     :root{
-      --bg:#f7fafc;
+      --translink:#0060A9;       /* כחול TransLink */
       --ink:#0f172a;
       --muted:#475569;
-      --brand:#0ea5e9;           /* צבע כותרת */
+      --bg:#f5f7fb;
       --card:#ffffff;
-      --expo:#1e3a8a;            /* כחול כהה */
-      --mill:#eab308;            /* צהוב/זהב */
-      --can:#06b6d4;             /* תכלת */
+      --expo:#123a7a;            /* קו אקספו – כחול כהה */
+      --mill:#eab308;            /* קו מילניום – זהב */
+      --can:#06b6d4;             /* קו קנדה – תכלת */
+      --accent:#7dd3fc;
+      --border:#e2e8f0;
       --ok:#16a34a;
-      --shadow: 0 8px 24px rgba(2,6,23,.08);
-      --radius: 20px;
+      --warn:#ca8a04;
+      --shadow: 0 10px 30px rgba(0,0,0,.06);
+      --radius:20px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans Hebrew",sans-serif;
-      background:var(--bg); color:var(--ink); line-height:1.55;
+      margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans Hebrew",sans-serif;
+      color:var(--ink); background:var(--bg); line-height:1.6;
     }
+
+    /* Header */
     header{
-      background:linear-gradient(135deg,#e0f2fe, #bae6fd 40%, #7dd3fc 85%);
-      padding:24px 16px 12px; position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.1) blur(4px);
-      border-bottom:1px solid #e2e8f0;
+      position:sticky; top:0; z-index:20;
+      background:linear-gradient(135deg,#e6f2fb 0%, #cde9ff 55%, #b2dbff 100%);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 6px 18px rgba(0,96,169,.08);
     }
-    h1{margin:0; font-size:clamp(20px,3.8vw,32px); color:#0b4a6f;}
-    .sub{color:var(--muted); font-size:clamp(14px,2.6vw,16px)}
-    .wrap{max-width:1000px; margin:0 auto; padding:16px}
-    nav.tabs{
-      display:flex; gap:8px; margin:12px 0 0; flex-wrap:wrap
-    }
+    .wrap{max-width:1100px; margin:0 auto; padding:14px 16px}
+    h1{margin:4px 0 0; font-size:clamp(22px,4.2vw,36px); color:var(--translink)}
+    .sub{color:#0b4a6f; font-weight:600; font-size:clamp(14px,2.6vw,16px)}
+    nav.tabs{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 6px}
     .tab-btn{
-      border:1px solid #cbd5e1; background:#fff; padding:10px 14px; border-radius:999px; cursor:pointer;
-      font-size:14px; transition:transform .05s ease, background .2s ease; white-space:nowrap
+      border:1px solid #b7d9ff; color:#0b4a6f; background:#fff;
+      padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:600;
+      transition:background .2s ease, transform .05s ease;
     }
-    .tab-btn[aria-selected="true"]{
-      background:#0ea5e91a; border-color:#7dd3fc; outline:2px solid transparent; color:#075985; font-weight:600;
-    }
+    .tab-btn[aria-selected="true"]{background:#e6f2ff; outline:2px solid transparent}
     .tab-btn:active{transform:scale(.98)}
-    .grid{display:grid; gap:16px}
-    @media (min-width:720px){ .grid-2{grid-template-columns:repeat(2,1fr)} .grid-3{grid-template-columns:repeat(3,1fr)}}
+
+    /* Layout */
+    main .grid{display:grid; gap:16px}
+    @media (min-width:760px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:repeat(3,1fr)} }
     .card{
-      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; border:1px solid #e2e8f0;
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:18px;
     }
-    .line-tag{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-weight:700; color:#fff}
+    .section{display:none; animation:fade .2s ease}
+    .section.active{display:block}
+    @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+
+    /* רכיבי עיצוב */
+    .line-tag{display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; color:#fff; font-weight:800}
     .expo{background:var(--expo)}
     .mill{background:var(--mill); color:#1f2937}
     .can{background:var(--can)}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#eef6ff; border:1px solid #cfe6ff; font-size:12px; margin-inline:4px}
     .muted{color:var(--muted)}
-    .section{display:none; animation:fade .18s ease-out}
-    .section.active{display:block}
-    @keyframes fade{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
-    ul,ol{padding-inline-start:20px; margin:8px 0}
-    .pill{display:inline-block; background:#e2e8f0; padding:2px 8px; border-radius:999px; font-size:12px; margin-inline:4px}
-    .tip{display:flex; gap:10px; align-items:flex-start; background:#ecfeff; border:1px solid #a5f3fc; border-radius:14px; padding:12px}
-    .ok{color:var(--ok); font-weight:700}
-    .checklist label{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:12px; border:1px dashed #cbd5e1; margin:8px 0; background:#fff}
     .small{font-size:13px}
-    footer{color:#64748b; font-size:12px; text-align:center; padding:24px 8px}
-    /* כפתור גלילה למעלה */
+    .ok{color:var(--ok); font-weight:700}
+    .warn{color:var(--warn); font-weight:700}
+    .tip{display:flex; gap:10px; background:#ecfeff; border:1px solid #a5f3fc; padding:12px; border-radius:14px}
+    ul,ol{padding-inline-start:22px; margin:8px 0}
+
+    /* טיימליין */
+    .timeline{position:relative; margin:8px 0 0 0; padding:0}
+    .timeline::before{
+      content:""; position:absolute; inset-inline-start:12px; top:0; bottom:0; width:4px; background:#b7d9ff; border-radius:6px;
+    }
+    .timeline li{
+      list-style:none; position:relative; margin:12px 0 12px 0; padding-inline-start:34px;
+    }
+    .timeline li::marker{content:""}
+    .dot{
+      position:absolute; inset-inline-start:5px; top:.4em; width:14px; height:14px; background:var(--translink);
+      border:2px solid #fff; outline:2px solid #9ed0ff; border-radius:50%;
+    }
+    .tag{display:inline-block; padding:2px 8px; border-radius:8px; background:#e8f3ff; border:1px solid #cfe6ff; font-size:12px; margin-inline-start:6px}
+
+    /* כפתור לראש הדף */
     #topBtn{position:fixed; inset-inline-end:14px; inset-block-end:14px; border:none; border-radius:999px; padding:12px 14px; box-shadow:var(--shadow); background:#fff; cursor:pointer}
+
+    footer{color:#64748b; text-align:center; font-size:12px; padding:28px 10px}
   </style>
 </head>
 <body>
   <header>
     <div class="wrap">
       <h1>הסקייטריין לילדים 🚈</h1>
-      <div class="sub">מערכת הרכבת המהירה של מטרו ונקובר – בגרסת “ידידותית לילדים” 🧒</div>
+      <div class="sub">עוד יותר ידע, יותר משחקים, ו<strong>טיימליין</strong> גדול – בסגנון TransLink</div>
       <nav class="tabs" role="tablist" aria-label="סקייטריין – ניווט">
-        <button class="tab-btn" role="tab" aria-selected="true" data-target="what">מה זה?</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-target="story">הסיפור הקצר</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-target="lines">קווים וצבעים</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-target="trips">טיולונים</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-target="facts">עובדות מגניבות</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-target="future">מה בונים עכשיו?</button>
-        <button class="tab-btn" role="tab" aria-selected="false" data-target="sources">מקורות</button>
+        <button class="tab-btn" aria-selected="true" data-target="what">מה זה?</button>
+        <button class="tab-btn" aria-selected="false" data-target="story">סיפור &amp; טיימליין</button>
+        <button class="tab-btn" aria-selected="false" data-target="how">איך זה עובד?</button>
+        <button class="tab-btn" aria-selected="false" data-target="lines">קווים וצבעים</button>
+        <button class="tab-btn" aria-selected="false" data-target="trips">טיולונים &amp; חלונות</button>
+        <button class="tab-btn" aria-selected="false" data-target="numbers">מספרים ידידותיים</button>
+        <button class="tab-btn" aria-selected="false" data-target="facts">עובדות מגניבות</button>
+        <button class="tab-btn" aria-selected="false" data-target="future">מה בונים עכשיו?</button>
+        <button class="tab-btn" aria-selected="false" data-target="sources">מקורות</button>
       </nav>
     </div>
   </header>
 
   <main class="wrap">
+
     <!-- מה זה -->
     <section id="what" class="section active">
-      <div class="card">
-        <h2>מה זה סקייטריין?</h2>
-        <p>סקייטריין היא רכבת מהירה בעיר שמ<span class="ok">נוסעת לבד בלי נהג</span> בתוך מנהרות ועל גשרים גבוהים. היא פועלת בחשמל, מגיעה מהר, ועוצרת בתחנות עם מעליות ורמפות.</p>
-        <div class="tip">
-          <div>💡</div>
-          <div>
-            תחשבו על רכבת צעצוע – רק אמיתית, חכמה, ומהירה. המחשב “נוהג”, ואנשים בתחנת הבקרה דואגים לבטיחות ולסדר.
-            <div class="small muted">המערכת התחילה לפעול בדצמבר 1985, ומאז התרחבה לעשרות תחנות.</div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>מה זה סקייטריין?</h2>
+          <p>סקייטריין היא רכבת מהירה בעיר שמ<span class="ok">נוסעת לבד בלי נהג</span> על מסילות מופרדות – בתוך מנהרות או על גשרים גבוהים. המחשב שומר מרחק מהיר בין רכבות, עוצר בתחנות בדיוק, ושולח הודעה אם יש תקלה.</p>
+          <div class="tip">
+            <div>💡</div>
+            <div>המערכת התחילה בדצמבר <strong>1985</strong> ועוד גדלה מאז. חלק גדול מהמסילה גבוה – לכן קוראים לה “סקיי” טריין (“רכבת־שמים”).</div>
           </div>
+          <p class="small muted">מקור: דפי TransLink/BCRTC על ההיסטוריה והאוטומציה.</p>
+        </div>
+        <div class="card">
+          <h2>כללי זהב לנוסע צעיר</h2>
+          <ul>
+            <li>עומדים מאחורי <strong>הקו הצהוב</strong> ומחכים בסבלנות.</li>
+            <li>נותנים לנוסעים <strong>לרדת קודם</strong>, ואז נכנסים.</li>
+            <li>מחזיקים יד במדרגות נעות, ושומרים על <strong>שקט</strong> כדי לשמוע הודעות.</li>
+            <li>מחפשים יחד סימנים במפה, ומסמנים אותם במשחק “מחפש-אוצרות”.</li>
+          </ul>
         </div>
       </div>
     </section>
 
-    <!-- הסיפור -->
+    <!-- סיפור & טיימליין -->
     <section id="story" class="section">
       <div class="card">
         <h2>הסיפור הקצר</h2>
-        <ol>
-          <li><strong>לפני הרבה שנים (1985–1986)</strong> – הקו הראשון נבנה לקראת תערוכת העולם “אקספו 86”.</li>
-          <li><strong>המערכת גדלה</strong> – נוספו קווים ותחנות, וב־2009 נפתח <em>קו קנדה</em> שמגיע גם לשדה התעופה.</li>
-          <li><strong>עוד הרחבות</strong> – נוספו שכונות וערים רחוקות יותר, כדי שלאנשים יהיה קל להגיע לעבודה, ללימודים ולבילוי.</li>
-        </ol>
-        <p class="muted small">היום יש שלושה קווים עיקריים: <span class="pill">אקספו</span> <span class="pill">מילניום</span> <span class="pill">קנדה</span>.</p>
+        <p>ונקובר רצתה תחבורה מהירה, בטוחה ונקייה. ב-<strong>1985</strong> נפתחה המערכת, וב-<strong>1986</strong> קיבלה פרסום גדול בזמן Expo 86. מאז הוסיפו קווים, תחנות וגשרים (כולל SkyBridge מעל נהר פרייזר), וב-<strong>2009</strong> נפתח <em>קו קנדה</em> אל שדה התעופה.</p>
+      </div>
+      <div class="card">
+        <h2>טיימליין של סקייטריין</h2>
+        <ul class="timeline" id="timeline">
+          <li><span class="dot"></span><strong>1985</strong> – התחלת הפעלה (חודש דצמבר). <span class="tag">היסטוריה</span></li>
+          <li><span class="dot"></span><strong>1986</strong> – Expo 86: קו אקספו באור הזרקורים. <span class="tag">אירוע גדול</span></li>
+          <li><span class="dot"></span><strong>סוף שנות ה-80–90</strong> – הרחבות מזרחה, גשרים ומסילות חדשות; תחנות בסארי ובניו ווסט. <span class="tag">התפתחות רשת</span></li>
+          <li><span class="dot"></span><strong>2002–2016</strong> – קו מילניום וקישוריו (כולל לוהיד וקו קואיטלם). <span class="tag">קו חדש</span></li>
+          <li><span class="dot"></span><strong>2009</strong> – נפתח <em>קו קנדה</em> לשדה התעופה YVR ולריצ’מונד. <span class="tag">PPP</span></li>
+          <li><span class="dot"></span><strong>2020–2027</strong> – פרויקט Broadway Subway (הארכת מילניום מערבה, תת-קרקעי). <span class="tag">בבנייה</span></li>
+          <li><span class="dot"></span><strong>2022–2029</strong> – Surrey–Langley SkyTrain (הארכת אקספו לאורך Fraser Hwy). יעד: <strong>סוף 2029</strong>. <span class="tag">בבנייה</span></li>
+        </ul>
+        <p class="small muted">תאריכים כלליים לילדים; לעדכון מדויק ר׳ לשונית “מקורות”.</p>
+      </div>
+    </section>
+
+    <!-- איך זה עובד -->
+    <section id="how" class="section">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>איך הרכבת “נוהגת לבד”?</h2>
+          <ul>
+            <li><strong>מחשבים חכמים</strong> שולטים במרווח בין רכבות ובמהירות (מערכת איתות מתקדמת).</li>
+            <li><strong>חיישנים</strong> יודעים אם יש רכבת לפני או אחרי.</li>
+            <li><strong>מרכז בקרה</strong> עם אנשים שמפקחים על הכול, ועוזרים במקרה חירום.</li>
+            <li>הכול עובד על <strong>חשמל</strong>, ולכן נקי ושקט יחסית.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>תחנות ונגישות</h2>
+          <ul>
+            <li>רוב התחנות כוללות <strong>מעליות</strong> ורמפות.</li>
+            <li>יש שלטים ברורים, צבעי קווים, והודעות קוליות.</li>
+            <li>כרטיסים חכמים מסוג <strong>Compass</strong> עוברים בשערים בכניסה.</li>
+          </ul>
+          <p class="small muted">מידע כללי מתוך דפי TransLink; מחירים משתנים – בדקו בלשונית “מקורות”.</p>
+        </div>
       </div>
     </section>
 
@@ -119,41 +190,47 @@
       <div class="grid grid-3">
         <div class="card">
           <div class="line-tag expo">קו אקספו</div>
-          <p>הקו הכחול. מחבר את מרכז ונקובר לבורנאבי, ניו ווסט וסארי. נופים של גשרים גבוהים מעל נהר פרייזר.</p>
+          <p>מחבר את מרכז ונקובר עם בֶּרנַאבי, ניו וסטמינסטר וסארי. הרבה גשרים ותצפיות על נהר פרייזר.</p>
           <ul>
-            <li>תחנות מוכרות: ווטרפרונט, סטדיום–צ’יינהטאון, מטְרוֹטַאון, סארי סנטרל, קינג ג'ורג'.</li>
+            <li>דוגמאות תחנות: Waterfront • Stadium–Chinatown • Metrotown • Surrey Central • King George</li>
+            <li>מה רואים מהחלון? גורדי שחקים, נהר, גשר SkyBridge, שכונות חדשות.</li>
+            <li>למי זה טוב? תלמידים, קונים בקניונים, ומטיילים בין ערים.</li>
           </ul>
         </div>
         <div class="card">
           <div class="line-tag mill">קו מילניום</div>
-          <p>הקו הצהוב/זהב. נוסע סביב צפון בורנאבי וקו קואיטלם – עם חיבור ל-VCC–Clark ול-Commercial–Broadway.</p>
+          <p>מסלול טבעת בצפון בֶּרנַאבי והלאה לקואיטלם. מתחבר ל-Commercial–Broadway ול-VCC–Clark.</p>
           <ul>
-            <li>תחנות מוכרות: ווסי-סי-סי קלארק, קומֶרשְל–ברודוויי, ברנטווד, לוּהיד, מוּדי סנטר, לאפָארג' לייק–דאגלס.</li>
+            <li>דוגמאות תחנות: VCC–Clark • Commercial–Broadway • Brentwood • Lougheed • Moody Centre • Lafarge Lake–Douglas</li>
+            <li>מה רואים מהחלון? קניונים חדשים, פארקים ולגונות, הרים רחוקים בימים בהירים.</li>
+            <li>למי זה טוב? סטודנטים, קונים, ומשפחות שמחפשות פארקים.</li>
           </ul>
         </div>
         <div class="card">
           <div class="line-tag can">קו קנדה</div>
-          <p>הקו התכלת. מחבר בין ונקובר, ריצ'מונד ו<strong>שדה התעופה YVR ✈️</strong>.</p>
+          <p>מחבר את דאונְטאון ונקובר לשדה התעופה <strong>YVR ✈️</strong> ולעיר ריצ’מונד.</p>
           <ul>
-            <li>תחנות מוכרות: ווטרפרונט, יילטאון–ראונדהאוס, אוקרידג'–41, ריצ'מונד–בריגהאוס, YVR–Airport.</li>
+            <li>דוגמאות תחנות: Waterfront • Yaletown–Roundhouse • Oakridge–41st • Richmond–Brighouse • YVR–Airport</li>
+            <li>מה רואים מהחלון? מטוסים ממריאים, מסילות נמוכות וגבוהות, שכונות בדרום ונקובר.</li>
+            <li>למי זה טוב? משפחות בדרך לטיסה, קניות ואוכל אסיאתי מצוין בריצ’מונד.</li>
           </ul>
         </div>
       </div>
-      <p class="small muted">הצבעים מבוססים על מפת המערכת הרשמית. שמות התחנות דוגמה לידידות לילדים.</p>
+      <p class="small muted">שמות התחנות והצבעים מבוססים על מפת המערכת הרשמית.</p>
     </section>
 
-    <!-- טיולים -->
+    <!-- טיולונים & חלונות -->
     <section id="trips" class="section">
       <div class="grid grid-2">
         <div class="card">
           <h2>טיולונים לפי קו</h2>
           <ul>
-            <li>🚀 <strong>אקספו:</strong> <em>Main Street–Science World</em> – מוזיאון מדע לכל המשפחה.</li>
-            <li>🛍️ <strong>אקספו:</strong> <em>Metrotown</em> – קניון ענקי וקולנוע.</li>
-            <li>🌳 <strong>מילניום:</strong> <em>Moody Centre</em> – קרוב ל-Rocky Point Park (טיילת וגלידה).</li>
-            <li>✈️ <strong>קנדה:</strong> <em>YVR–Airport</em> – לראות מטוסים ממריאים ונוחתים.</li>
+            <li>🚀 <strong>אקספו:</strong> Main Street–Science World – מוזיאון מדע עם ניסויים לכל המשפחה.</li>
+            <li>🛍️ <strong>אקספו:</strong> Metrotown – קניון ענקי, קולנוע וחנות ספרים גדולה.</li>
+            <li>🌳 <strong>מילניום:</strong> Moody Centre – טיילת Rocky Point Park וגלידה.</li>
+            <li>✈️ <strong>קנדה:</strong> YVR–Airport – נקודת תצפית למטוסים (בדקו איפה מותר לעמוד).</li>
           </ul>
-          <div class="small muted">בדקו שעות פתיחה/תחבורה משלימה מראש.</div>
+          <p class="small muted">בדקו שעות פתיחה ותחבורה משלימה לפני היציאה.</p>
         </div>
         <div class="card">
           <h2>מחפש-אוצרות 🗺️</h2>
@@ -161,9 +238,34 @@
             <label><input type="checkbox" data-key="bridge"> עברנו על גשר גבוה?</label>
             <label><input type="checkbox" data-key="tunnel"> נסענו במנהרה ארוכה?</label>
             <label><input type="checkbox" data-key="airport"> ראינו את תחנת ✈️ YVR–Airport?</label>
-            <label><input type="checkbox" data-key="map"> מצאנו את התחנה שלנו על מפה בתחנה?</label>
+            <label><input type="checkbox" data-key="map"> מצאנו את התחנה שלנו על המפה בתחנה?</label>
+            <label><input type="checkbox" data-key="elev"> עלינו במעלית תחנה?</label>
           </div>
-          <div class="small muted">הסימונים נשמרים במכשיר (localStorage) כדי לחזור אליהם אחר-כך.</div>
+          <p class="small muted">הסימונים נשמרים מקומית במכשיר (localStorage).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- מספרים ידידותיים -->
+    <section id="numbers" class="section">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>כמה גדול? בכיף של ילדים</h2>
+          <ul>
+            <li>מספר התחנות הכולל הוא <em>עשרות</em>. דמיינו חבילת <strong>קלפי תחנות</strong> לאיסוף!</li>
+            <li>ביום עבודה רגיל – <em>מאות אלפי</em> נסיעות. כמו למלא כמה אולמות ענק.</li>
+            <li>הרכבות מגיעות כל כמה דקות – לפעמים <strong>2–3</strong> דקות בשיא.</li>
+          </ul>
+          <p class="small muted">המספרים משתנים משנה לשנה; ר׳ “מקורות” לנתונים רשמיים מעודכנים.</p>
+        </div>
+        <div class="card">
+          <h2>כרטיסים וקצת חוקים</h2>
+          <ul>
+            <li>משתמשים בכרטיס חכם <strong>Compass</strong> או בכרטיס נטען חד-פעמי.</li>
+            <li>האזור שבו נוסעים משפיע על המחיר (Zones). ילדים נהנים מהנחות.</li>
+            <li>חשוב “לטפ-אאוט” ביציאה כדי שהמחיר יחושב נכון.</li>
+          </ul>
+          <p class="small muted">טבלאות מחירים מתעדכנות – בדקו בדפי TransLink בלשונית “מקורות”.</p>
         </div>
       </div>
     </section>
@@ -174,29 +276,34 @@
         <div class="card">
           <h2>עובדות מגניבות 🤩</h2>
           <ul>
-            <li>הרכבות <strong>אוטומטיות</strong> ונוסעות בלי נהג – המחשב שומר על המרחק והמהירות.</li>
-            <li>המערכת פועלת משנת <strong>1985</strong> והייתה בין הראשונות בעולם בלי נהג.</li>
-            <li>הקוים נעים בחשמל – זה עוזר לשמור על האוויר נקי.</li>
-            <li>יש <strong>עשרות תחנות</strong> במטרו ונקובר, ורבות מהן עם מעליות ונגישות.</li>
+            <li>אחת המערכות ה<strong>אוטומטיות</strong> הוותיקות בעולם (מאז 1985).</li>
+            <li>גשרים גבוהים, מנהרות, ותצפיות נהדרות – לכן קוראים לה SkyTrain.</li>
+            <li>הרכבות נקיות ושקטות יחסית כי הן חשמליות.</li>
+            <li>יש מרכז בקרה שמפקח על כל הרכבות 24/7.</li>
           </ul>
         </div>
         <div class="card">
-          <h2>טיפ לנסיעה חכמה</h2>
-          <p>כדאי לעמוד מאחורי הקו הצהוב על הרציף, לתת לאנשים לרדת קודם, ולהחזיק יד של מבוגר ליד המדרגות הנעות.</p>
+          <h2>שאלות חכמות לילדים</h2>
+          <ol>
+            <li>כמה תחנות עברנו עד שהגענו ליעד?</li>
+            <li>איזה קו נסע מהר יותר לדעתכם – אקספו או קנדה? למה?</li>
+            <li>מה רואים מחלון הרכבת באזור הנהר?</li>
+            <li>איך לדעתכם המחשב יודע מתי לעצור בדיוק בתחנה?</li>
+          </ol>
         </div>
       </div>
     </section>
 
-    <!-- העתיד -->
+    <!-- מה בונים עכשיו -->
     <section id="future" class="section">
       <div class="grid">
         <div class="card">
           <h2>מה בונים עכשיו? 🏗️</h2>
           <ul>
-            <li><strong>Broadway Subway</strong> – הארכה של קו מילניום מערבה מתחת לרחוב ברודוויי. יעד פתיחה שואף ל-<strong>2027</strong>.</li>
-            <li><strong>Surrey–Langley SkyTrain</strong> – הארכה של קו אקספו לאורך Fraser Hwy עד מרכז לאנגלי. היעד הנוכחי: <strong>סוף 2029</strong>.</li>
+            <li><strong>Broadway Subway</strong> – הארכה של קו מילניום מערבה מתחת לרחוב Broadway. יעד פתיחה נוכחי: <strong>2027</strong>.</li>
+            <li><strong>Surrey–Langley SkyTrain</strong> – הארכה של קו אקספו לאורך Fraser Hwy עד מרכז לאנגלי (16 ק״מ, 8 תחנות). יעד שירות: <strong>סוף 2029</strong>.</li>
           </ul>
-          <p class="small muted">היעדים עשויים להשתנות לפי התקדמות עבודות. פרטים מדויקים באתרי הפרויקטים.</p>
+          <p class="small muted">היעדים עשויים להתעדכן – בדקו עדכונים באתרי הפרויקטים.</p>
         </div>
       </div>
     </section>
@@ -204,38 +311,26 @@
     <!-- מקורות -->
     <section id="sources" class="section">
       <div class="card">
-        <h2>מקורות אמינים</h2>
-        <p>המידע באפליקציה נסמך על מקורות רשמיים ועדכניים:</p>
-        <ul class="small">
-          <li>🗺️ מפות רשמיות וקווי צבע – TransLink System Map (PDF) ו-Interactive Map.</li>
-          <li>🛫 קו קנדה לשדה התעופה – דפי TransLink/YVR.</li>
-          <li>🤖 “רכבת ללא נהג” ותחילת הפעלה ב-1985 – דפי TransLink/BCRTC וה-Buzzer Podcast.</li>
-          <li>🏗️ פרויקטי Broadway Subway (יעד 2027) ו-Surrey–Langley (יעד סוף 2029) – אתרי הממשלה/TransLink.</li>
+        <h2>מקורות אמינים (רשמיים/ראשיים)</h2>
+        <ul>
+          <li>🗺️ מפת רשת – <a href="https://www.translink.ca/-/media/translink/documents/schedules-and-maps/transit-system-maps/system-maps/skytrain_network_map.pdf" target="_blank" rel="noopener">TransLink – SkyTrain Network Map (PDF)</a></li>
+          <li>🗺️ מפה אינטראקטיבית – <a href="https://www.translink.ca/schedules-and-maps/interactive-system-map" target="_blank" rel="noopener">TransLink – Interactive System Map</a></li>
+          <li>🏢 היסטוריה, אוטומציה וביצועים – <a href="https://www.translink.ca/about-us/about-translink/operating-companies/british-columbia-rapid-transit-company" target="_blank" rel="noopener">BCRTC/TransLink – British Columbia Rapid Transit Company</a></li>
+          <li>💳 מחירים ואזורים – <a href="https://www.translink.ca/transit-fares/pricing-and-fare-zones" target="_blank" rel="noopener">TransLink – Pricing & Fare Zones</a></li>
+          <li>🏗️ Broadway Subway – <a href="https://www.broadwaysubway.ca/" target="_blank" rel="noopener">Province of BC – Project Website</a> | <a href="https://www.translink.ca/plans-and-projects/projects/rapid-transit-projects/broadway-subway-project" target="_blank" rel="noopener">TransLink – Project Page</a> | <a href="https://vancouver.ca/streets-transportation/broadway-subway-project.aspx" target="_blank" rel="noopener">City of Vancouver – Timeline</a></li>
+          <li>🏗️ Surrey–Langley SkyTrain – <a href="https://surreylangleyskytrain.gov.bc.ca/" target="_blank" rel="noopener">Official Project Site</a> (יעד “סוף 2029”) | <a href="https://www.ticorp.ca/surrey-langley-skytrain/" target="_blank" rel="noopener">TI Corp – Overview & Budget</a></li>
         </ul>
-        <details>
-          <summary>פתח קישורים</summary>
-          <ul class="small">
-            <li><a href="https://www.translink.ca/schedules-and-maps/interactive-system-map" target="_blank" rel="noopener">TransLink – Interactive System Map</a></li>
-            <li><a href="https://www.translink.ca/-/media/translink/documents/schedules-and-maps/transit-system-maps/system-maps/skytrain_network_map.pdf" target="_blank" rel="noopener">TransLink – SkyTrain Network Map (PDF)</a></li>
-            <li><a href="https://www.translink.ca/about-us/about-translink/operating-companies/british-columbia-rapid-transit-company" target="_blank" rel="noopener">TransLink/BCRTC – על המערכת האוטומטית (Driverless) והיסטוריה משנת 1985</a></li>
-            <li><a href="https://broadwaysubway.ca" target="_blank" rel="noopener">Broadway Subway Project – אתר רשמי</a></li>
-            <li><a href="https://www.translink.ca/plans-and-projects/projects/rapid-transit-projects/broadway-subway-project" target="_blank" rel="noopener">TransLink – Broadway Subway (תקציר ויעד 2027)</a></li>
-            <li><a href="https://surreylangleyskytrain.gov.bc.ca/project-overview/" target="_blank" rel="noopener">Province of BC – Surrey–Langley SkyTrain (Late 2029)</a></li>
-            <li><a href="https://www.translink.ca/schedules-and-maps/station/yvr-airport/schedule" target="_blank" rel="noopener">TransLink – YVR Airport Station</a></li>
-            <li><a href="https://www.yvr.ca/en/passengers/transportation/public-transportation" target="_blank" rel="noopener">YVR – Canada Line to the Airport</a></li>
-            <li><a href="https://buzzer.translink.ca/2023/11/translink-podcast-step-inside-the-skytrain-control-centre/" target="_blank" rel="noopener">TransLink Podcast – סקייטריין היא מערכת אוטומטית מאז 1985</a></li>
-          </ul>
-        </details>
+        <p class="small muted">המידע באפליקציה נכתב לילדים בגיל ~7, מבוסס על דפי TransLink/BC רשמיים (עודכן ל-אוגוסט 2025). לעומק היסטורי כללי אפשר לעיין גם בערכים בוויקיפדיה.</p>
       </div>
     </section>
 
-    <footer>© תוכן ידידותי לילדים. נא לבדוק שעות/מצב עבודות באתרי המקור לפני נסיעה.</footer>
+    <footer>© תוכן ידידותי לילדים. לפני יציאה לטיול – בדקו שעות, מחירים ושינויים באתרי המקור.</footer>
   </main>
 
   <button id="topBtn" aria-label="חזור לראש הדף" title="לראש">⬆️</button>
 
   <script>
-    // ניווט בין כרטיסיות
+    // ניווט בין לשוניות
     const tabs = document.querySelectorAll('.tab-btn');
     const sections = document.querySelectorAll('.section');
     tabs.forEach(btn=>{
@@ -248,26 +343,34 @@
       });
     });
 
-    // שמירת "מחפש-אוצרות"
+    // שמירת רשימת "מחפש-אוצרות"
     const huntBox = document.getElementById('hunt');
     if(huntBox){
       const boxes = huntBox.querySelectorAll('input[type="checkbox"][data-key]');
-      // טען מצב
       boxes.forEach(cb=>{
         const k = 'hunt_'+cb.dataset.key;
         cb.checked = localStorage.getItem(k)==='1';
-        cb.addEventListener('change', ()=>{
-          localStorage.setItem(k, cb.checked?'1':'0');
-        });
+        cb.addEventListener('change', ()=> localStorage.setItem(k, cb.checked?'1':'0'));
+      });
+    }
+
+    // טיימליין: קיפול/פריסה של פריטים ארוכים בעתיד (אם יתווספו)
+    const timeline = document.getElementById('timeline');
+    if(timeline){
+      timeline.addEventListener('click', (e)=>{
+        const li = e.target.closest('li');
+        if(li && li.dataset.long==="1"){
+          li.classList.toggle('open');
+        }
       });
     }
 
     // כפתור לראש הדף
     const topBtn = document.getElementById('topBtn');
-    topBtn.addEventListener('click', ()=> scrollTo({top:0, behavior:'smooth'}));
     addEventListener('scroll', ()=>{
-      topBtn.style.opacity = (scrollY>200)?'1':'0.0';
+      topBtn.style.opacity = (scrollY>200)?'1':'0';
     }, {passive:true});
+    topBtn.addEventListener('click', ()=> scrollTo({top:0, behavior:'smooth'}));
   </script>
 </body>
 </html>
