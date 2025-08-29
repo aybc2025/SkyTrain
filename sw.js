@@ -1,11 +1,11 @@
-const CACHE_NAME = 'skytrain-cache-v1';
+const CACHE_NAME = 'skytrain-cache-v2'; // שדרוג גרסה כדי לרענן קאש
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
   './sw.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon.svg',
+  './icons/icon-maskable.svg'
 ];
 
 self.addEventListener('install', (event) => {
