@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>מפת ונקובר לילדים - סקייטריין ואוטובוסים</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0060A9">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+    .card-hover:hover{transform:translateY(-4px); transition:all 0.3s ease;}
+    .train-animation{animation:train-move 3s ease-in-out infinite;}
+    @keyframes train-move{0%{transform:translateX(-10px)} 50%{transform:translateX(10px)} 100%{transform:translateX(-10px)}}
+    .expo-gradient{background:linear-gradient(135deg, #0060A9, #004c8a);}
+    .millennium-gradient{background:linear-gradient(135deg, #FED100, #e6bc00);}
+    .canada-gradient{background:linear-gradient(135deg, #009AC8, #007da3);}
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-cyan-50">
+
+  <!-- כותרת ראשית -->
+  <header class="bg-white shadow-lg">
+    <div class="max-w-4xl mx-auto px-4 py-6">
+      <div class="text-center">
+        <!-- סמל רכבת מונפש -->
+        <div class="text-6xl mb-4 train-animation">🚇</div>
+        
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+          מפת ונקובר לילדים
+        </h1>
+        <p class="text-xl text-gray-600 mb-4">
+          למד על הסקייטריין ותכנן מסלולים!
+        </p>
+        
+        <!-- פס צבעים של הקווים -->
+        <div class="flex justify-center items-center gap-2 mb-4">
+          <div class="w-6 h-6 rounded-full expo-gradient"></div>
+          <div class="w-6 h-6 rounded-full millennium-gradient"></div>
+          <div class="w-6 h-6 rounded-full canada-gradient"></div>
+          <span class="text-sm text-gray-500 mr-2">3 קווי רכבת + אוטובוסים</span>
+        </div>
+
+        <div class="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg max-w-md mx-auto">
+          <p class="text-sm text-yellow-800">
+            💡 <strong>טיפ:</strong> בחר את המפה כדי לראות את התחנות, או את מחשבון המסלולים כדי לתכנן נסיעה!
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- תפריט ראשי -->
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <div class="grid md:grid-cols-2 gap-8">
+      
+      <!-- כרטיס המפה -->
+      <div class="card-hover bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer" onclick="goToMap()">
+        <div class="expo-gradient p-6 text-white text-center">
+          <div class="text-5xl mb-4">🗺️</div>
+          <h2 class="text-2xl font-bold mb-2">המפה האינטראקטיבית</h2>
+          <p class="text-blue-100">ראה את כל התחנות והקווים</p>
+        </div>
+        
+        <div class="p-6">
+          <div class="space-y-3 mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 rounded-full expo-gradient"></div>
+              <span class="text-sm font-medium">קו אקספו - 20 תחנות</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 rounded-full millennium-gradient"></div>
+              <span class="text-sm font-medium">קו המילניום - 17 תחנות</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-4 h-4 rounded-full canada-gradient"></div>
+              <span class="text-sm font-medium">קו קנדה - 17 תחנות</span>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 rounded-lg p-4 text-center">
+            <p class="text-blue-800 font-medium">👆 לחץ על תחנה למידע נוסף</p>
+            <p class="text-blue-600 text-sm mt-1">זום, גלילה ואינטראקציה</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- כרטיס מחשבון המסלולים -->
+      <div class="card-hover bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer" onclick="goToCalculator()">
+        <div class="millennium-gradient p-6 text-gray-800 text-center">
+          <div class="text-5xl mb-4">🧭</div>
+          <h2 class="text-2xl font-bold mb-2">מחשבון מסלולים</h2>
+          <p class="text-yellow-800">תכנן את הנסיעה שלך</p>
+        </div>
+        
+        <div class="p-6">
+          <div class="space-y-4 mb-6">
+            <div class="bg-green-50 rounded-lg p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-green-600">🟢</span>
+                <span class="font-medium text-green-800">קל - רק סקייטריין</span>
+              </div>
+              <p class="text-sm text-green-600">נסיעה ישירה או עם חיבור אחד</p>
+            </div>
+            
+            <div class="bg-yellow-50 rounded-lg p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="text-yellow-600">🟡</span>
+                <span class="font-medium text-yellow-800">בינוני - עם אוטובוסים</span>
+              </div>
+              <p class="text-sm text-yellow-600">מכל מקום לכל מקום בונקובר</p>
+            </div>
+          </div>
+          
+          <div class="canada-gradient text-white rounded-lg p-4 text-center">
+            <p class="font-medium">🎯 בחר 2 תחנות ותקבל מסלול!</p>
+            <p class="text-cyan-100 text-sm mt-1">עם הוראות שלב אחר שלב</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- מידע נוסף -->
+    <div class="mt-12 bg-white rounded-2xl shadow-lg p-8">
+      <h3 class="text-2xl font-bold text-gray-800 text-center mb-6">
+        למה הסקייטריין נהדר?
+      </h3>
+      
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="text-4xl mb-3">🤖</div>
+          <h4 class="font-bold text-gray-800 mb-2">רכבת אוטומטית</h4>
+          <p class="text-gray-600 text-sm">בלי נהג - הרכבת נוסעת לבד!</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-4xl mb-3">♿</div>
+          <h4 class="font-bold text-gray-800 mb-2">נגיש לכולם</h4>
+          <p class="text-gray-600 text-sm">כל התחנות נגישות לכיסאות גלגלים</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="text-4xl mb-3">🌍</div>
+          <h4 class="font-bold text-gray-800 mb-2">ידידותי לסביבה</h4>
+          <p class="text-gray-600 text-sm">חשמל נקי + הרבה פחות זיהום</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- מידע טכני -->
+    <div class="mt-8 text-center text-gray-500 text-sm">
+      <div class="bg-gray-50 rounded-lg p-4">
+        <p class="mb-1">📱 <strong>אפליקציה לילדים</strong> • פועלת גם בלי אינטרנט</p>
+        <p>📊 נתונים מדויקים של TransLink • עודכן אוגוסט 2025</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function goToMap() {
+      window.location.href = './map.html';
+    }
+    
+    function goToCalculator() {
+      window.location.href = './calculator.html';
+    }
+
+    /* Service Worker registration */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
+    }
+
+    /* הוספת אפקטי אנימציה */
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.card-hover');
+      
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) scale(1.02)';
+          this.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+          this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
