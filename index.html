@@ -22,6 +22,9 @@
     /* תוויות */
     .station-label{ font-size:11px; fill:#111827; font-weight:600; }
     .label-bg{ fill:#fff; stroke:#e5e7eb; stroke-width:1; rx:3 }
+    /* תחנות חיבור */
+    .transfer-station{ cursor:pointer; }
+    .transfer-station:hover .station{ transform:scale(1.15); }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -294,7 +297,7 @@
     function closeStationInfo(){stationModal.classList.add('hidden'); stationModal.classList.remove('flex')}
     window.closeStationInfo=closeStationInfo;
 
-    /* ===== ציור ה-SVG ===== */
+    /* ===== ציור ה-SVG המתוקן ===== */
     const svg=document.getElementById('schemaSvg');
     const gPaths=document.getElementById('paths');
     const gStations=document.getElementById('stations');
@@ -336,60 +339,6 @@
       gPaths.appendChild(pth);
     }
 
-    function addStation(x,y,id,color,label,preferred='right'){
-      const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-      g.classList.add('taparea');
-
-      // עיגול תחנה
-      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',7.5);
-      c.setAttribute('fill','#fff'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',3);
-      c.classList.add('station');
-      g.appendChild(c);
-
-      // תווית טקסט עם רקע - גישה פשוטה יותר
-      const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      bg.setAttribute('class','label-bg');
-      
-      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tx.textContent = label;
-      tx.setAttribute('class','station-label');
-      tx.setAttribute('dominant-baseline','middle');
-      
-      // מיקום התווית לפי העדפה
-      const offset = 15;
-      if(preferred === 'right') {
-        tx.setAttribute('x', x + offset);
-        tx.setAttribute('text-anchor', 'start');
-      } else {
-        tx.setAttribute('x', x - offset);  
-        tx.setAttribute('text-anchor', 'end');
-      }
-      tx.setAttribute('y', y);
-      
-      g.appendChild(bg);
-      g.appendChild(tx);
-      
-      // הוספה ל-DOM כדי שנוכל לחשב את הגבולות
-      gStations.appendChild(g);
-      
-      // עכשיו נחשב את גבולות הטקסט ונעדכן את הרקע
-      setTimeout(() => {
-        try {
-          const bbox = tx.getBBox();
-          const padding = 2;
-          bg.setAttribute('x', bbox.x - padding);
-          bg.setAttribute('y', bbox.y - padding);
-          bg.setAttribute('width', bbox.width + padding * 2);
-          bg.setAttribute('height', bbox.height + padding * 2);
-        } catch(e) {
-          console.warn('Could not calculate text bounds for', label);
-        }
-      }, 0);
-
-      g.addEventListener('click',()=>handleStationClick(id));
-    }
-
     function link(a,b){
       const p=document.createElementNS('http://www.w3.org/2000/svg','path');
       p.setAttribute('d',`M ${a.x} ${a.y} L ${b.x} ${b.y}`);
@@ -405,9 +354,202 @@
       return id;
     }
 
-    // ציור הקווים והתחנות
+    // פונקציה חדשה: יצירת מערך תחנות ייחודיות
+    function createUniqueStationsMap() {
+      const uniqueStations = new Map();
+      
+      Object.entries(lines).forEach(([lineKey, lineData]) => {
+        lineData.stations.forEach(station => {
+          if (!uniqueStations.has(station.id)) {
+            uniqueStations.set(station.id, {
+              id: station.id,
+              nameHe: station.nameHe,
+              nameEn: station.nameEn,
+              lines: []
+            });
+          }
+          
+          const stationData = uniqueStations.get(station.id);
+          stationData.lines.push({
+            key: lineKey,
+            color: lineData.color,
+            name: lineData.nameHe
+          });
+        });
+      });
+      
+      return uniqueStations;
+    }
+
+    // פונקציה מעודכנת לציור תחנה עם תמיכה בכמה קווים
+    function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.classList.add('taparea');
+      
+      if (linesData.length > 1) {
+        g.classList.add('transfer-station');
+      }
+
+      // ציור התחנה לפי מספר הקווים
+      if (linesData.length > 1) {
+        // תחנת חיבור - עיגול חיצוני לבן עם עיגולים קטנים בצבעי הקווים
+        const outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outerCircle.setAttribute('cx', x);
+        outerCircle.setAttribute('cy', y);
+        outerCircle.setAttribute('r', 10);
+        outerCircle.setAttribute('fill', '#fff');
+        outerCircle.setAttribute('stroke', '#333');
+        outerCircle.setAttribute('stroke-width', 2);
+        outerCircle.classList.add('station');
+        g.appendChild(outerCircle);
+        
+        // עיגולים קטנים לכל קו
+        linesData.forEach((lineData, index) => {
+          const angle = (index * 2 * Math.PI) / linesData.length;
+          const cx = x + 4 * Math.cos(angle);
+          const cy = y + 4 * Math.sin(angle);
+          
+          const lineCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          lineCircle.setAttribute('cx', cx);
+          lineCircle.setAttribute('cy', cy);
+          lineCircle.setAttribute('r', 3);
+          lineCircle.setAttribute('fill', lineData.color);
+          g.appendChild(lineCircle);
+        });
+      } else {
+        // תחנה רגילה
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', x);
+        c.setAttribute('cy', y);
+        c.setAttribute('r', 7.5);
+        c.setAttribute('fill', '#fff');
+        c.setAttribute('stroke', linesData[0].color);
+        c.setAttribute('stroke-width', 3);
+        c.classList.add('station');
+        g.appendChild(c);
+      }
+
+      // תווית טקסט עם רקע
+      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bg.setAttribute('class', 'label-bg');
+      
+      const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tx.textContent = label;
+      tx.setAttribute('class', 'station-label');
+      tx.setAttribute('dominant-baseline', 'middle');
+      
+      // מיקום התווית
+      const offset = linesData.length > 1 ? 18 : 15;
+      if (preferred === 'center') {
+        tx.setAttribute('x', x);
+        tx.setAttribute('y', y - offset);
+        tx.setAttribute('text-anchor', 'middle');
+      } else if (preferred === 'right') {
+        tx.setAttribute('x', x + offset);
+        tx.setAttribute('y', y);
+        tx.setAttribute('text-anchor', 'start');
+      } else {
+        tx.setAttribute('x', x - offset);
+        tx.setAttribute('y', y);
+        tx.setAttribute('text-anchor', 'end');
+      }
+      
+      g.appendChild(bg);
+      g.appendChild(tx);
+      gStations.appendChild(g);
+      
+      // חישוב גבולות הטקסט לרקע
+      setTimeout(() => {
+        try {
+          const bbox = tx.getBBox();
+          const padding = 2;
+          bg.setAttribute('x', bbox.x - padding);
+          bg.setAttribute('y', bbox.y - padding);
+          bg.setAttribute('width', bbox.width + padding * 2);
+          bg.setAttribute('height', bbox.height + padding * 2);
+        } catch(e) {
+          console.warn('Could not calculate text bounds for', label);
+        }
+      }, 0);
+
+      g.addEventListener('click', () => handleStationClick(id));
+    }
+
+    // פונקציה חדשה: ציור תחנות ייחודיות
+    function drawUniqueStations() {
+      const uniqueStations = createUniqueStationsMap();
+      
+      // הגדרת מיקומים לכל תחנה
+      const stationPositions = {
+        // תחנות קו קנדה - ציר ראשי
+        ...canadaMain.reduce((acc, id) => {
+          acc[id] = { x: X.canadaMain, y: Y(row[id]), labelSide: 'left' };
+          return acc;
+        }, {}),
+        
+        // תחנות קו קנדה - נמל תעופה
+        ...canadaAir.reduce((acc, id) => {
+          acc[id] = { x: X.canadaAir, y: Y(row[id]), labelSide: 'left' };
+          return acc;
+        }, {}),
+        
+        // תחנות קו קנדה - ריצ'מונד
+        ...canadaRich.reduce((acc, id) => {
+          acc[id] = { x: X.canadaRich, y: Y(row[id]), labelSide: 'right' };
+          return acc;
+        }, {}),
+        
+        // תחנות אקספו - ציר ראשי
+        ...expoMain.reduce((acc, id) => {
+          acc[id] = { x: X.expoMain, y: Y(row[id]), labelSide: 'right' };
+          return acc;
+        }, {}),
+        
+        // תחנות אקספו - הסתעפות
+        ...['sapperton','braid','lougheed','production-way'].reduce((acc, id) => {
+          acc[id] = { x: X.expoBranch, y: Y(row[id]), labelSide: 'left' };
+          return acc;
+        }, {}),
+        
+        // תחנות מילניום
+        ...milli.reduce((acc, id) => {
+          acc[id] = { x: X.millennium, y: Y(row[id]), labelSide: 'right' };
+          return acc;
+        }, {})
+      };
+      
+      // מיקומים מיוחדים לתחנות חיבור
+      const specialPositions = {
+        'waterfront': { x: (X.canadaMain + X.expoMain) / 2, y: Y(row['waterfront']), labelSide: 'center' },
+        'commercial': { x: (X.expoMain + X.millennium) / 2, y: Y(row['commercial']), labelSide: 'center' },
+        'lougheed': { x: (X.expoBranch + X.millennium) / 2, y: Y(row['lougheed']), labelSide: 'center' },
+        'production-way': { x: (X.expoBranch + X.millennium) / 2, y: Y(row['production-way']), labelSide: 'center' }
+      };
+      
+      // ציור התחנות
+      uniqueStations.forEach((stationData, stationId) => {
+        const position = specialPositions[stationId] || stationPositions[stationId];
+        if (!position) return;
+        
+        let labelSide = position.labelSide;
+        if (stationData.lines.length > 1) {
+          labelSide = 'center';
+        }
+        
+        addStationUnique(
+          position.x, 
+          position.y, 
+          stationId, 
+          stationData.lines,
+          stationData.nameHe, 
+          labelSide
+        );
+      });
+    }
+
+    // פונקציית ציור מעודכנת
     function drawMap() {
-      // קווים
+      // ציור הקווים
       addPath(canadaMain.map(id=>({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
       addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id=>({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
       addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaRich.map(id=>({x:X.canadaRich,y:Y(row[id])})) ], lines.canada.color);
@@ -425,13 +567,8 @@
       link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaAir,y:Y(row['templeton'])});
       link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaRich,y:Y(row['aberdeen'])});
 
-      // תחנות + תוויות
-      canadaMain.forEach(id=>addStation(X.canadaMain,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
-      canadaAir.forEach(id=>addStation(X.canadaAir,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
-      canadaRich.forEach(id=>addStation(X.canadaRich,Y(row[id]),id,lines.canada.color,findLabel(id),'right'));
-      expoMain.forEach(id=>addStation(X.expoMain,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
-      ['sapperton','braid','lougheed','production-way'].forEach(id=>addStation(X.expoBranch,Y(row[id]),id,lines.expo.color,findLabel(id),'left'));
-      milli.forEach(id=>addStation(X.millennium,Y(row[id]),id,lines.millennium.color,findLabel(id),'right'));
+      // ציור תחנות ייחודיות
+      drawUniqueStations();
     }
 
     // אתחול האפליקציה
