@@ -10,6 +10,7 @@ const STATIC_CACHE_FILES = [
   './index.html',
   './map.html', 
   './calculator.html',
+  './knowledge.html',  // ← הוסף את הקובץ הזה
   './manifest.webmanifest',
   './icons/icon.svg',
   // Tailwind CSS מCDN
