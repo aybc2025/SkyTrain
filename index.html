@@ -49,7 +49,7 @@
         <img id="schemaImage"
              src="skytrain-map.png"
              alt="מפת קווי הסקייטריין"
-             class="block mx-auto w-full h-auto max-w-[900px] max-h-[520px] object-contain rounded-lg border border-gray-200" />
+             class="block mx-auto w-full h-auto max-w-[780px] max-h-[460px] object-contain rounded-lg border border-gray-200"
       </div>
     </section>
 
@@ -77,17 +77,22 @@
           <g id="stations"></g>
 
           <!-- מקרא תקין ומרווח -->
-          <g id="legend" transform="translate(540,24)" filter="url(#shadow)">
-            <rect width="250" height="110" rx="10" fill="#fff" stroke="#e5e7eb"/>
-            <g transform="translate(16,20)">
-              <circle r="6" cx="8"  cy="6"  fill="#0060A9"/>
-              <text x="24" y="10" font-size="13" fill="#111827">קו אקספו</text>
-              <circle r="6" cx="8"  cy="36" fill="#FED100"/>
-              <text x="24" y="40" font-size="13" fill="#111827">קו המילניום</text>
-              <circle r="6" cx="8"  cy="66" fill="#009AC8"/>
-              <text x="24" y="70" font-size="13" fill="#111827">קו קנדה</text>
-            </g>
-          </g>
+          <!-- מקרא -->
+<g id="legend" transform="translate(520,20)" filter="url(#shadow)">
+  <rect width="280" height="110" rx="12" fill="#fff" stroke="#e5e7eb"/>
+  <g transform="translate(20,20)">
+    <!-- שורה 1 -->
+    <text x="230" y="10" font-size="13" fill="#111827" text-anchor="end">קו אקספו</text>
+    <circle r="7" cx="240" cy="6" fill="#0060A9"/>
+    <!-- שורה 2 -->
+    <text x="230" y="40" font-size="13" fill="#111827" text-anchor="end">קו המילניום</text>
+    <circle r="7" cx="240" cy="36" fill="#FED100"/>
+    <!-- שורה 3 -->
+    <text x="230" y="70" font-size="13" fill="#111827" text-anchor="end">קו קנדה</text>
+    <circle r="7" cx="240" cy="66" fill="#009AC8"/>
+  </g>
+</g>
+
 
           <text x="20" y="30" font-size="12" fill="#6b7280">סכמה – לא בקנה מידה</text>
         </svg>
@@ -306,6 +311,16 @@
     const gPaths=document.getElementById('paths');
     const gStations=document.getElementById('stations');
 
+    // מאגר תיבות תפוסות (תוויות + עיגולים) למניעת חפיפות
+const taken = [];
+
+// פונקציות עזר
+function rect(x,y,w,h){ return {x, y, width:w, height:h}; }
+function overlap(a,b){
+  return !(a.x+a.width <= b.x || b.x+b.width <= a.x || a.y+a.height <= b.y || b.y+b.height <= a.y);
+}
+
+
     const X = { canadaMain:210, canadaAir:170, canadaRich:250, expoMain:410, expoBranch:520, millennium:630 };
     const yStart=100, yStep=56;
     const row = {};
@@ -345,59 +360,71 @@
     function pushBox(b){ placedBoxes.push(b); }
 
     function addStation(x,y,id,color,label,preferred='right'){
-      const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-      g.classList.add('taparea');
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.classList.add('taparea');
 
-      // נקודת תחנה
-      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',7.5);
-      c.setAttribute('fill','#fff'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',3);
-      c.classList.add('station');
-      g.appendChild(c);
+  // עיגול תחנה
+  const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',7.5);
+  c.setAttribute('fill','#fff'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',3);
+  c.classList.add('station');
+  g.appendChild(c);
 
-      // טקסט
-      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tx.textContent = label;
-      tx.setAttribute('class','station-label');
-      g.appendChild(tx);
+  // רושמים את העיגול כמכשול (עם שוליים קטנים)
+  taken.push(rect(x-12, y-12, 24, 24));
 
-      // פונקציית מיקום: צד + היסט אנכי עד שאין חפיפה
-      function place(side){
-        const offsetX = (side==='right') ? 12 : -12;
-        tx.setAttribute('text-anchor', side==='right' ? 'start' : 'end');
-        tx.setAttribute('x', x + offsetX);
-        tx.setAttribute('y', y + 4); // בסיס
-        let tries = 0;
-        let box;
-        do{
-          // מדידה
-          box = tx.getBBox();
-          // אם חופף — דוחפים מטה 12px
-          if (placedBoxes.some(b=>intersects(box,b))){
-            const cy = parseFloat(tx.getAttribute('y')) + 12;
-            tx.setAttribute('y', cy);
-            tries++;
-          } else break;
-        } while(tries < 8);
-        // רקע לבן מאחורי הטקסט
-        const pad=2;
-        box = tx.getBBox();
-        const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-        bg.setAttribute('x', box.x - pad);
-        bg.setAttribute('y', box.y - pad);
-        bg.setAttribute('width', box.width + pad*2);
-        bg.setAttribute('height', box.height + pad*2);
-        bg.setAttribute('class','label-bg');
-        g.insertBefore(bg, tx);
-        pushBox(bg.getBBox());
+  // טקסט
+  const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+  tx.textContent = label;
+  tx.setAttribute('class','station-label');
+  tx.setAttribute('direction','rtl');      // רמז ל-RTL
+  tx.setAttribute('unicode-bidi','plaintext');
+  g.appendChild(tx);
+
+  // רקע לתווית
+  const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  bg.setAttribute('class','label-bg');
+  g.insertBefore(bg, tx);
+
+  // מציב תווית ללא חפיפה: מנסה ימין/שמאל והיסטים למעלה/למטה
+  function place(){
+    const sides = preferred==='right' ? ['right','left'] : ['left','right'];
+    for (const side of sides){
+      tx.setAttribute('text-anchor', side==='right' ? 'start' : 'end');
+      const baseX = side==='right' ? x+12 : x-12;
+      let dyList = [0,12,-12,24,-24,36,-36,48,-48];  // למעלה/למטה
+      for (const dy of dyList){
+        tx.setAttribute('x', baseX);
+        tx.setAttribute('y', y + 4 + dy);
+        // לחשב תיבת הטקסט ולייצר רקע
+        let b = tx.getBBox();
+        const pad = 3;
+        const box = rect(b.x-pad, b.y-pad, b.width+pad*2, b.height+pad*2);
+
+        // אם אין חפיפה – מאשרים
+        if (!taken.some(t=>overlap(t, box))){
+          bg.setAttribute('x', box.x);
+          bg.setAttribute('y', box.y);
+          bg.setAttribute('width', box.width);
+          bg.setAttribute('height', box.height);
+          taken.push(box);
+          return true;
+        }
       }
-
-      // ניסיון עם הצד המועדף; אם חופף חזק – הפוך צד ונסה שוב
-      place(preferred);
-
-      g.addEventListener('click',()=>handleStationClick(id));
-      gStations.appendChild(g);
     }
+    // אם עדיין חופף – נקטין קצת פונט וננסה שוב פעם אחת
+    const fs = parseFloat(getComputedStyle(svg).getPropertyValue('--label-fs') || '11');
+    if (fs > 9){
+      tx.style.fontSize = (fs-1) + 'px';
+      return place();
+    }
+    return false;
+  }
+
+  place();
+  g.addEventListener('click',()=>handleStationClick(id));
+  gStations.appendChild(g);
+}
 
     function link(a,b){
       const p=document.createElementNS('http://www.w3.org/2000/svg','path');
