@@ -20,7 +20,7 @@
     @media (max-width: 640px){ .svg-wrap{min-width:700px} }
     #schemaSvg { touch-action: pan-x pinch-zoom; }
     /* תוויות */
-    .station-label{ font-size:11px; fill:#111827 }
+    .station-label{ font-size:11px; fill:#111827; font-weight:600; }
     .label-bg{ fill:#fff; stroke:#e5e7eb; stroke-width:1; rx:3 }
   </style>
 </head>
@@ -43,16 +43,6 @@
   </header>
 
   <main class="p-4">
-    <!-- תמונת המפה – מוקטן וממורכז -->
-    <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
-      <div class="w-full flex items-center justify-center">
-       <img id="schemaImage"
-     src="skytrain-map.png"
-     alt="מפת קווי הסקייטריין"
-     class="block mx-auto w-full h-auto max-w-[780px] max-h-[460px] object-contain rounded-lg border border-gray-200" />
-      </div>
-    </section>
-
     <!-- סכמה אינטראקטיבית -->
     <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6 mt-6">
       <div class="mb-4 text-center">
@@ -76,30 +66,28 @@
           <g id="paths"></g>
           <g id="stations"></g>
 
-          <!-- מקרא תקין ומרווח -->
           <!-- מקרא -->
-<g id="legend" transform="translate(520,20)" filter="url(#shadow)">
-  <rect width="280" height="110" rx="12" fill="#fff" stroke="#e5e7eb"/>
-  <g transform="translate(20,20)">
-    <!-- שורה 1 -->
-    <text x="230" y="10" font-size="13" fill="#111827" text-anchor="end">קו אקספו</text>
-    <circle r="7" cx="240" cy="6" fill="#0060A9"/>
-    <!-- שורה 2 -->
-    <text x="230" y="40" font-size="13" fill="#111827" text-anchor="end">קו המילניום</text>
-    <circle r="7" cx="240" cy="36" fill="#FED100"/>
-    <!-- שורה 3 -->
-    <text x="230" y="70" font-size="13" fill="#111827" text-anchor="end">קו קנדה</text>
-    <circle r="7" cx="240" cy="66" fill="#009AC8"/>
-  </g>
-</g>
-
+          <g id="legend" transform="translate(520,20)" filter="url(#shadow)">
+            <rect width="280" height="110" rx="12" fill="#fff" stroke="#e5e7eb"/>
+            <g transform="translate(20,20)">
+              <!-- שורה 1 -->
+              <text x="230" y="10" font-size="13" fill="#111827" text-anchor="end">קו אקספו</text>
+              <circle r="7" cx="240" cy="6" fill="#0060A9"/>
+              <!-- שורה 2 -->
+              <text x="230" y="40" font-size="13" fill="#111827" text-anchor="end">קו המילניום</text>
+              <circle r="7" cx="240" cy="36" fill="#FED100"/>
+              <!-- שורה 3 -->
+              <text x="230" y="70" font-size="13" fill="#111827" text-anchor="end">קו קנדה</text>
+              <circle r="7" cx="240" cy="66" fill="#009AC8"/>
+            </g>
+          </g>
 
           <text x="20" y="30" font-size="12" fill="#6b7280">סכמה – לא בקנה מידה</text>
         </svg>
       </div>
     </section>
 
-    <!-- 3) רשימות תחנות לפי קו -->
+    <!-- רשימות תחנות לפי קו -->
     <section class="px-0 pb-8 mt-6">
       <div class="max-w-6xl mx-auto space-y-6" id="linesContainer"></div>
     </section>
@@ -311,28 +299,24 @@
     const gPaths=document.getElementById('paths');
     const gStations=document.getElementById('stations');
 
-    // מאגר תיבות תפוסות (תוויות + עיגולים) למניעת חפיפות
-const taken = [];
-
-// פונקציות עזר
-function rect(x,y,w,h){ return {x, y, width:w, height:h}; }
-function overlap(a,b){
-  return !(a.x+a.width <= b.x || b.x+b.width <= a.x || a.y+a.height <= b.y || b.y+b.height <= a.y);
-}
-
-
     const X = { canadaMain:210, canadaAir:170, canadaRich:250, expoMain:410, expoBranch:520, millennium:630 };
     const yStart=100, yStep=56;
     const row = {};
+    
+    // הגדרת תחנות לפי שורות
     const expoMain = ['waterfront','burrard','granville','stadium','main-street','commercial','nanaimo','29th-ave','joyce','patterson','metrotown','royal-oak','edmonds','22nd-street','new-west','columbia','scott-road','gateway','surrey-central','king-george'];
     expoMain.forEach((id,i)=>row[id]=i);
     ['sapperton','braid','lougheed','production-way'].forEach((id,i)=>row[id]=row['columbia']+1+i);
+    
     const canadaMain = ['waterfront','vancouver-city-centre','yaletown','olympic-village','broadway-city-hall','king-edward','oakridge','langara','marine-drive','bridgeport'];
     canadaMain.forEach((id,i)=>row[id]=Math.min(row[id]??Infinity, i));
+    
     const canadaAir = ['templeton','sea-island-centre','yvr-airport'];
     canadaAir.forEach((id,i)=>row[id]=row['bridgeport']+1+i);
+    
     const canadaRich = ['aberdeen','lansdowne','richmond-brighouse'];
     canadaRich.forEach((id,i)=>row[id]=row['bridgeport']+1+i);
+    
     const milli = ['vcc-clark','commercial','renfrew','rupert','gilmore','brentwood','holdom','sperling','lake-city-way','production-way','lougheed','burquitlam','moody-centre','inlet-centre','coquitlam-central','lincoln','lafarge-lake'];
     const mStart = row['commercial'] - 1;
     milli.forEach((id,i)=>row[id]=row[id]??(mStart+i));
@@ -353,71 +337,58 @@ function overlap(a,b){
     }
 
     function addStation(x,y,id,color,label,preferred='right'){
-  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-  g.classList.add('taparea');
+      const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.classList.add('taparea');
 
-  // עיגול תחנה
-  const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-  c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',7.5);
-  c.setAttribute('fill','#fff'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',3);
-  c.classList.add('station');
-  g.appendChild(c);
+      // עיגול תחנה
+      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',7.5);
+      c.setAttribute('fill','#fff'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',3);
+      c.classList.add('station');
+      g.appendChild(c);
 
-  // רושמים את העיגול כמכשול (עם שוליים קטנים)
-  taken.push(rect(x-12, y-12, 24, 24));
-
-  // טקסט
-  const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-  tx.textContent = label;
-  tx.setAttribute('class','station-label');
-  tx.setAttribute('direction','rtl');      // רמז ל-RTL
-  tx.setAttribute('unicode-bidi','plaintext');
-  g.appendChild(tx);
-
-  // רקע לתווית
-  const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
-  bg.setAttribute('class','label-bg');
-  g.insertBefore(bg, tx);
-
-  // מציב תווית ללא חפיפה: מנסה ימין/שמאל והיסטים למעלה/למטה
-  function place(){
-    const sides = preferred==='right' ? ['right','left'] : ['left','right'];
-    for (const side of sides){
-      tx.setAttribute('text-anchor', side==='right' ? 'start' : 'end');
-      const baseX = side==='right' ? x+12 : x-12;
-     let dyList = [0,12,-12,24,-24,36,-36,48,-48,60,-60,72,-72];  // למעלה/למטה
-      for (const dy of dyList){
-        tx.setAttribute('x', baseX);
-        tx.setAttribute('y', y + 4 + dy);
-        // לחשב תיבת הטקסט ולייצר רקע
-        let b = tx.getBBox();
-        const pad = 3;
-        const box = rect(b.x-pad, b.y-pad, b.width+pad*2, b.height+pad*2);
-
-        // אם אין חפיפה – מאשרים
-        if (!taken.some(t=>overlap(t, box))){
-          bg.setAttribute('x', box.x);
-          bg.setAttribute('y', box.y);
-          bg.setAttribute('width', box.width);
-          bg.setAttribute('height', box.height);
-          taken.push(box);
-          return true;
-        }
+      // תווית טקסט עם רקע - גישה פשוטה יותר
+      const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+      bg.setAttribute('class','label-bg');
+      
+      const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+      tx.textContent = label;
+      tx.setAttribute('class','station-label');
+      tx.setAttribute('dominant-baseline','middle');
+      
+      // מיקום התווית לפי העדפה
+      const offset = 15;
+      if(preferred === 'right') {
+        tx.setAttribute('x', x + offset);
+        tx.setAttribute('text-anchor', 'start');
+      } else {
+        tx.setAttribute('x', x - offset);  
+        tx.setAttribute('text-anchor', 'end');
       }
-    }
-    // אם עדיין חופף – נקטין קצת פונט וננסה שוב פעם אחת
-    const fs = parseFloat(getComputedStyle(svg).getPropertyValue('--label-fs') || '11');
-    if (fs > 9){
-      tx.style.fontSize = (fs-1) + 'px';
-      return place();
-    }
-    return false;
-  }
+      tx.setAttribute('y', y);
+      
+      g.appendChild(bg);
+      g.appendChild(tx);
+      
+      // הוספה ל-DOM כדי שנוכל לחשב את הגבולות
+      gStations.appendChild(g);
+      
+      // עכשיו נחשב את גבולות הטקסט ונעדכן את הרקע
+      setTimeout(() => {
+        try {
+          const bbox = tx.getBBox();
+          const padding = 2;
+          bg.setAttribute('x', bbox.x - padding);
+          bg.setAttribute('y', bbox.y - padding);
+          bg.setAttribute('width', bbox.width + padding * 2);
+          bg.setAttribute('height', bbox.height + padding * 2);
+        } catch(e) {
+          console.warn('Could not calculate text bounds for', label);
+        }
+      }, 0);
 
-  place();
-  g.addEventListener('click',()=>handleStationClick(id));
-  gStations.appendChild(g);
-}
+      g.addEventListener('click',()=>handleStationClick(id));
+    }
 
     function link(a,b){
       const p=document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -425,24 +396,6 @@ function overlap(a,b){
       p.setAttribute('stroke','#111827'); p.setAttribute('stroke-width','2'); p.setAttribute('stroke-dasharray','4 4'); p.setAttribute('opacity','0.35');
       gPaths.appendChild(p);
     }
-
-    /* קווים */
-    addPath(canadaMain.map(id=>({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
-    addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id=>({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
-    addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaRich.map(id=>({x:X.canadaRich,y:Y(row[id])})) ], lines.canada.color);
-
-    addPath(expoMain.map(id=>({x:X.expoMain,y:Y(row[id])})), lines.expo.color);
-    addPath([ {x:X.expoMain,y:Y(row['columbia'])}, ...['sapperton','braid','lougheed','production-way'].map(id=>({x:X.expoBranch,y:Y(row[id])})) ], lines.expo.color);
-
-    addPath(milli.map(id=>({x:X.millennium,y:Y(row[id])})), lines.millennium.color);
-
-    /* חיבורים */
-    link({x:X.canadaMain,y:Y(row['waterfront'])},{x:X.expoMain,y:Y(row['waterfront'])});
-    link({x:X.expoMain,y:Y(row['commercial'])},{x:X.millennium,y:Y(row['commercial'])});
-    link({x:X.expoBranch,y:Y(row['lougheed'])},{x:X.millennium,y:Y(row['lougheed'])});
-    link({x:X.expoBranch,y:Y(row['production-way'])},{x:X.millennium,y:Y(row['production-way'])});
-    link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaAir,y:Y(row['templeton'])});
-    link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaRich,y:Y(row['aberdeen'])});
 
     function findLabel(id){
       for(const l of Object.values(lines)){
@@ -452,15 +405,40 @@ function overlap(a,b){
       return id;
     }
 
-    /* תחנות + תוויות (צד מועדף לפי עמודה) */
-    canadaMain.forEach(id=>addStation(X.canadaMain,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
-    canadaAir.forEach(id=>addStation(X.canadaAir,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
-    canadaRich.forEach(id=>addStation(X.canadaRich,Y(row[id]),id,lines.canada.color,findLabel(id),'right'));
-    expoMain.forEach(id=>addStation(X.expoMain,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
-    ['sapperton','braid','lougheed','production-way'].forEach(id=>addStation(X.expoBranch,Y(row[id]),id,lines.expo.color,findLabel(id),'left'));
-    milli.forEach(id=>addStation(X.millennium,Y(row[id]),id,lines.millennium.color,findLabel(id),'right'));
+    // ציור הקווים והתחנות
+    function drawMap() {
+      // קווים
+      addPath(canadaMain.map(id=>({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
+      addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id=>({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
+      addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaRich.map(id=>({x:X.canadaRich,y:Y(row[id])})) ], lines.canada.color);
 
-    renderLines();
+      addPath(expoMain.map(id=>({x:X.expoMain,y:Y(row[id])})), lines.expo.color);
+      addPath([ {x:X.expoMain,y:Y(row['columbia'])}, ...['sapperton','braid','lougheed','production-way'].map(id=>({x:X.expoBranch,y:Y(row[id])})) ], lines.expo.color);
+
+      addPath(milli.map(id=>({x:X.millennium,y:Y(row[id])})), lines.millennium.color);
+
+      // חיבורים
+      link({x:X.canadaMain,y:Y(row['waterfront'])},{x:X.expoMain,y:Y(row['waterfront'])});
+      link({x:X.expoMain,y:Y(row['commercial'])},{x:X.millennium,y:Y(row['commercial'])});
+      link({x:X.expoBranch,y:Y(row['lougheed'])},{x:X.millennium,y:Y(row['lougheed'])});
+      link({x:X.expoBranch,y:Y(row['production-way'])},{x:X.millennium,y:Y(row['production-way'])});
+      link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaAir,y:Y(row['templeton'])});
+      link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaRich,y:Y(row['aberdeen'])});
+
+      // תחנות + תוויות
+      canadaMain.forEach(id=>addStation(X.canadaMain,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
+      canadaAir.forEach(id=>addStation(X.canadaAir,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
+      canadaRich.forEach(id=>addStation(X.canadaRich,Y(row[id]),id,lines.canada.color,findLabel(id),'right'));
+      expoMain.forEach(id=>addStation(X.expoMain,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
+      ['sapperton','braid','lougheed','production-way'].forEach(id=>addStation(X.expoBranch,Y(row[id]),id,lines.expo.color,findLabel(id),'left'));
+      milli.forEach(id=>addStation(X.millennium,Y(row[id]),id,lines.millennium.color,findLabel(id),'right'));
+    }
+
+    // אתחול האפליקציה
+    window.addEventListener('load', () => {
+      drawMap();
+      renderLines();
+    });
   </script>
 </body>
 </html>
