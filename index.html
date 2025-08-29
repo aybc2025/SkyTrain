@@ -14,14 +14,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
-    .label{background:#fff;padding:.1rem .3rem;border-radius:.25rem}
-    .station:hover{transform:scale(1.15)}
+    .station:hover{transform:scale(1.12)}
     .taparea{cursor:pointer}
     .svg-wrap{min-width:850px}
-    @media (max-width: 640px){
-      .svg-wrap{min-width:700px}
-    }
+    @media (max-width: 640px){ .svg-wrap{min-width:700px} }
     #schemaSvg { touch-action: pan-x pinch-zoom; }
+    /* תוויות */
+    .station-label{ font-size:11px; fill:#111827 }
+    .label-bg{ fill:#fff; stroke:#e5e7eb; stroke-width:1; rx:3 }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -43,17 +43,17 @@
   </header>
 
   <main class="p-4">
-  <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
-    <div class="relative w-full bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center aspect-[3/4] md:aspect-[2/3]">
-      <!-- תמונת המפה -->
-      <img id="schemaImage"
-           src="skytrain-map.png"
-           alt="מפת קווי הסקייטריין"
-           class="max-h-full max-w-full object-contain" />
-    </div>
-  </section>
+    <!-- תמונת המפה – מוקטן וממורכז -->
+    <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
+      <div class="w-full flex items-center justify-center">
+        <img id="schemaImage"
+             src="skytrain-map.png"
+             alt="מפת קווי הסקייטריין"
+             class="block mx-auto w-full h-auto max-w-[900px] max-h-[520px] object-contain rounded-lg border border-gray-200" />
+      </div>
+    </section>
 
-    <!-- 2) סכמה אינטראקטיבית ב-SVG -->
+    <!-- סכמה אינטראקטיבית -->
     <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6 mt-6">
       <div class="mb-4 text-center">
         <h2 class="text-xl font-bold text-gray-800 mb-2">סכמה אינטראקטיבית של קווי הסקייטריין</h2>
@@ -76,14 +76,19 @@
           <g id="paths"></g>
           <g id="stations"></g>
 
-          <g transform="translate(580,30)" filter="url(#shadow)">
-            <rect width="220" height="90" rx="10" fill="#fff" stroke="#e5e7eb"/>
-            <g transform="translate(12,14)">
-              <circle r="6" cx="8" cy="8" fill="#0060A9"/><text x="24" y="12" font-size="12" fill="#111827">קו אקספו</text>
-              <circle r="6" cx="8" cy="34" fill="#FED100"/><text x="24" y="38" font-size="12" fill="#111827">קו המילניום</text>
-              <circle r="6" cx="8" cy="60" fill="#009AC8"/><text x="24" y="64" font-size="12" fill="#111827">קו קנדה</text>
+          <!-- מקרא תקין ומרווח -->
+          <g id="legend" transform="translate(540,24)" filter="url(#shadow)">
+            <rect width="250" height="110" rx="10" fill="#fff" stroke="#e5e7eb"/>
+            <g transform="translate(16,20)">
+              <circle r="6" cx="8"  cy="6"  fill="#0060A9"/>
+              <text x="24" y="10" font-size="13" fill="#111827">קו אקספו</text>
+              <circle r="6" cx="8"  cy="36" fill="#FED100"/>
+              <text x="24" y="40" font-size="13" fill="#111827">קו המילניום</text>
+              <circle r="6" cx="8"  cy="66" fill="#009AC8"/>
+              <text x="24" y="70" font-size="13" fill="#111827">קו קנדה</text>
             </g>
           </g>
+
           <text x="20" y="30" font-size="12" fill="#6b7280">סכמה – לא בקנה מידה</text>
         </svg>
       </div>
@@ -216,7 +221,7 @@
 
     const transferTypeMap={expo:'קו אקספו',millennium:'קו המילניום',canada:'קו קנדה',seabus:'SeaBus',westcoast:'West Coast Express'};
 
-    /* Lists */
+    /* ===== רשימות ===== */
     const linesContainer=document.getElementById('linesContainer');
     function renderLines(){
       linesContainer.innerHTML='';
@@ -253,7 +258,7 @@
       });
     }
 
-    /* Station modal */
+    /* ===== מודל תחנה ===== */
     function getStationInfo(stationId){
       for(const [_,lineData] of Object.entries(lines)){
         const station=lineData.stations.find(s=>s.id===stationId);
@@ -296,7 +301,7 @@
     function closeStationInfo(){stationModal.classList.add('hidden'); stationModal.classList.remove('flex')}
     window.closeStationInfo=closeStationInfo;
 
-    /* SVG schema drawing */
+    /* ===== ציור ה-SVG ===== */
     const svg=document.getElementById('schemaSvg');
     const gPaths=document.getElementById('paths');
     const gStations=document.getElementById('stations');
@@ -318,6 +323,7 @@
     milli.forEach((id,i)=>row[id]=row[id]??(mStart+i));
 
     const Y = r => yStart + r*yStep;
+
     function addPath(points,color){
       if(points.length<2) return;
       const d = points.map((p,i)=> (i?'L':'M')+p.x+' '+p.y ).join(' ');
@@ -330,25 +336,69 @@
       pth.setAttribute('stroke-linejoin','round');
       gPaths.appendChild(pth);
     }
-    function addStation(x,y,id,color,label,align='right'){
+
+    // מנגנון למניעת חפיפות תוויות
+    const placedBoxes = [];
+    function intersects(a,b){
+      return !(a.x+a.width < b.x || b.x+b.width < a.x || a.y+a.height < b.y || b.y+b.height < a.y);
+    }
+    function pushBox(b){ placedBoxes.push(b); }
+
+    function addStation(x,y,id,color,label,preferred='right'){
       const g=document.createElementNS('http://www.w3.org/2000/svg','g');
       g.classList.add('taparea');
+
+      // נקודת תחנה
       const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
       c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',7.5);
       c.setAttribute('fill','#fff'); c.setAttribute('stroke',color); c.setAttribute('stroke-width',3);
       c.classList.add('station');
       g.appendChild(c);
+
+      // טקסט
       const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-      tx.setAttribute('x', align==='right' ? x+12 : x-12);
-      tx.setAttribute('y', y+4);
-      tx.setAttribute('font-size','12');
-      tx.setAttribute('text-anchor', align==='right' ? 'start':'end');
-      tx.setAttribute('fill','#111827');
-      tx.innerHTML = `<tspan class="label">${label}</tspan>`;
+      tx.textContent = label;
+      tx.setAttribute('class','station-label');
       g.appendChild(tx);
+
+      // פונקציית מיקום: צד + היסט אנכי עד שאין חפיפה
+      function place(side){
+        const offsetX = (side==='right') ? 12 : -12;
+        tx.setAttribute('text-anchor', side==='right' ? 'start' : 'end');
+        tx.setAttribute('x', x + offsetX);
+        tx.setAttribute('y', y + 4); // בסיס
+        let tries = 0;
+        let box;
+        do{
+          // מדידה
+          box = tx.getBBox();
+          // אם חופף — דוחפים מטה 12px
+          if (placedBoxes.some(b=>intersects(box,b))){
+            const cy = parseFloat(tx.getAttribute('y')) + 12;
+            tx.setAttribute('y', cy);
+            tries++;
+          } else break;
+        } while(tries < 8);
+        // רקע לבן מאחורי הטקסט
+        const pad=2;
+        box = tx.getBBox();
+        const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+        bg.setAttribute('x', box.x - pad);
+        bg.setAttribute('y', box.y - pad);
+        bg.setAttribute('width', box.width + pad*2);
+        bg.setAttribute('height', box.height + pad*2);
+        bg.setAttribute('class','label-bg');
+        g.insertBefore(bg, tx);
+        pushBox(bg.getBBox());
+      }
+
+      // ניסיון עם הצד המועדף; אם חופף חזק – הפוך צד ונסה שוב
+      place(preferred);
+
       g.addEventListener('click',()=>handleStationClick(id));
       gStations.appendChild(g);
     }
+
     function link(a,b){
       const p=document.createElementNS('http://www.w3.org/2000/svg','path');
       p.setAttribute('d',`M ${a.x} ${a.y} L ${b.x} ${b.y}`);
@@ -356,6 +406,7 @@
       gPaths.appendChild(p);
     }
 
+    /* קווים */
     addPath(canadaMain.map(id=>({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
     addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id=>({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
     addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaRich.map(id=>({x:X.canadaRich,y:Y(row[id])})) ], lines.canada.color);
@@ -365,6 +416,7 @@
 
     addPath(milli.map(id=>({x:X.millennium,y:Y(row[id])})), lines.millennium.color);
 
+    /* חיבורים */
     link({x:X.canadaMain,y:Y(row['waterfront'])},{x:X.expoMain,y:Y(row['waterfront'])});
     link({x:X.expoMain,y:Y(row['commercial'])},{x:X.millennium,y:Y(row['commercial'])});
     link({x:X.expoBranch,y:Y(row['lougheed'])},{x:X.millennium,y:Y(row['lougheed'])});
@@ -380,6 +432,7 @@
       return id;
     }
 
+    /* תחנות + תוויות (צד מועדף לפי עמודה) */
     canadaMain.forEach(id=>addStation(X.canadaMain,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
     canadaAir.forEach(id=>addStation(X.canadaAir,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
     canadaRich.forEach(id=>addStation(X.canadaRich,Y(row[id]),id,lines.canada.color,findLabel(id),'right'));
