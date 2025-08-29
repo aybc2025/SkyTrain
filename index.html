@@ -43,6 +43,16 @@
   </header>
 
   <main class="p-4">
+    <!-- תמונת המפה – מוקטן וממורכז -->
+    <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6">
+      <div class="w-full flex items-center justify-center">
+       <img id="schemaImage"
+     src="skytrain-map.png"
+     alt="מפת קווי הסקייטריין"
+     class="block mx-auto w-full h-auto max-w-[780px] max-h-[460px] object-contain rounded-lg border border-gray-200" />
+      </div>
+    </section>
+
     <!-- סכמה אינטראקטיבית -->
     <section class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-6 mt-6">
       <div class="mb-4 text-center">
@@ -67,18 +77,19 @@
           <g id="stations"></g>
 
           <!-- מקרא -->
-          <g id="legend" transform="translate(520,20)" filter="url(#shadow)">
-            <rect width="280" height="110" rx="12" fill="#fff" stroke="#e5e7eb"/>
-            <g transform="translate(20,20)">
+          <g id="legend" transform="translate(500,30)" filter="url(#shadow)">
+            <rect width="300" height="130" rx="12" fill="#fff" stroke="#e5e7eb" stroke-width="2"/>
+            <g transform="translate(15,20)">
+              <text x="140" y="15" font-size="16" font-weight="bold" fill="#111827" text-anchor="middle">מקרא</text>
               <!-- שורה 1 -->
-              <text x="230" y="10" font-size="13" fill="#111827" text-anchor="end">קו אקספו</text>
-              <circle r="7" cx="240" cy="6" fill="#0060A9"/>
+              <circle r="8" cx="20" cy="40" fill="#0060A9"/>
+              <text x="40" y="45" font-size="14" fill="#111827" text-anchor="start">קו אקספו</text>
               <!-- שורה 2 -->
-              <text x="230" y="40" font-size="13" fill="#111827" text-anchor="end">קו המילניום</text>
-              <circle r="7" cx="240" cy="36" fill="#FED100"/>
+              <circle r="8" cx="20" cy="65" fill="#FED100"/>
+              <text x="40" y="70" font-size="14" fill="#111827" text-anchor="start">קו המילניום</text>
               <!-- שורה 3 -->
-              <text x="230" y="70" font-size="13" fill="#111827" text-anchor="end">קו קנדה</text>
-              <circle r="7" cx="240" cy="66" fill="#009AC8"/>
+              <circle r="8" cx="20" cy="90" fill="#009AC8"/>
+              <text x="40" y="95" font-size="14" fill="#111827" text-anchor="start">קו קנדה</text>
             </g>
           </g>
 
@@ -336,6 +347,20 @@
       gPaths.appendChild(pth);
     }
 
+    // מאגר מיקומי תוויות תפוסות
+    const occupiedPositions = [];
+
+    function isPositionOccupied(x, y, width, height) {
+      return occupiedPositions.some(pos => 
+        !(x + width < pos.x || pos.x + pos.width < x || 
+          y + height < pos.y || pos.y + pos.height < y)
+      );
+    }
+
+    function addOccupiedPosition(x, y, width, height) {
+      occupiedPositions.push({ x, y, width, height });
+    }
+
     function addStation(x,y,id,color,label,preferred='right'){
       const g=document.createElementNS('http://www.w3.org/2000/svg','g');
       g.classList.add('taparea');
@@ -347,7 +372,7 @@
       c.classList.add('station');
       g.appendChild(c);
 
-      // תווית טקסט עם רקע - גישה פשוטה יותר
+      // תווית טקסט עם רקע
       const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
       bg.setAttribute('class','label-bg');
       
@@ -356,34 +381,68 @@
       tx.setAttribute('class','station-label');
       tx.setAttribute('dominant-baseline','middle');
       
-      // מיקום התווית לפי העדפה
-      const offset = 15;
-      if(preferred === 'right') {
-        tx.setAttribute('x', x + offset);
-        tx.setAttribute('text-anchor', 'start');
-      } else {
-        tx.setAttribute('x', x - offset);  
-        tx.setAttribute('text-anchor', 'end');
-      }
-      tx.setAttribute('y', y);
-      
       g.appendChild(bg);
       g.appendChild(tx);
-      
-      // הוספה ל-DOM כדי שנוכל לחשב את הגבולות
       gStations.appendChild(g);
       
-      // עכשיו נחשב את גבולות הטקסט ונעדכן את הרקע
+      // מיקום התווית עם בדיקת חפיפות
       setTimeout(() => {
         try {
-          const bbox = tx.getBBox();
-          const padding = 2;
-          bg.setAttribute('x', bbox.x - padding);
-          bg.setAttribute('y', bbox.y - padding);
-          bg.setAttribute('width', bbox.width + padding * 2);
-          bg.setAttribute('height', bbox.height + padding * 2);
+          const labelWidth = label.length * 7; // הערכה גסה לרוחב התווית
+          const labelHeight = 20;
+          
+          // מיקומים אפשריים (בסדר עדיפות)
+          const positions = preferred === 'right' 
+            ? [
+                { x: x + 15, y: y - 10, anchor: 'start' }, // ימין
+                { x: x - 15, y: y - 10, anchor: 'end' },   // שמאל
+                { x: x + 15, y: y + 15, anchor: 'start' }, // ימין למטה
+                { x: x - 15, y: y + 15, anchor: 'end' },   // שמאל למטה
+                { x: x + 15, y: y - 25, anchor: 'start' }, // ימין למעלה
+                { x: x - 15, y: y - 25, anchor: 'end' }    // שמאל למעלה
+              ]
+            : [
+                { x: x - 15, y: y - 10, anchor: 'end' },   // שמאל
+                { x: x + 15, y: y - 10, anchor: 'start' }, // ימין
+                { x: x - 15, y: y + 15, anchor: 'end' },   // שמאל למטה
+                { x: x + 15, y: y + 15, anchor: 'start' }, // ימין למטה
+                { x: x - 15, y: y - 25, anchor: 'end' },   // שמאל למעלה
+                { x: x + 15, y: y - 25, anchor: 'start' }  // ימין למעלה
+              ];
+
+          let bestPosition = positions[0];
+          for (const pos of positions) {
+            const testX = pos.anchor === 'end' ? pos.x - labelWidth : pos.x;
+            if (!isPositionOccupied(testX, pos.y - labelHeight/2, labelWidth, labelHeight)) {
+              bestPosition = pos;
+              break;
+            }
+          }
+
+          tx.setAttribute('x', bestPosition.x);
+          tx.setAttribute('y', bestPosition.y);
+          tx.setAttribute('text-anchor', bestPosition.anchor);
+          
+          // חישוב מיקום רקע
+          const finalX = bestPosition.anchor === 'end' ? bestPosition.x - labelWidth : bestPosition.x;
+          const padding = 3;
+          
+          bg.setAttribute('x', finalX - padding);
+          bg.setAttribute('y', bestPosition.y - labelHeight/2 - padding);
+          bg.setAttribute('width', labelWidth + padding * 2);
+          bg.setAttribute('height', labelHeight + padding * 2);
+          
+          // רישום המיקום כתפוס
+          addOccupiedPosition(finalX - padding * 2, bestPosition.y - labelHeight/2 - padding * 2, 
+                            labelWidth + padding * 4, labelHeight + padding * 4);
+          
         } catch(e) {
-          console.warn('Could not calculate text bounds for', label);
+          console.warn('Could not position label for', label, e);
+          // מיקום ברירת מחדל במקרה של שגיאה
+          const defaultX = preferred === 'right' ? x + 15 : x - 15;
+          tx.setAttribute('x', defaultX);
+          tx.setAttribute('y', y);
+          tx.setAttribute('text-anchor', preferred === 'right' ? 'start' : 'end');
         }
       }, 0);
 
@@ -407,6 +466,9 @@
 
     // ציור הקווים והתחנות
     function drawMap() {
+      // איפוס מיקומי תוויות תפוסות
+      occupiedPositions.length = 0;
+      
       // קווים
       addPath(canadaMain.map(id=>({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
       addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id=>({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
@@ -425,13 +487,13 @@
       link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaAir,y:Y(row['templeton'])});
       link({x:X.canadaMain,y:Y(row['bridgeport'])},{x:X.canadaRich,y:Y(row['aberdeen'])});
 
-      // תחנות + תוויות
+      // תחנות + תוויות (בסדר מסוים למניעת חפיפות)
       canadaMain.forEach(id=>addStation(X.canadaMain,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
+      expoMain.forEach(id=>addStation(X.expoMain,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
+      milli.forEach(id=>addStation(X.millennium,Y(row[id]),id,lines.millennium.color,findLabel(id),'right'));
       canadaAir.forEach(id=>addStation(X.canadaAir,Y(row[id]),id,lines.canada.color,findLabel(id),'left'));
       canadaRich.forEach(id=>addStation(X.canadaRich,Y(row[id]),id,lines.canada.color,findLabel(id),'right'));
-      expoMain.forEach(id=>addStation(X.expoMain,Y(row[id]),id,lines.expo.color,findLabel(id),'right'));
       ['sapperton','braid','lougheed','production-way'].forEach(id=>addStation(X.expoBranch,Y(row[id]),id,lines.expo.color,findLabel(id),'left'));
-      milli.forEach(id=>addStation(X.millennium,Y(row[id]),id,lines.millennium.color,findLabel(id),'right'));
     }
 
     // אתחול האפליקציה
