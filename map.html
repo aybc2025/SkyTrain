@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>מפת סקייטריין ונקובר – סכמה אינטראקטיבית</title>
+  <title>מפה אינטראקטיבית - מפת ונקובר לילדים</title>
 
   <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest">
@@ -29,18 +29,25 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
 
-  <!-- כותרת -->
+  <!-- כותרת עם כפתור חזרה -->
   <header class="bg-white shadow p-4">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-blue-600"></div>
+        <button onclick="goHome()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+          🏠 <span>חזרה לעמוד הראשי</span>
+        </button>
         <div>
-          <h1 class="text-2xl font-bold text-gray-800">מפת סקייטריין ונקובר</h1>
-          <p class="text-sm text-gray-600">סכמה אינטראקטיבית + רשימות תחנות</p>
+          <h1 class="text-2xl font-bold text-gray-800">המפה האינטראקטיבית</h1>
+          <p class="text-sm text-gray-600">לחץ על תחנה למידע מפורט</p>
         </div>
       </div>
-      <div id="offlineBadge" class="hidden bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-        פועל במצב לא מקוון
+      <div class="flex items-center gap-2">
+        <button onclick="goToCalculator()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors">
+          🧭 מחשבון מסלולים
+        </button>
+        <div id="offlineBadge" class="hidden bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+          פועל במצב לא מקוון
+        </div>
       </div>
     </div>
   </header>
@@ -78,7 +85,7 @@
               <circle r="7" cx="150" cy="6" fill="#0060A9"/>
               <!-- שורה 2 -->
               <text x="70" y="40" font-size="13" fill="#111827" text-anchor="end">קו המילניום</text>
-              <circle r="7" cx="150" cy="36" fill="#FED100"/>
+              <circle r="7" cx="150" cy="36" fill="#ffcd00"/>
               <!-- שורה 3 -->
               <text x="90" y="70" font-size="13" fill="#111827" text-anchor="end">קו קנדה</text>
               <circle r="7" cx="150" cy="66" fill="#009AC8"/>
@@ -123,6 +130,15 @@
   </footer>
 
   <script>
+    /* Navigation functions */
+    function goHome() {
+      window.location.href = './index.html';
+    }
+    
+    function goToCalculator() {
+      window.location.href = './calculator.html';
+    }
+
     /* Service Worker registration */
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
@@ -208,43 +224,49 @@
           {id:'yvr-airport',nameHe:'נמל תעופה YVR',nameEn:'YVR–Airport',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'aberdeen',nameHe:'אברדין',nameEn:'Aberdeen',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'lansdowne',nameHe:'לנסדאון',nameEn:'Lansdowne',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'richmond-brighouse',nameHe:'ריצ\'מונד-בריגהאוס',nameEn:'Richmond–Brighouse',zone:2,platforms:2,accessibility:true,transfers:[]}
+          {id:'richmond-brighouse',nameHe:'ריצ\'מונד-בריגהאוס',nameEn:'Richmond-Brighouse',zone:2,platforms:2,accessibility:true,transfers:[]}
         ]
       }
     };
 
-    const transferTypeMap={expo:'קו אקספו',millennium:'קו המילניום',canada:'קו קנדה',seabus:'SeaBus',westcoast:'West Coast Express'};
+    const transferTypeMap = {
+      'canada': 'קו קנדה',
+      'expo': 'קו אקספו', 
+      'millennium': 'קו המילניום',
+      'seabus': 'מעבורת ימית',
+      'westcoast': 'רכבת חוף מערבי'
+    };
 
-    /* ===== רשימות ===== */
-    const linesContainer=document.getElementById('linesContainer');
-    function renderLines(){
-      linesContainer.innerHTML='';
-      Object.entries(lines).forEach(([key,line])=>{
-        const section=document.createElement('section');
-        section.className='bg-white rounded-xl shadow-lg p-6';
-        section.innerHTML=`
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-6 h-6 rounded-full" style="background:${line.color}"></div>
-            <h3 class="text-xl font-bold text-gray-800">${line.nameHe}</h3>
-            <span class="text-gray-600">(${line.nameEn})</span>
-            <span class="bg-gray-100 px-2 py-1 rounded text-sm text-gray-600">${line.stations.length} תחנות</span>
+    /* ===== רשימת תחנות לפי קו ===== */
+    function renderLines() {
+      const container = document.getElementById('linesContainer');
+      
+      Object.entries(lines).forEach(([lineKey, lineData]) => {
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'bg-white rounded-xl shadow-lg overflow-hidden';
+        
+        lineDiv.innerHTML = `
+          <div class="p-4" style="background-color: ${lineData.color}; color: white;">
+            <h3 class="text-xl font-bold">${lineData.nameHe}</h3>
+            <p class="text-sm opacity-90">${lineData.nameEn} • ${lineData.stations.length} תחנות</p>
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="grid-${key}"></div>
+          <div class="p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="stations-${lineKey}"></div>
+          </div>
         `;
-        linesContainer.appendChild(section);
-        const grid=section.querySelector(`#grid-${key}`);
-        line.stations.forEach(st=>{
-          const btn=document.createElement('button');
-          btn.className='p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-right border border-gray-200';
-          btn.innerHTML=`
-            <div class="flex items-center gap-2 mb-1">
-              <span class="w-2.5 h-2.5 rounded-full inline-block" style="background:${line.color}"></span>
-              <span class="font-medium text-gray-800 text-sm">${st.nameHe}</span>
-            </div>
-            <div class="text-xs text-gray-600">${st.nameEn}</div>
-            <div class="flex items-center gap-2 mt-1">
-              <span class="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">אזור ${st.zone}</span>
-              ${st.accessibility?'<span class="text-xs text-green-700">♿︎</span>':''}
+        
+        container.appendChild(lineDiv);
+        
+        const grid = document.getElementById(`stations-${lineKey}`);
+        lineData.stations.forEach(st => {
+          const btn = document.createElement('button');
+          btn.className = 'text-right p-3 rounded-lg border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors';
+          btn.innerHTML = `
+            <div class="font-medium text-gray-800">${st.nameHe}</div>
+            <div class="text-sm text-gray-600">${st.nameEn}</div>
+            <div class="text-xs text-gray-500 mt-1">
+              אזור ${st.zone} • ${st.platforms} רציפים
+              ${st.accessibility ? '<span class="text-xs text-green-700">♿︎</span>':''}
             </div>`;
           btn.addEventListener('click',()=>handleStationClick(st.id));
           grid.appendChild(btn);
@@ -318,7 +340,7 @@
     const canadaRich = ['aberdeen','lansdowne','richmond-brighouse'];
     canadaRich.forEach((id,i)=>row[id]=row['bridgeport']+1+i);
     
-    const milli = ['vcc-clark','commercial','renfrew','rupert','gilmore','brentwood','holdom','sperling','lake-city-way','production-way','lougheed','burquitlam','moody-centre','inlet-centre','coquitlam-central','lincoln','lafarge-lake'];
+      const milli = ['vcc-clark','commercial','renfrew','rupert','gilmore','brentwood','holdom','sperling','lake-city-way','production-way','lougheed','burquitlam','moody-centre','inlet-centre','coquitlam-central','lincoln','lafarge-lake'];
     const mStart = row['commercial'] - 1;
     milli.forEach((id,i)=>row[id]=row[id]??(mStart+i));
 
@@ -403,40 +425,38 @@
         
         // עיגולים קטנים לכל קו
         linesData.forEach((lineData, index) => {
-          const angle = (index * 2 * Math.PI) / linesData.length;
-          const cx = x + 4 * Math.cos(angle);
-          const cy = y + 4 * Math.sin(angle);
+          const angle = (index / linesData.length) * 2 * Math.PI;
+          const radius = 5;
+          const cx = x + Math.cos(angle) * radius;
+          const cy = y + Math.sin(angle) * radius;
           
-          const lineCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          lineCircle.setAttribute('cx', cx);
-          lineCircle.setAttribute('cy', cy);
-          lineCircle.setAttribute('r', 3);
-          lineCircle.setAttribute('fill', lineData.color);
-          g.appendChild(lineCircle);
+          const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          innerCircle.setAttribute('cx', cx);
+          innerCircle.setAttribute('cy', cy);
+          innerCircle.setAttribute('r', 3);
+          innerCircle.setAttribute('fill', lineData.color);
+          g.appendChild(innerCircle);
         });
       } else {
-        // תחנה רגילה
-        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        c.setAttribute('cx', x);
-        c.setAttribute('cy', y);
-        c.setAttribute('r', 7.5);
-        c.setAttribute('fill', '#fff');
-        c.setAttribute('stroke', linesData[0].color);
-        c.setAttribute('stroke-width', 3);
-        c.classList.add('station');
-        g.appendChild(c);
+        // תחנה רגילה - עיגול אחד בצבע הקו
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 8);
+        circle.setAttribute('fill', linesData[0].color);
+        circle.setAttribute('stroke', '#fff');
+        circle.setAttribute('stroke-width', 2);
+        circle.classList.add('station');
+        g.appendChild(circle);
       }
 
-      // תווית טקסט עם רקע
+      // הוספת תווית
       const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      bg.setAttribute('class', 'label-bg');
-      
+      bg.classList.add('label-bg');
       const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tx.classList.add('station-label');
       tx.textContent = label;
-      tx.setAttribute('class', 'station-label');
-      tx.setAttribute('dominant-baseline', 'middle');
       
-      // מיקום התווית
       const offset = linesData.length > 1 ? 18 : 15;
       if (preferred === 'center') {
         tx.setAttribute('x', x);
@@ -490,7 +510,7 @@
           acc[id] = { x: X.canadaAir, y: Y(row[id]), labelSide: 'left' };
           return acc;
         }, {}),
-        
+     
         // תחנות קו קנדה - ריצ'מונד
         ...canadaRich.reduce((acc, id) => {
           acc[id] = { x: X.canadaRich, y: Y(row[id]), labelSide: 'right' };
