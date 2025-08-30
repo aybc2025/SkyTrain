@@ -306,24 +306,29 @@
             </div>
             <div class="text-xs mt-1">
               קווים: ${linesInfo}
-            </div>`;
+            </div>
+            ${st.busLines && st.busLines.length ? `<div class="text-xs mt-1 text-orange-600">
+              אוטובוסים: ${st.busLines.slice(0, 2).join(', ')}${st.busLines.length > 2 ? ` +${st.busLines.length - 2}` : ''}
+            </div>` : ''}`;
           btn.addEventListener('click',() => handleStationClick(st.id));
           grid.appendChild(btn);
         });
       });
     }
 
-    /* ===== מודל תחנה - תיקון 1: הצגת קווים העוברים בתחנה ===== */
+    /* ===== מודל תחנה - תיקון 1,2,3: הצגת קווים העוברים בתחנה וקווי אוטובוס ===== */
     function getStationInfo(stationId){
       // יצירת מערך של כל הקווים שעוברים בתחנה
       const stationLines = [];
-      const stationData = {};
+      let stationData = {};
+      let busLines = [];
       
       Object.entries(lines).forEach(([lineKey, lineData]) => {
         const station = lineData.stations.find(s => s.id === stationId);
         if (station) {
           if (!stationData.nameHe) {
             Object.assign(stationData, station);
+            busLines = station.busLines || [];
           }
           stationLines.push({
             key: lineKey,
@@ -335,7 +340,7 @@
       });
       
       if (stationLines.length > 0) {
-        return { ...stationData, lines: stationLines };
+        return { ...stationData, lines: stationLines, busLines: busLines };
       }
       
       return null;
@@ -466,7 +471,7 @@
       return uniqueStations;
     }
 
-    // פונקציה מעודכנת לציור תחנה עם תמיכה בכמה קווים
+    // פונקציה מעודכנת לציור תחנה עם תמיכה בכמה קווים - תיקון 1: תוויות מתוקנות
     function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       g.classList.add('taparea');
@@ -515,37 +520,44 @@
         g.appendChild(circle);
       }
 
-      // הוספת תווית
+      // תיקון 1: הוספת תווית עם חישוב מדויק יותר של הגודל
       const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       
-      let labelX, labelY, textAnchor;
-      const labelWidth = label.length * 5.5;
-      const labelHeight = 16;
+      // חישוב מדויק יותר של גודל התווית
+      const avgCharWidth = 6.5; // רוחב ממוצע של תו
+      const labelWidth = Math.max(label.length * avgCharWidth, 60); // מינימום רוחב
+      const labelHeight = 18;
+      const padding = 4;
+      
+      let labelX, labelY, textX, textAnchor;
       
       if (preferred === 'right') {
         labelX = x + 15;
-        labelY = y - 8;
+        labelY = y - 9;
+        textX = labelX + padding;
         textAnchor = 'start';
       } else if (preferred === 'left') {
         labelX = x - 15 - labelWidth;
-        labelY = y - 8;
+        labelY = y - 9;
+        textX = labelX + labelWidth - padding;
         textAnchor = 'end';
       } else { // center
         labelX = x - labelWidth/2;
-        labelY = y - 20;
+        labelY = y - 25;
+        textX = x;
         textAnchor = 'middle';
       }
       
       labelBg.classList.add('label-bg');
-      labelBg.setAttribute('x', labelX - 2);
+      labelBg.setAttribute('x', labelX);
       labelBg.setAttribute('y', labelY);
-      labelBg.setAttribute('width', labelWidth + 4);
+      labelBg.setAttribute('width', labelWidth);
       labelBg.setAttribute('height', labelHeight);
       
       labelText.classList.add('station-label');
-      labelText.setAttribute('x', preferred === 'center' ? x : (labelX + (textAnchor === 'end' ? labelWidth : 2)));
-      labelText.setAttribute('y', labelY + 12);
+      labelText.setAttribute('x', textX);
+      labelText.setAttribute('y', labelY + 13);
       labelText.setAttribute('text-anchor', textAnchor);
       labelText.textContent = label;
       
