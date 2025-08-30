@@ -662,49 +662,127 @@
       return transferStations.includes(stationId);
     }
 
-    function findOneTransferRoute(fromStation, toStation) {
-      console.log('מחפש מסלול עם החלפה אחת');
-      
-      const allTransferStations = Object.keys(stations).filter(stationId => {
-        const station = stations[stationId];
-        return station.lines.length > 1 || isTransferStation(stationId);
-      });
-      
-      console.log('תחנות חיבור פוטנציאליות:', allTransferStations);
-      
-      for (const transferId of allTransferStations) {
-        const transferStation = stations[transferId];
-        if (!transferStation) continue;
-        
-        const line1Options = fromStation.lines.filter(line => transferStation.lines.includes(line));
-        const line2Options = transferStation.lines.filter(line => toStation.lines.includes(line));
-        
-        console.log(`בדיקת תחנת חיבור ${transferStation.nameHe}:`, 
-                   `קווים מקור-חיבור: ${line1Options}`, 
-                   `קווים חיבור-יעד: ${line2Options}`);
-        
-        if (line1Options.length > 0 && line2Options.length > 0) {
-          const line1 = line1Options[0];
-          const line2 = line2Options[0];
-          
+   // פונקציה חדשה לחישוב מרחק בין שתי תחנות באותו קו
+function calculateStationDistance(stationId1, stationId2, lineKey) {
+  // מקבל את רשימת התחנות של הקו
+  const lineStations = Object.entries(stations)
+    .filter(([id, station]) => station.lines.includes(lineKey))
+    .sort((a, b) => {
+      // מיין לפי הסדר בהגדרת הקו (אם יש)
+      const lineData = getAllLinesData()[lineKey];
+      if (lineData && lineData.stations) {
+        const indexA = lineData.stations.findIndex(s => s.id === a[0]);
+        const indexB = lineData.stations.findIndex(s => s.id === b[0]);
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      }
+      return 0;
+    })
+    .map(([id]) => id);
+
+  const index1 = lineStations.indexOf(stationId1);
+  const index2 = lineStations.indexOf(stationId2);
+  
+  if (index1 === -1 || index2 === -1) return Infinity;
+  return Math.abs(index2 - index1);
+}
+
+// פונקציה מוספת לקבלת נתוני קווים (משתמש בנתונים מ-map.html)
+function getAllLinesData() {
+  return {
+    expo: {
+      stations: [
+        {id:'waterfront'}, {id:'burrard'}, {id:'granville'}, {id:'stadium'},
+        {id:'main-street'}, {id:'commercial'}, {id:'nanaimo'}, {id:'29th-ave'},
+        {id:'joyce'}, {id:'patterson'}, {id:'metrotown'}, {id:'royal-oak'},
+        {id:'edmonds'}, {id:'22nd-street'}, {id:'new-west'}, {id:'columbia'},
+        {id:'scott-road'}, {id:'gateway'}, {id:'surrey-central'}, {id:'king-george'},
+        {id:'sapperton'}, {id:'braid'}, {id:'lougheed'}, {id:'production-way'}
+      ]
+    },
+    millennium: {
+      stations: [
+        {id:'vcc-clark'}, {id:'commercial'}, {id:'renfrew'}, {id:'rupert'},
+        {id:'gilmore'}, {id:'brentwood'}, {id:'holdom'}, {id:'sperling'},
+        {id:'lake-city-way'}, {id:'production-way'}, {id:'lougheed'},
+        {id:'burquitlam'}, {id:'moody-centre'}, {id:'inlet-centre'},
+        {id:'coquitlam-central'}, {id:'lincoln'}, {id:'lafarge-lake'}
+      ]
+    },
+    canada: {
+      stations: [
+        {id:'waterfront'}, {id:'vancouver-city-centre'}, {id:'yaletown'},
+        {id:'olympic-village'}, {id:'broadway-city-hall'}, {id:'king-edward'},
+        {id:'oakridge'}, {id:'langara'}, {id:'marine-drive'}, {id:'bridgeport'},
+        {id:'templeton'}, {id:'sea-island-centre'}, {id:'yvr-airport'},
+        {id:'aberdeen'}, {id:'lansdowne'}, {id:'richmond-brighouse'}
+      ]
+    }
+  };
+}
+
+// החלפת הפונקציה הקיימת findOneTransferRoute בגרסה משופרת
+function findOneTransferRoute(fromStation, toStation) {
+  console.log('מחפש מסלול עם החלפה אחת');
+  
+  const allTransferStations = Object.keys(stations).filter(stationId => {
+    const station = stations[stationId];
+    return station.lines.length > 1 || isTransferStation(stationId);
+  });
+  
+  console.log('תחנות חיבור פוטנציאליות:', allTransferStations);
+  
+  let bestRoute = null;
+  let shortestDistance = Infinity;
+  
+  for (const transferId of allTransferStations) {
+    const transferStation = stations[transferId];
+    if (!transferStation) continue;
+    
+    const line1Options = fromStation.lines.filter(line => transferStation.lines.includes(line));
+    const line2Options = transferStation.lines.filter(line => toStation.lines.includes(line));
+    
+    if (line1Options.length > 0 && line2Options.length > 0) {
+      // בדיקת כל הצירופים האפשריים של קווים
+      for (const line1 of line1Options) {
+        for (const line2 of line2Options) {
           if (line1 !== line2) {
-            console.log(`נמצא מסלול דרך ${transferStation.nameHe}: ${line1} → ${line2}`);
-            return {
-              type: 'transfer',
-              from: fromStation,
-              to: toStation,
-              transfer: transferStation,
-              line1: lineInfo[line1],
-              line2: lineInfo[line2],
-              steps: 2
-            };
+            // חישוב מרחק כולל של המסלול
+            const fromId = getStationId(fromStation);
+            const toId = getStationId(toStation);
+            
+            const distance1 = calculateStationDistance(fromId, transferId, line1);
+            const distance2 = calculateStationDistance(transferId, toId, line2);
+            const totalDistance = distance1 + distance2;
+            
+            console.log(`מסלול דרך ${transferStation.nameHe}: ${line1} (${distance1}) + ${line2} (${distance2}) = ${totalDistance}`);
+            
+            if (totalDistance < shortestDistance) {
+              shortestDistance = totalDistance;
+              bestRoute = {
+                type: 'transfer',
+                from: fromStation,
+                to: toStation,
+                transfer: transferStation,
+                line1: lineInfo[line1],
+                line2: lineInfo[line2],
+                steps: 2,
+                distance: totalDistance
+              };
+            }
           }
         }
       }
-      
-      console.log('לא נמצא מסלול עם החלפה אחת');
-      return null;
     }
+  }
+  
+  if (bestRoute) {
+    console.log(`נמצא מסלול הכי קצר דרך ${bestRoute.transfer.nameHe} במרחק ${bestRoute.distance} תחנות`);
+    return bestRoute;
+  }
+  
+  console.log('לא נמצא מסלול עם החלפה אחת');
+  return null;
+}
 
     function findTwoTransferRoute(fromStation, toStation) {
       console.log('מחפש מסלול עם שתי החלפות');
@@ -980,24 +1058,38 @@
     }
 
     function generateRouteInfo(route) {
-      return `
-        <div class="bg-blue-50 rounded-xl p-4 mt-6">
-          <div class="grid md:grid-cols-3 gap-4 text-center text-sm">
-            <div>
-              <div class="font-medium text-blue-800">משך נסיעה משוער</div>
-              <div class="text-blue-600">${estimateTime(route)} דקות</div>
-            </div>
-            <div>
-              <div class="font-medium text-blue-800">מספר החלפות</div>
-              <div class="text-blue-600">${route.steps - 1} החלפות</div>
-            </div>
-            <div>
-              <div class="font-medium text-blue-800">רמת קושי</div>
-              <div class="text-blue-600">${getDifficultyLevel(route)}</div>
-            </div>
-          </div>
-        </div>`;
-    }
+  let distanceText = '';
+  
+  if (route.distance) {
+    distanceText = `<div class="text-center text-sm text-gray-600">
+      📏 מרחק: ${route.distance} תחנות
+    </div>`;
+  }
+  
+  return `
+    <div class="bg-blue-50 rounded-xl p-4 mt-4">
+      <h4 class="font-bold text-blue-800 mb-2 text-center">📊 פרטי המסלול</h4>
+      <div class="grid grid-cols-3 gap-4 text-center text-sm">
+        <div>
+          <div class="font-bold text-blue-600">${route.steps || 1}</div>
+          <div class="text-gray-600">שלבים</div>
+        </div>
+        <div>
+          <div class="font-bold text-blue-600">${(route.steps || 1) - 1}</div>
+          <div class="text-gray-600">החלפות</div>
+        </div>
+        <div>
+          <div class="font-bold text-blue-600">אזור ${route.to.zone}</div>
+          <div class="text-gray-600">יעד</div>
+        </div>
+      </div>
+      ${distanceText}
+      <div class="text-xs text-center text-gray-500 mt-2">
+        💡 טיפ: זמן נסיעה משוער כ-2 דקות לתחנה + זמן החלפה
+      </div>
+    </div>
+  `;
+}
 
     function estimateTime(route) {
       const baseTime = 5; // זמן בסיס
