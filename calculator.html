@@ -1,46 +1,87 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>מחשבון מסלולים • SkyTrain לילדים</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>מחשבון מסלולים - מפת ונקובר לילדים</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0060A9">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
-    .expo-bg { background-color: #0060A9; }
-    .millennium-bg { background-color: #FED100; }
-    .canada-bg { background-color: #009AC8; }
-    .card-hover { transition: all 0.3s ease; }
-    .difficulty-btn:hover { transform: translateY(-4px); }
-    .step-animation { animation: fadeInUp 0.6s ease forwards; }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+    .disabled{opacity:0.5;cursor:not-allowed}
+    .difficulty-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+    .card-hover{transition:all 0.3s ease}
+    .step-animation{animation:slideInRight 0.5s ease-out forwards}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+    
+    /* צבעי קווים */
+    .expo-bg{background-color:#0060A9}
+    .millennium-bg{background-color:#FED100}
+    .canada-bg{background-color:#009AC8}
+    .expo-gradient{background:linear-gradient(135deg,#0060A9,#004A87)}
+    .millennium-gradient{background:linear-gradient(135deg,#FED100,#E6B800)}
+    .canada-gradient{background:linear-gradient(135deg,#009AC8,#007AA3)}
+    .transfer-bg{background:linear-gradient(135deg,#6B7280,#4B5563)}
+    
+    /* סטיילים למסלול */
+    .route-step {
+      border-right: 4px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .route-step.expo { border-right-color: #0060A9; }
+    .route-step.millennium { border-right-color: #FED100; }
+    .route-step.canada { border-right-color: #009AC8; }
+    .route-step.transfer { border-right-color: #6B7280; }
+
+    /* סינון לפי קו */
+    .line-filter {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .line-filter:hover {
+      transform: scale(1.05);
+    }
+    .line-filter.active {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-cyan-100 min-h-screen">
-  
-  <nav class="bg-white shadow-lg mb-8">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="text-2xl">🚇</div>
-        <h1 class="text-xl font-bold text-gray-800">מחשבון מסלולים</h1>
-      </div>
-      <button onclick="goHome()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-        🏠 דף הבית
-      </button>
-    </div>
-  </nav>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
 
-  <main class="container mx-auto px-4">
+  <!-- כותרת עם כפתור חזרה -->
+  <header class="bg-white shadow p-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button onclick="goHome()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+          🏠 <span>חזרה לעמוד הראשי</span>
+        </button>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">מחשבון מסלולים</h1>
+          <p class="text-sm text-gray-600">תכנן את הנסיעה שלך בסקייטריין</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="goToMap()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+          🗺️ המפה האינטראקטיבית
+        </button>
+        <div id="offlineBadge" class="hidden bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+          פועל במצב לא מקוון
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
     
     <!-- בחירת רמת קושי -->
     <div id="difficultySelection" class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">איזה סוג חיפוש אתה רוצה?</h2>
+      <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">איזה רמת קושי אתה מעדיף?</h2>
       
       <div class="grid md:grid-cols-2 gap-6">
         <button onclick="setDifficulty('easy')" class="difficulty-btn bg-green-50 border-2 border-green-200 hover:border-green-400 rounded-xl p-6 text-right transition-all">
@@ -48,10 +89,10 @@
             <div>
               <div class="text-3xl mb-2">🟢</div>
               <h3 class="font-bold text-green-800 text-lg">קל - רק סקייטריין</h3>
-              <p class="text-green-600 text-sm mt-1">רכבת אוטומטית בלבד</p>
+              <p class="text-green-600 text-sm mt-1">נסיעה ישירה או עם חיבור אחד</p>
               <div class="flex items-center gap-1 mt-2">
-                <div class="text-xs bg-green-200 px-2 py-1 rounded">מהיר</div>
-                <div class="text-xs bg-green-200 px-2 py-1 rounded">פשוט</div>
+                <div class="text-xs bg-green-200 px-2 py-1 rounded">3 קווים</div>
+                <div class="text-xs bg-green-200 px-2 py-1 rounded">54 תחנות</div>
               </div>
             </div>
             <div class="text-4xl">🚇</div>
@@ -83,6 +124,29 @@
     <!-- בחירת תחנות -->
     <div id="stationSelection" class="bg-white rounded-2xl shadow-lg p-6 mb-6 hidden">
       <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">איפה אתה רוצה לנסוע?</h2>
+      
+      <!-- סינון לפי קו -->
+      <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">סינון לפי קו:</h3>
+        <div class="flex flex-wrap gap-2">
+          <div class="line-filter bg-gray-200 px-3 py-2 rounded-lg flex items-center gap-2" data-line="all">
+            <span class="w-4 h-4 rounded-full bg-gray-500"></span>
+            <span class="text-sm font-medium">כל הקווים</span>
+          </div>
+          <div class="line-filter bg-blue-100 px-3 py-2 rounded-lg flex items-center gap-2" data-line="expo">
+            <span class="w-4 h-4 rounded-full expo-bg"></span>
+            <span class="text-sm font-medium">קו אקספו</span>
+          </div>
+          <div class="line-filter bg-yellow-100 px-3 py-2 rounded-lg flex items-center gap-2" data-line="millennium">
+            <span class="w-4 h-4 rounded-full millennium-bg"></span>
+            <span class="text-sm font-medium">קו המילניום</span>
+          </div>
+          <div class="line-filter bg-cyan-100 px-3 py-2 rounded-lg flex items-center gap-2" data-line="canada">
+            <span class="w-4 h-4 rounded-full canada-bg"></span>
+            <span class="text-sm font-medium">קו קנדה</span>
+          </div>
+        </div>
+      </div>
       
       <div class="grid md:grid-cols-2 gap-6">
         <!-- תחנת מקור -->
@@ -123,63 +187,93 @@
   </main>
 
   <script>
-    // נתוני תחנות מעודכנים
+    /* Navigation functions */
+    function goHome() {
+      window.location.href = './index.html';
+    }
+    
+    function goToMap() {
+      window.location.href = './map.html';
+    }
+
+    /* Service Worker registration */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
+    }
+
+    /* Offline badge */
+    function updateOfflineBadge(){
+      const b = document.getElementById('offlineBadge');
+      if (!navigator.onLine) {
+        b.classList.remove('hidden');
+      } else {
+        b.classList.add('hidden');
+      }
+    }
+    window.addEventListener('online', updateOfflineBadge);
+    window.addEventListener('offline', updateOfflineBadge);
+    updateOfflineBadge();
+
+    // נתוני תחנות מעודכנים עם מידע על קווים מרובים
     const stations = {
-      'waterfront': {nameHe: 'ווטרפרונט', nameEn: 'Waterfront', line: 'expo', zone: 1, accessibility: true, transfers: ['canada']},
-      'burrard': {nameHe: 'בוררד', nameEn: 'Burrard', line: 'expo', zone: 1, accessibility: true, transfers: []},
-      'granville': {nameHe: 'גרנוויל', nameEn: 'Granville', line: 'expo', zone: 1, accessibility: true, transfers: []},
-      'stadium': {nameHe: 'איצטדיון-צ\'יינטאון', nameEn: 'Stadium–Chinatown', line: 'expo', zone: 1, accessibility: true, transfers: []},
-      'main-street': {nameHe: 'מיין סטריט-אמטאון', nameEn: 'Main Street–Science World', line: 'expo', zone: 1, accessibility: true, transfers: []},
-      'commercial': {nameHe: 'קומרשיאל-ברודוויי', nameEn: 'Commercial–Broadway', line: 'expo', zone: 1, accessibility: true, transfers: ['millennium']},
-      'nanaimo': {nameHe: 'ננאימו', nameEn: 'Nanaimo', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      '29th-avenue': {nameHe: 'שדרה 29', nameEn: '29th Avenue', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'joyce': {nameHe: 'ג\'ויס-קולינגווד', nameEn: 'Joyce–Collingwood', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'patterson': {nameHe: 'פטרסון', nameEn: 'Patterson', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'metrotown': {nameHe: 'מטרוטאון', nameEn: 'Metrotown', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'royal-oak': {nameHe: 'רויאל אוק', nameEn: 'Royal Oak', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'edmonds': {nameHe: 'אדמונדס', nameEn: 'Edmonds', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      '22nd-street': {nameHe: 'רחוב 22', nameEn: '22nd Street', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'new-west': {nameHe: 'ניו ווסטמינסטר', nameEn: 'New Westminster', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'columbia': {nameHe: 'קולומביה', nameEn: 'Columbia', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'scott-road': {nameHe: 'דרך סקוט', nameEn: 'Scott Road', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'gateway': {nameHe: 'גייטוויי', nameEn: 'Gateway', line: 'expo', zone: 2, accessibility: true, transfers: []},
-      'surrey-central': {nameHe: 'מרכז סארי', nameEn: 'Surrey Central', line: 'expo', zone: 3, accessibility: true, transfers: []},
-      'king-george': {nameHe: 'קינג ג\'ורג\'', nameEn: 'King George', line: 'expo', zone: 3, accessibility: true, transfers: []},
+      // קו אקספו
+      'waterfront': {nameHe: 'ווטרפרונט', nameEn: 'Waterfront', lines: ['expo', 'canada'], zone: 1, accessibility: true, transfers: ['canada', 'seabus', 'westcoast']},
+      'burrard': {nameHe: 'בוררד', nameEn: 'Burrard', lines: ['expo'], zone: 1, accessibility: true, transfers: []},
+      'granville': {nameHe: 'גרנוויל', nameEn: 'Granville', lines: ['expo'], zone: 1, accessibility: true, transfers: []},
+      'stadium': {nameHe: 'איצטדיון-צ\'יינטאון', nameEn: 'Stadium–Chinatown', lines: ['expo'], zone: 1, accessibility: true, transfers: []},
+      'main-street': {nameHe: 'מיין סטריט-אמטאון', nameEn: 'Main Street–Science World', lines: ['expo'], zone: 1, accessibility: true, transfers: []},
+      'commercial': {nameHe: 'קומרשיאל-ברודוויי', nameEn: 'Commercial–Broadway', lines: ['expo', 'millennium'], zone: 1, accessibility: true, transfers: ['millennium']},
+      'nanaimo': {nameHe: 'ננאימו', nameEn: 'Nanaimo', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      '29th-avenue': {nameHe: 'שדרה 29', nameEn: '29th Avenue', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'joyce': {nameHe: 'ג\'ויס-קולינגווד', nameEn: 'Joyce–Collingwood', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'patterson': {nameHe: 'פטרסון', nameEn: 'Patterson', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'metrotown': {nameHe: 'מטרוטאון', nameEn: 'Metrotown', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'royal-oak': {nameHe: 'רויאל אוק', nameEn: 'Royal Oak', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'edmonds': {nameHe: 'אדמונדס', nameEn: 'Edmonds', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      '22nd-street': {nameHe: 'רחוב 22', nameEn: '22nd Street', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'new-west': {nameHe: 'ניו ווסטמינסטר', nameEn: 'New Westminster', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'columbia': {nameHe: 'קולומביה', nameEn: 'Columbia', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'scott-road': {nameHe: 'דרך סקוט', nameEn: 'Scott Road', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'gateway': {nameHe: 'גייטוויי', nameEn: 'Gateway', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'surrey-central': {nameHe: 'מרכז סארי', nameEn: 'Surrey Central', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'king-george': {nameHe: 'קינג ג\'ורג\'', nameEn: 'King George', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'sapperton': {nameHe: 'סאפרטון', nameEn: 'Sapperton', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'braid': {nameHe: 'ברייד', nameEn: 'Braid', lines: ['expo'], zone: 2, accessibility: true, transfers: []},
+      'lougheed': {nameHe: 'לאוהיד', nameEn: 'Lougheed Town Centre', lines: ['expo', 'millennium'], zone: 2, accessibility: true, transfers: ['millennium']},
+      'production-way': {nameHe: 'פרודקשן וויי', nameEn: 'Production Way–University', lines: ['expo', 'millennium'], zone: 2, accessibility: true, transfers: ['millennium']},
 
-      // קו המילניום
-      'vcc-clark': {nameHe: 'VCC-קלארק', nameEn: 'VCC–Clark', line: 'millennium', zone: 1, accessibility: true, transfers: []},
-      'renfrew': {nameHe: 'רנפרו', nameEn: 'Renfrew', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'rupert': {nameHe: 'רופרט', nameEn: 'Rupert', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'gilmore': {nameHe: 'גילמור', nameEn: 'Gilmore', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'brentwood': {nameHe: 'ברנטווד', nameEn: 'Brentwood Town Centre', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'holdom': {nameHe: 'הולדום', nameEn: 'Holdom', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'sperling': {nameHe: 'ספרלינג', nameEn: 'Sperling–Burnaby Lake', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'lake-city': {nameHe: 'לייק סיטי', nameEn: 'Lake City Way', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'production-way': {nameHe: 'פרודקשן וויי', nameEn: 'Production Way–University', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'lougheed': {nameHe: 'לאוהיד', nameEn: 'Lougheed Town Centre', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'burquitlam': {nameHe: 'ברקיטלם', nameEn: 'Burquitlam', line: 'millennium', zone: 2, accessibility: true, transfers: []},
-      'moody-centre': {nameHe: 'מרכז מודי', nameEn: 'Moody Centre', line: 'millennium', zone: 3, accessibility: true, transfers: []},
-      'inlet-centre': {nameHe: 'אינלט סנטר', nameEn: 'Inlet Centre', line: 'millennium', zone: 3, accessibility: true, transfers: []},
-      'coquitlam-central': {nameHe: 'מרכז קוקיטלם', nameEn: 'Coquitlam Central', line: 'millennium', zone: 3, accessibility: true, transfers: []},
-      'lincoln': {nameHe: 'לינקולן', nameEn: 'Lincoln', line: 'millennium', zone: 3, accessibility: true, transfers: []},
-      'lafarge': {nameHe: 'לפארג\'', nameEn: 'Lafarge Lake–Douglas', line: 'millennium', zone: 3, accessibility: true, transfers: []},
+      // קו מילניום
+      'vcc-clark': {nameHe: 'VCC-קלארק', nameEn: 'VCC–Clark', lines: ['millennium'], zone: 1, accessibility: true, transfers: []},
+      'renfrew': {nameHe: 'רנפרו', nameEn: 'Renfrew', lines: ['millennium'], zone: 1, accessibility: true, transfers: []},
+      'rupert': {nameHe: 'רופרט', nameEn: 'Rupert', lines: ['millennium'], zone: 2, accessibility: true, transfers: []},
+      'gilmore': {nameHe: 'גילמור', nameEn: 'Gilmore', lines: ['millennium'], zone: 2, accessibility: true, transfers: []},
+      'brentwood': {nameHe: 'ברנטווד', nameEn: 'Brentwood Town Centre', lines: ['millennium'], zone: 2, accessibility: true, transfers: []},
+      'holdom': {nameHe: 'הולדום', nameEn: 'Holdom', lines: ['millennium'], zone: 2, accessibility: true, transfers: []},
+      'sperling': {nameHe: 'ספרלינג', nameEn: 'Sperling–Burnaby Lake', lines: ['millennium'], zone: 2, accessibility: true, transfers: []},
+      'lake-city-way': {nameHe: 'דרך עיר האגם', nameEn: 'Lake City Way', lines: ['millennium'], zone: 2, accessibility: true, transfers: []},
+      'burquitlam': {nameHe: 'ברקיטלם', nameEn: 'Burquitlam', lines: ['millennium'], zone: 3, accessibility: true, transfers: []},
+      'moody-centre': {nameHe: 'מרכז מודי', nameEn: 'Moody Centre', lines: ['millennium'], zone: 3, accessibility: true, transfers: []},
+      'inlet-centre': {nameHe: 'מרכז אינלט', nameEn: 'Inlet Centre', lines: ['millennium'], zone: 3, accessibility: true, transfers: []},
+      'coquitlam-central': {nameHe: 'מרכז קוקיטלם', nameEn: 'Coquitlam Central', lines: ['millennium'], zone: 3, accessibility: true, transfers: []},
+      'lincoln': {nameHe: 'לינקולן', nameEn: 'Lincoln', lines: ['millennium'], zone: 3, accessibility: true, transfers: []},
+      'lafarge-lake': {nameHe: 'אגם לאפארג\'', nameEn: 'Lafarge Lake–Douglas', lines: ['millennium'], zone: 3, accessibility: true, transfers: []},
 
-      // קו קנדה  
-      'vancouver-city-centre': {nameHe: 'מרכז העיר ונקובר', nameEn: 'Vancouver City Centre', line: 'canada', zone: 1, accessibility: true, transfers: []},
-      'yaletown': {nameHe: 'יילטאון', nameEn: 'Yaletown–Roundhouse', line: 'canada', zone: 1, accessibility: true, transfers: []},
-      'olympic-village': {nameHe: 'הכפר האולימפי', nameEn: 'Olympic Village', line: 'canada', zone: 1, accessibility: true, transfers: []},
-      'broadway-city-hall': {nameHe: 'ברודוויי-עיריה', nameEn: 'Broadway–City Hall', line: 'canada', zone: 1, accessibility: true, transfers: []},
-      'king-edward': {nameHe: 'קינג אדוארד', nameEn: 'King Edward', line: 'canada', zone: 1, accessibility: true, transfers: []},
-      'oakridge': {nameHe: 'אוקריג\'-שדרה 41', nameEn: 'Oakridge–41st Avenue', line: 'canada', zone: 1, accessibility: true, transfers: []},
-      'langara': {nameHe: 'לנגרה-שדרה 49', nameEn: 'Langara–49th Avenue', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'marine-drive': {nameHe: 'מרין דרייב', nameEn: 'Marine Drive', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'bridgeport': {nameHe: 'ברידג\'פורט', nameEn: 'Bridgeport', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'templeton': {nameHe: 'טמפלטון', nameEn: 'Templeton', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'sea-island-centre': {nameHe: 'מרכז אי הים', nameEn: 'Sea Island Centre', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'yvr-airport': {nameHe: 'נמל תעופה YVR', nameEn: 'YVR–Airport', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'aberdeen': {nameHe: 'אברדין', nameEn: 'Aberdeen', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'lansdowne': {nameHe: 'לנסדאון', nameEn: 'Lansdowne', line: 'canada', zone: 2, accessibility: true, transfers: []},
-      'richmond-brighouse': {nameHe: 'ריצ\'מונד-בריגהאוס', nameEn: 'Richmond-Brighouse', line: 'canada', zone: 2, accessibility: true, transfers: []},
+      // קו קנדה
+      'vancouver-city-centre': {nameHe: 'מרכז העיר ונקובר', nameEn: 'Vancouver City Centre', lines: ['canada'], zone: 1, accessibility: true, transfers: []},
+      'yaletown': {nameHe: 'יילטאון', nameEn: 'Yaletown–Roundhouse', lines: ['canada'], zone: 1, accessibility: true, transfers: []},
+      'olympic-village': {nameHe: 'הכפר האולימפי', nameEn: 'Olympic Village', lines: ['canada'], zone: 1, accessibility: true, transfers: []},
+      'broadway-city-hall': {nameHe: 'ברודוויי-עיריית העיר', nameEn: 'Broadway–City Hall', lines: ['canada'], zone: 1, accessibility: true, transfers: []},
+      'king-edward': {nameHe: 'קינג אדוארד', nameEn: 'King Edward', lines: ['canada'], zone: 1, accessibility: true, transfers: []},
+      'oakridge': {nameHe: 'אוקרידג\'', nameEn: 'Oakridge–41st Avenue', lines: ['canada'], zone: 1, accessibility: true, transfers: []},
+      'langara': {nameHe: 'לנגרה', nameEn: 'Langara–49th Avenue', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'marine-drive': {nameHe: 'דרייב ימי', nameEn: 'Marine Drive', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'bridgeport': {nameHe: 'ברידג\'פורט', nameEn: 'Bridgeport', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'templeton': {nameHe: 'טמפלטון', nameEn: 'Templeton', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'sea-island-centre': {nameHe: 'מרכז אי הים', nameEn: 'Sea Island Centre', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'yvr-airport': {nameHe: 'נמל תעופה YVR', nameEn: 'YVR–Airport', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'aberdeen': {nameHe: 'אברדין', nameEn: 'Aberdeen', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'lansdowne': {nameHe: 'לנסדאון', nameEn: 'Lansdowne', lines: ['canada'], zone: 2, accessibility: true, transfers: []},
+      'richmond-brighouse': {nameHe: 'ריצ\'מונד-בריגהאוס', nameEn: 'Richmond-Brighouse', lines: ['canada'], zone: 2, accessibility: true, transfers: []}
     };
 
     // חיבורי אוטובוס (נתונים מעובדים מה-GTFS)
@@ -189,7 +283,7 @@
       'edmonds': ['116 אדמונדס', '112 אדמונדס', '119 קינגסווי', '147 אדמונדס'],
       'metrotown': ['110 מטרוטאון', '119 מטרוטאון'],
       'waterfront': ['SeaBus למול התעופה', 'West Coast Express'],
-      'surrey-central': ['319 ניוטון', '320 סארי'],
+      'surrey-central': ['319 ניוטן', '320 סארי'],
       'king-george': ['R1 קינג ג\'ורג\'', '350 ווייט רוק'],
       'vcc-clark': ['84 VCC-קלארק'],
       'burquitlam': ['143 ברקיטלם'],
@@ -206,6 +300,7 @@
     };
 
     let currentDifficulty = null;
+    let currentLineFilter = 'all';
 
     function setDifficulty(level) {
       currentDifficulty = level;
@@ -213,7 +308,27 @@
       document.getElementById('stationSelection').classList.remove('hidden');
       
       populateStations(level);
+      setupLineFilter();
       window.scrollTo({top: document.getElementById('stationSelection').offsetTop - 20, behavior: 'smooth'});
+    }
+
+    // הגדרת סינון לפי קו
+    function setupLineFilter() {
+      const filters = document.querySelectorAll('.line-filter');
+      filters.forEach(filter => {
+        filter.addEventListener('click', function() {
+          // הסרת active מכל הפילטרים
+          filters.forEach(f => f.classList.remove('active'));
+          // הוספת active לפילטר הנוכחי
+          this.classList.add('active');
+          
+          currentLineFilter = this.dataset.line;
+          populateStations(currentDifficulty);
+        });
+      });
+      
+      // הגדרת הפילטר הראשון כ-active
+      filters[0].classList.add('active');
     }
 
     function populateStations(difficulty) {
@@ -226,12 +341,19 @@
 
       let availableStations = Object.keys(stations);
       
+      // סינון לפי קו אם נבחר
+      if (currentLineFilter !== 'all') {
+        availableStations = availableStations.filter(stationId => 
+          stations[stationId].lines.includes(currentLineFilter)
+        );
+      }
+      
       if (difficulty === 'easy') {
         // רק תחנות סקייטריין
-        availableStations = Object.keys(stations);
+        availableStations = availableStations;
       } else {
         // כולל נקודות אוטובוס (נוסיף בהמשך)
-        availableStations = Object.keys(stations);
+        availableStations = availableStations;
       }
 
       // מיין לפי שם עברי
@@ -243,11 +365,67 @@
         const option2 = document.createElement('option');
         
         option1.value = option2.value = stationId;
-        option1.textContent = option2.textContent = `${station.nameHe} (${station.nameEn})`;
+        
+        // הוספת מידע על הקווים בכל תחנה
+        const linesInfo = station.lines.map(line => lineInfo[line].nameHe).join(', ');
+        option1.textContent = option2.textContent = `${station.nameHe} (${station.nameEn}) - ${linesInfo}`;
         
         fromSelect.appendChild(option1);
         toSelect.appendChild(option2);
       });
+      
+      // הגדרת event listeners לבחירת תחנות
+      fromSelect.addEventListener('change', updateStationInfo);
+      toSelect.addEventListener('change', updateStationInfo);
+    }
+
+    function updateStationInfo() {
+      const fromId = document.getElementById('fromStation').value;
+      const toId = document.getElementById('toStation').value;
+      const calculateBtn = document.getElementById('calculateBtn');
+      
+      // הצגת מידע על התחנות שנבחרו
+      updateStationInfoDisplay('fromStationInfo', fromId);
+      updateStationInfoDisplay('toStationInfo', toId);
+      
+      // הפעלה/כיבוי כפתור חישוב
+      calculateBtn.disabled = !fromId || !toId;
+      calculateBtn.classList.toggle('disabled', !fromId || !toId);
+    }
+
+    function updateStationInfoDisplay(elementId, stationId) {
+      const infoDiv = document.getElementById(elementId);
+      if (!stationId) {
+        infoDiv.classList.add('hidden');
+        return;
+      }
+      
+      const station = stations[stationId];
+      const linesInfo = station.lines.map(line => {
+        const info = lineInfo[line];
+        return `<span class="inline-flex items-center gap-1">
+          <span class="w-3 h-3 rounded-full ${info.colorClass}-bg"></span>
+          ${info.nameHe}
+        </span>`;
+      }).join(' ');
+      
+      infoDiv.innerHTML = `אזור ${station.zone} • ${linesInfo}`;
+      infoDiv.classList.remove('hidden');
+    }
+
+    function resetSelection() {
+      document.getElementById('stationSelection').classList.add('hidden');
+      document.getElementById('difficultySelection').classList.remove('hidden');
+      document.getElementById('results').classList.add('hidden');
+      
+      // איפוס בחירות
+      document.getElementById('fromStation').value = '';
+      document.getElementById('toStation').value = '';
+      currentLineFilter = 'all';
+      
+      // איפוס פילטרים
+      document.querySelectorAll('.line-filter').forEach(f => f.classList.remove('active'));
+      document.querySelector('.line-filter[data-line="all"]').classList.add('active');
     }
 
     function calculateRoute() {
@@ -272,15 +450,10 @@
       
       console.log(`חיפוש מסלול: ${fromStation.nameHe} → ${toStation.nameHe}`);
       
-      // 1. בדיקה אם באותו קו (מסלול ישיר)
-      if (fromStation.line === toStation.line) {
-        return {
-          type: 'direct',
-          from: fromStation,
-          to: toStation,
-          line: lineInfo[fromStation.line],
-          steps: 1
-        };
+      // 1. בדיקה אם באותו קו (מסלול ישיר) - תיקון 9: עדיפות למסלול ישיר
+      const directRoutes = findDirectRoutes(fromStation, toStation);
+      if (directRoutes.length > 0) {
+        return directRoutes[0]; // מחזיר את המסלול הישיר הראשון
       }
 
       // 2. חיפוש מסלול עם החלפה אחת
@@ -299,7 +472,28 @@
       return createFallbackRoute(fromStation, toStation);
     }
 
+    // תיקון 9: פונקציה למציאת מסלולים ישירים
+    function findDirectRoutes(fromStation, toStation) {
+      const directRoutes = [];
+      
+      // בדיקה של כל הקווים המשותפים
+      const sharedLines = fromStation.lines.filter(line => toStation.lines.includes(line));
+      
+      sharedLines.forEach(line => {
+        directRoutes.push({
+          type: 'direct',
+          from: fromStation,
+          to: toStation,
+          line: lineInfo[line],
+          steps: 1
+        });
+      });
+      
+      return directRoutes;
+    }
+
     function findOneTransferRoute(fromStation, toStation) {
+      // תיקון 4: טיפול בפיצולים - בדיקה של תחנות חיבור
       const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way'];
       
       for (const transferId of transferStations) {
@@ -310,15 +504,22 @@
         const canReachDestination = canReachStation(transferStation, toStation);
         
         if (canReachTransfer && canReachDestination) {
-          return {
-            type: 'transfer',
-            from: fromStation,
-            to: toStation,
-            transfer: transferStation,
-            line1: lineInfo[fromStation.line],
-            line2: lineInfo[toStation.line],
-            steps: 2
-          };
+          // מציאת הקווים הנכונים
+          const line1 = findBestLine(fromStation, transferStation);
+          const line2 = findBestLine(transferStation, toStation);
+          
+          // תיקון 8: וידוא שהקווים נכונים
+          if (line1 && line2) {
+            return {
+              type: 'transfer',
+              from: fromStation,
+              to: toStation,
+              transfer: transferStation,
+              line1: lineInfo[line1],
+              line2: lineInfo[line2],
+              steps: 2
+            };
+          }
         }
       }
       
@@ -340,9 +541,9 @@
           to: toStation,
           transfer1: waterfront,
           transfer2: commercial,
-          line1: lineInfo[fromStation.line],
-          line2: lineInfo['canada'], // waterfront-commercial דרך canada
-          line3: lineInfo[toStation.line],
+          line1: lineInfo[findBestLine(fromStation, waterfront)],
+          line2: lineInfo[findBestLine(waterfront, commercial)],
+          line3: lineInfo[findBestLine(commercial, toStation)],
           steps: 3
         };
       }
@@ -351,14 +552,15 @@
     }
 
     function canReachStation(from, to) {
-      // אם באותו קו - בוודאי אפשר
-      if (from.line === to.line) return true;
-      
-      // אם יש חיבור transfers
-      if (from.transfers && from.transfers.includes(to.line)) return true;
-      if (to.transfers && to.transfers.includes(from.line)) return true;
-      
-      return false;
+      // בדיקה אם יש קו משותף
+      const sharedLines = from.lines.filter(line => to.lines.includes(line));
+      return sharedLines.length > 0;
+    }
+
+    function findBestLine(from, to) {
+      // מציאת הקו הטוב ביותר בין שתי תחנות
+      const sharedLines = from.lines.filter(line => to.lines.includes(line));
+      return sharedLines[0] || null;
     }
 
     function createFallbackRoute(fromStation, toStation) {
@@ -370,8 +572,8 @@
         from: fromStation,
         to: toStation,
         via: waterfront,
-        line1: lineInfo[fromStation.line],
-        line2: lineInfo[toStation.line],
+        line1: lineInfo[fromStation.lines[0]],
+        line2: lineInfo[toStation.lines[0]],
         steps: 3,
         note: `דרך ${waterfront.nameHe} (תחנה מרכזית)`
       };
@@ -427,7 +629,7 @@
             </div>
           </div>
           
-          <div class="step-animation bg-blue-50 rounded-xl p-6 border-r-4 border-blue-400">
+          <div class="route-step ${route.line.colorClass} step-animation bg-blue-50 rounded-xl p-6">
             <h3 class="font-bold text-blue-800 text-lg mb-3">🚇 ההוראות שלך:</h3>
             <div class="space-y-2">
               <p class="text-blue-700">
@@ -480,19 +682,19 @@
           </div>
           
           <div class="space-y-4">
-            <div class="step-animation bg-green-50 rounded-xl p-4 border-r-4 border-green-400">
+            <div class="route-step ${route.line1.colorClass} step-animation bg-green-50 rounded-xl p-4">
               <h4 class="font-bold text-green-800 mb-2">🚇 שלב 1: נסיעה ל${route.transfer.nameHe}</h4>
               <p class="text-green-700">קח את ${route.line1.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line1.colorClass}-bg mx-1"></span> מ${route.from.nameHe} עד ${route.transfer.nameHe}</p>
             </div>
             
-            <div class="step-animation bg-blue-50 rounded-xl p-4 border-r-4 border-blue-400" style="animation-delay: 0.5s">
-              <h4 class="font-bold text-blue-800 mb-2">🔄 שלב 2: החלפה</h4>
-              <p class="text-blue-700">רד מהרכבת ועבור לרציף של ${route.line2.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line2.colorClass}-bg mx-1"></span></p>
+            <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.3s">
+              <h4 class="font-bold text-gray-800 mb-2">🔄 שלב 2: החלפה</h4>
+              <p class="text-gray-700">רד מהרכבת ועבור לרציף של ${route.line2.nameHe}</p>
             </div>
             
-            <div class="step-animation bg-purple-50 rounded-xl p-4 border-r-4 border-purple-400" style="animation-delay: 1s">
-              <h4 class="font-bold text-purple-800 mb-2">🎯 שלב 3: המשך ליעד</h4>
-              <p class="text-purple-700">קח את ${route.line2.nameHe} מ${route.transfer.nameHe} עד ${route.to.nameHe} - הגעת!</p>
+            <div class="route-step ${route.line2.colorClass} step-animation bg-blue-50 rounded-xl p-4" style="animation-delay: 0.6s">
+              <h4 class="font-bold text-blue-800 mb-2">🚇 שלב 3: נסיעה ליעד</h4>
+              <p class="text-blue-700">קח את ${route.line2.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line2.colorClass}-bg mx-1"></span> מ${route.transfer.nameHe} עד ${route.to.nameHe} 🎯</p>
             </div>
           </div>
           
@@ -505,54 +707,38 @@
         <div class="bg-white rounded-2xl shadow-lg p-6">
           <div class="text-center mb-6">
             <div class="text-4xl mb-2">🔄🔄</div>
-            <h2 class="text-2xl font-bold text-purple-600">צריך שתי החלפות</h2>
-            <p class="text-gray-600">קצת יותר מורכב, אבל בהחלט אפשרי!</p>
+            <h2 class="text-2xl font-bold text-orange-600">מסלול עם שתי החלפות</h2>
+            <p class="text-gray-600">קצת יותר מורכב, אבל אפשרי!</p>
           </div>
           
-          <div class="bg-gray-50 rounded-xl p-6 mb-6">
-            <div class="grid grid-cols-4 items-center gap-2 text-center text-sm">
-              <div>
-                <div class="font-bold">${route.from.nameHe}</div>
-                <div class="w-4 h-4 rounded-full ${route.line1.colorClass}-bg mx-auto mt-1"></div>
-              </div>
-              <div>
-                <div class="text-xl mb-1">🔄</div>
-                <div class="font-medium text-blue-600">${route.transfer1.nameHe}</div>
-              </div>
-              <div>
-                <div class="text-xl mb-1">🔄</div>
-                <div class="font-medium text-blue-600">${route.transfer2.nameHe}</div>
-              </div>
-              <div>
-                <div class="font-bold">${route.to.nameHe}</div>
-                <div class="w-4 h-4 rounded-full ${route.line3.colorClass}-bg mx-auto mt-1"></div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-3">
-            <div class="step-animation bg-green-50 rounded-xl p-3 border-r-4 border-green-400">
-              <h4 class="font-bold text-green-800 mb-1">🚇 שלב 1</h4>
-              <p class="text-green-700 text-sm">${route.line1.nameHe}: ${route.from.nameHe} → ${route.transfer1.nameHe}</p>
+          <div class="space-y-4">
+            <div class="route-step ${route.line1.colorClass} step-animation bg-green-50 rounded-xl p-4">
+              <h4 class="font-bold text-green-800 mb-2">🚇 שלב 1</h4>
+              <p class="text-green-700">קח את ${route.line1.nameHe} מ${route.from.nameHe} עד ${route.transfer1.nameHe}</p>
             </div>
             
-            <div class="step-animation bg-blue-50 rounded-xl p-3 border-r-4 border-blue-400" style="animation-delay: 0.3s">
-              <h4 class="font-bold text-blue-800 mb-1">🔄 שלב 2</h4>
-              <p class="text-blue-700 text-sm">${route.line2.nameHe}: ${route.transfer1.nameHe} → ${route.transfer2.nameHe}</p>
+            <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.3s">
+              <h4 class="font-bold text-gray-800 mb-2">🔄 החלפה ראשונה</h4>
+              <p class="text-gray-700">עבור ל${route.line2.nameHe} ב${route.transfer1.nameHe}</p>
             </div>
             
-            <div class="step-animation bg-purple-50 rounded-xl p-3 border-r-4 border-purple-400" style="animation-delay: 0.6s">
-              <h4 class="font-bold text-purple-800 mb-1">🎯 שלב 3</h4>
-              <p class="text-purple-700 text-sm">${route.line3.nameHe}: ${route.transfer2.nameHe} → ${route.to.nameHe}</p>
+            <div class="route-step ${route.line2.colorClass} step-animation bg-blue-50 rounded-xl p-4" style="animation-delay: 0.6s">
+              <h4 class="font-bold text-blue-800 mb-2">🚇 שלב 2</h4>
+              <p class="text-blue-700">קח את ${route.line2.nameHe} עד ${route.transfer2.nameHe}</p>
+            </div>
+            
+            <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.9s">
+              <h4 class="font-bold text-gray-800 mb-2">🔄 החלפה שנייה</h4>
+              <p class="text-gray-700">עבור ל${route.line3.nameHe} ב${route.transfer2.nameHe}</p>
+            </div>
+            
+            <div class="route-step ${route.line3.colorClass} step-animation bg-purple-50 rounded-xl p-4" style="animation-delay: 1.2s">
+              <h4 class="font-bold text-purple-800 mb-2">🚇 שלב 3</h4>
+              <p class="text-purple-700">קח את ${route.line3.nameHe} עד ${route.to.nameHe} 🎯</p>
             </div>
           </div>
           
-          <div class="bg-yellow-50 rounded-xl p-4 mt-6">
-            <h4 class="font-bold text-yellow-800 mb-2">💡 טיפ חשוב</h4>
-            <p class="text-yellow-700 text-sm">זה מסלול ארוך יותר - קח את הזמן שלך בהחלפות!</p>
-          </div>
-          
-          ${generateRouteInfo(route, true)}
+          ${generateRouteInfo(route)}
         </div>`;
     }
 
@@ -560,171 +746,40 @@
       return `
         <div class="bg-white rounded-2xl shadow-lg p-6">
           <div class="text-center mb-6">
-            <div class="text-4xl mb-2">🚀</div>
-            <h2 class="text-2xl font-bold text-indigo-600">מסלול מיוחד</h2>
-            <p class="text-gray-600">מצאנו דרך! ${route.note}</p>
+            <div class="text-4xl mb-2">🤔</div>
+            <h2 class="text-2xl font-bold text-purple-600">מסלול מורכב</h2>
+            <p class="text-gray-600">${route.note}</p>
           </div>
           
-          <div class="bg-indigo-50 rounded-xl p-6 mb-6 border-2 border-indigo-200">
-            <h3 class="font-bold text-indigo-800 mb-3">🗺️ המסלול שלך:</h3>
-            <div class="space-y-2 text-indigo-700">
-              <p><span class="font-medium">1️⃣ מ${route.from.nameHe}</span> נסע ב${route.line1.nameHe} לכיוון ${route.via.nameHe}</p>
-              <p><span class="font-medium">2️⃣ ב${route.via.nameHe}</span> תחליף לכיוון ${route.to.nameHe}</p>
-              <p><span class="font-medium">3️⃣ המשך ב${route.line2.nameHe}</span> עד ${route.to.nameHe}</p>
-            </div>
+          <div class="bg-purple-50 rounded-xl p-4">
+            <p class="text-purple-700">המסלול הזה דורש תכנון מוקפד. מומלץ לבדוק עם TransLink או להשתמש באפליקציה הרשמית שלהם לפרטים מדויקים.</p>
           </div>
           
-          <div class="bg-green-50 rounded-xl p-4">
-            <h4 class="font-bold text-green-800 mb-3">✨ מה מיוחד בזה?</h4>
-            <ul class="text-sm text-green-700 space-y-1">
-              <li>• ${route.via.nameHe} הוא צמת מרכזי עם הרבה חיבורים</li>
-              <li>• זה המסלול הבטוח ביותר למקרה הזה</li>
-              <li>• תמיד יש רכבות לכיוונים השונים</li>
-            </ul>
-          </div>
-          
-          ${generateRouteInfo(route, true)}
+          ${generateRouteInfo(route)}
         </div>`;
     }
 
-    function generateRouteInfo(route, isComplex = false) {
-      const fromZone = route.from.zone;
-      const toZone = route.to.zone;
-      const maxZone = Math.max(fromZone, toZone);
-      
-      let estimatedTime = 5; // זמן בסיס
-      if (route.type === 'transfer') estimatedTime += 25;
-      if (route.type === 'direct') estimatedTime += 15;
-      if (route.type === 'double-transfer') estimatedTime += 40;
-      if (route.type === 'complex-but-possible') estimatedTime += 35;
-      
-      const busInfo = generateBusInfo(route);
-      
+    function generateRouteInfo(route) {
       return `
-      <div class="grid md:grid-cols-2 gap-6 mt-6">
-        <div class="bg-blue-50 rounded-xl p-4">
-          <h4 class="font-bold text-blue-800 mb-3">📊 מידע על הנסיעה</h4>
-          <div class="space-y-2 text-sm">
-            <div class="flex justify-between">
-              <span>⏱️ זמן משוער:</span>
-              <span class="font-medium">כ-${estimatedTime} דקות</span>
-            </div>
-            <div class="flex justify-between">
-              <span>💰 אזור תעריף:</span>
-              <span class="font-medium">אזור ${maxZone}</span>
-            </div>
-            <div class="flex justify-between">
-              <span>♿ נגישות:</span>
-              <span class="font-medium text-green-600">✅ נגיש</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-green-50 rounded-xl p-4">
-          <h4 class="font-bold text-green-800 mb-3">💡 טיפים חשובים</h4>
-          <ul class="text-sm text-green-700 space-y-1">
-            <li>• הרכבות פועלות כל 2-7 דקות</li>
-            <li>• שעות פעילות: 05:00-01:30</li>
-            <li>• תמיד עמוד מימין במדרגות הנעות</li>
-            <li>• שמור על כרטיס עד סוף הנסיעה</li>
-            ${isComplex ? '<li>• <strong>תן לעצמך זמן נוסף להחלפות</strong></li>' : ''}
+        <div class="bg-gray-50 rounded-lg p-4 mt-4">
+          <h4 class="font-bold text-gray-800 mb-2">💡 טיפים שימושיים:</h4>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li>• הסקייטריין פועל בקירוב 05:00-01:30</li>
+            <li>• תדירות: 2-7 דקות בשעות העומס</li>
+            <li>• כל התחנות נגישות לכיסאות גלגלים</li>
+            <li>• אין צורך בכרטיס נפרד לחיבורים</li>
           </ul>
-        </div>
-      </div>
-      
-      ${busInfo}
-      
-      <div class="flex justify-center gap-4 mt-6">
-        <button onclick="resetCalculation()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-medium">
-          🔄 חשב מסלול אחר
-        </button>
-        <button onclick="goToMap()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium">
-          🗺️ ראה במפה
-        </button>
-      </div>`;
-    }
-
-    function generateBusInfo(route) {
-      if (currentDifficulty === 'easy') return '';
-      
-      const fromBuses = busConnections[route.from.id] || [];
-      const toBuses = busConnections[route.to.id] || [];
-      
-      if (fromBuses.length === 0 && toBuses.length === 0) return '';
-      
-      return `
-      <div class="bg-yellow-50 rounded-xl p-4 mt-6">
-        <h4 class="font-bold text-yellow-800 mb-3">🚌 חיבורי אוטובוס</h4>
-        ${fromBuses.length > 0 ? `
-        <div class="mb-3">
-          <p class="font-medium text-yellow-700 mb-1">מ${route.from.nameHe}:</p>
-          <div class="flex flex-wrap gap-2">
-            ${fromBuses.map(bus => `<span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded">${bus}</span>`).join('')}
-          </div>
-        </div>` : ''}
-        ${toBuses.length > 0 ? `
-        <div>
-          <p class="font-medium text-yellow-700 mb-1">ל${route.to.nameHe}:</p>
-          <div class="flex flex-wrap gap-2">
-            ${toBuses.map(bus => `<span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded">${bus}</span>`).join('')}
-          </div>
-        </div>` : ''}
-      </div>`;
+        </div>`;
     }
 
     function showError(message) {
       const resultsDiv = document.getElementById('results');
       resultsDiv.innerHTML = `
-      <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
-        <div class="text-4xl mb-4">😅</div>
-        <h2 class="text-xl font-bold text-red-600 mb-2">אופס!</h2>
-        <p class="text-gray-600">${message}</p>
-      </div>`;
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <div class="text-4xl mb-2">⚠️</div>
+          <p class="text-red-600 font-medium">${message}</p>
+        </div>`;
       resultsDiv.classList.remove('hidden');
-    }
-
-    function resetCalculation() {
-      document.getElementById('fromStation').value = '';
-      document.getElementById('toStation').value = '';
-      document.getElementById('results').classList.add('hidden');
-      document.getElementById('calculateBtn').disabled = true;
-    }
-
-    function resetSelection() {
-      document.getElementById('stationSelection').classList.add('hidden');
-      document.getElementById('difficultySelection').classList.remove('hidden');
-      document.getElementById('results').classList.add('hidden');
-      currentDifficulty = null;
-    }
-
-    function goHome() {
-      window.location.href = './index.html';
-    }
-
-    function goToMap() {
-      window.location.href = './map.html';
-    }
-
-    // עדכון מצב הכפתור
-    document.getElementById('fromStation').addEventListener('change', updateCalculateButton);
-    document.getElementById('toStation').addEventListener('change', updateCalculateButton);
-
-    function updateCalculateButton() {
-      const from = document.getElementById('fromStation').value;
-      const to = document.getElementById('toStation').value;
-      const btn = document.getElementById('calculateBtn');
-      
-      btn.disabled = !from || !to;
-      
-      if (from && to) {
-        btn.classList.remove('disabled:bg-gray-300');
-        btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      }
-    }
-
-    /* Service Worker registration */
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
     }
   </script>
 </body>
