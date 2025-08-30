@@ -833,38 +833,358 @@ function calculateStationDistance(stationId1, stationId2, lineKey) {
 }
 
 // פונקציה מוספת לקבלת נתוני קווים (משתמש בנתונים מ-map.html)
-function getAllLinesData() {
-  return {
-    expo: {
-      stations: [
-        {id:'waterfront'}, {id:'burrard'}, {id:'granville'}, {id:'stadium'},
-        {id:'main-street'}, {id:'commercial'}, {id:'nanaimo'}, {id:'29th-ave'},
-        {id:'joyce'}, {id:'patterson'}, {id:'metrotown'}, {id:'royal-oak'},
-        {id:'edmonds'}, {id:'22nd-street'}, {id:'new-west'}, {id:'columbia'},
-        {id:'scott-road'}, {id:'gateway'}, {id:'surrey-central'}, {id:'king-george'},
-        {id:'sapperton'}, {id:'braid'}, {id:'lougheed'}, {id:'production-way'}
-      ]
-    },
-    millennium: {
-      stations: [
-        {id:'vcc-clark'}, {id:'commercial'}, {id:'renfrew'}, {id:'rupert'},
-        {id:'gilmore'}, {id:'brentwood'}, {id:'holdom'}, {id:'sperling'},
-        {id:'lake-city-way'}, {id:'production-way'}, {id:'lougheed'},
-        {id:'burquitlam'}, {id:'moody-centre'}, {id:'inlet-centre'},
-        {id:'coquitlam-central'}, {id:'lincoln'}, {id:'lafarge-lake'}
-      ]
-    },
-    canada: {
-      stations: [
-        {id:'waterfront'}, {id:'vancouver-city-centre'}, {id:'yaletown'},
-        {id:'olympic-village'}, {id:'broadway-city-hall'}, {id:'king-edward'},
-        {id:'oakridge'}, {id:'langara'}, {id:'marine-drive'}, {id:'bridgeport'},
-        {id:'templeton'}, {id:'sea-island-centre'}, {id:'yvr-airport'},
-        {id:'aberdeen'}, {id:'lansdowne'}, {id:'richmond-brighouse'}
-      ]
-    }
-  };
+💡 הזמנים כוללים נסיעה, עצירות ומעברים בין רכבות
+      </div>
+    </div>
+  `;
 }
+
+
+    function estimateTime(route) {
+  let totalMinutes = 0;
+  
+  // זמני נסיעה בסיסיים לפי סוג קו (בדקות לתחנה)
+  const timePerStation = {
+    'expo': 2.1,     // קו אקספו - מהיר יותר, מרחקים ארוכים
+    'millennium': 1.8, // קו המילניום - קומפקטי יותר
+    'canada': 2.3     // קו קנדה - כולל מנהרות וגשרים
+  };
+  
+  // זמני החלפה לפי תחנה (בדקות)
+  const transferTimes = {
+    'waterfront': 6,      // תחנה גדולה ומרכזית
+    'commercial': 5,      // תחנת חיבור עמוסה
+    'lougheed': 4,        // תחנת חיבור רגילה
+    'production-way': 4,  // תחנת חיבור רגילה
+    'bridgeport': 5,      // תחנת חיבור לקו קנדה
+    'columbia': 4,        // תחנת חיבור קטנה יותר
+    'default': 4          // זמן החלפה ברירת מחדל
+  };
+
+  if (route.type === 'direct') {
+    // נסיעה ישירה
+    const lineKey = route.line.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                   route.line.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    
+    // אם יש מידע על מרחק בתחנות, השתמש בו
+    const distance = route.distance || estimateDirectDistance(route);
+    totalMinutes = distance * timePerStation[lineKey] + 2; // +2 דקות זמן עלייה/ירידה
+    
+  } else if (route.type === 'transfer') {
+    // נסיעה עם החלפה אחת
+    const line1Key = route.line1.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line1.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    const line2Key = route.line2.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line2.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    
+    // חישוב מרחקים אם יש, אחרת הערכה
+    const segment1Distance = route.segment1Distance || 8; // הערכה ממוצעת
+    const segment2Distance = route.segment2Distance || 6; // הערכה ממוצעת
+    
+    const segment1Time = segment1Distance * timePerStation[line1Key];
+    const segment2Time = segment2Distance * timePerStation[line2Key];
+    const transferId = getStationId(route.transfer);
+    const transferTime = transferTimes[transferId] || transferTimes['default'];
+    
+    totalMinutes = segment1Time + transferTime + segment2Time + 2;
+    
+  } else if (route.type === 'double-transfer') {
+    // נסיעה עם שתי החלפות
+    const line1Key = route.line1.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line1.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    const line2Key = route.line2.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line2.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    const line3Key = route.line3.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line3.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    
+    // הערכות מרחק לכל מקטע
+    const segment1Time = 6 * timePerStation[line1Key];
+    const segment2Time = 4 * timePerStation[line2Key]; 
+    const segment3Time = 5 * timePerStation[line3Key];
+    
+    const transfer1Id = getStationId(route.transfer1);
+    const transfer2Id = getStationId(route.transfer2);
+    const transfer1Time = transferTimes[transfer1Id] || transferTimes['default'];
+    const transfer2Time = transferTimes[transfer2Id] || transferTimes['default'];
+    
+    totalMinutes = segment1Time + transfer1Time + segment2Time + transfer2Time + segment3Time + 3;
+    
+  } else {
+    // מסלול חירום/מורכב
+    totalMinutes = 35; // הערכה גסה למסלול מורכב
+  }
+  
+  // עיגול לדקה הקרובה
+  return Math.round(totalMinutes);
+}
+
+// פונקציה עזר להערכת מרחק בנסיעה ישירה
+function estimateDirectDistance(route) {
+  // ניסיון חכם להעריך מרחק על בסיס אזורי תעריף
+  const zoneDiff = Math.abs((route.to.zone || 2) - (route.from.zone || 1));
+  
+  if (zoneDiff === 0) return 3; // באותו אזור - קרוב
+  if (zoneDiff === 1) return 7; // אזור אחד הפרש - בינוני
+  return 12; // הפרש של 2+ אזורים - רחוק
+}
+
+    function getDifficultyLevel(route) {
+      if (route.steps === 1) return 'קל ⭐';
+      if (route.steps === 2) return 'בינוני ⭐⭐';
+      if (route.steps === 3) return 'מאתגר ⭐⭐⭐';
+      return 'מורכב ⭐⭐⭐⭐';
+    }
+
+    // פונקציות המפה
+    function initMap() {
+      if (routeMap) {
+        routeMap.remove();
+      }
+      
+      routeMap = L.map('routeMap').setView([49.2827, -123.1207], 11);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(routeMap);
+      
+      return routeMap;
+    }
+
+    function showRouteOnMap() {
+      if (!currentRoute) return;
+      
+      document.getElementById('mapContainer').classList.remove('hidden');
+      
+      setTimeout(() => {
+        const map = initMap();
+        plotRouteOnMap(map, currentRoute);
+        
+        // גלילה למפה
+        document.getElementById('mapContainer').scrollIntoView({
+          behavior: 'smooth', 
+          block: 'start'
+        });
+      }, 100);
+    }
+
+    function plotRouteOnMap(map, route) {
+      // פונקציה לקבלת קואורדינטות של תחנה
+      const getStationCoords = (station) => {
+        if (!station) return null;
+        
+        // חיפוש מזהה התחנה
+        const stationId = Object.keys(stations).find(key => stations[key] === station);
+        return stationId ? stationCoordinates[stationId] : null;
+      };
+
+      const fromCoords = getStationCoords(route.from);
+      const toCoords = getStationCoords(route.to);
+      
+      if (!fromCoords || !toCoords) {
+        console.error('לא נמצאו קואורדינטות עבור התחנות');
+        return;
+      }
+
+      const allMarkers = []; // מערך לכל הסמנים עבור fitBounds
+
+      // סימון תחנת מקור
+      const fromMarker = L.marker(fromCoords, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background-color: #22c55e; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">🚉</div>',
+          iconSize: [25, 25],
+          iconAnchor: [12, 12]
+        })
+      })
+        .addTo(map)
+        .bindPopup(`
+          <div class="text-center">
+            <h3 class="font-bold">${route.from.nameHe}</h3>
+            <p class="text-sm text-gray-600">${route.from.nameEn}</p>
+            <p class="text-xs text-green-600 font-medium">🚉 תחנת התחלה</p>
+          </div>
+        `);
+      allMarkers.push(fromMarker);
+
+      // סימון תחנת יעד  
+      const toMarker = L.marker(toCoords, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background-color: #ef4444; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">🎯</div>',
+          iconSize: [25, 25],
+          iconAnchor: [12, 12]
+        })
+      })
+        .addTo(map)
+        .bindPopup(`
+          <div class="text-center">
+            <h3 class="font-bold">${route.to.nameHe}</h3>
+            <p class="text-sm text-gray-600">${route.to.nameEn}</p>
+            <p class="text-xs text-red-600 font-medium">🎯 תחנת יעד</p>
+          </div>
+        `);
+      allMarkers.push(toMarker);
+
+      // בניית רשימת הקואורדינטות למסלול
+      const routeCoords = [fromCoords];
+
+      // טיפול במסלול עם החלפה אחת
+      if (route.transfer) {
+        const transferCoords = getStationCoords(route.transfer);
+        if (transferCoords) {
+          const transferMarker = L.marker(transferCoords, {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: '<div style="background-color: #3b82f6; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">🔄</div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          })
+            .addTo(map)
+            .bindPopup(`
+              <div class="text-center">
+                <h3 class="font-bold">${route.transfer.nameHe}</h3>
+                <p class="text-sm text-gray-600">${route.transfer.nameEn}</p>
+                <p class="text-xs text-blue-600 font-medium">🔄 תחנת חיבור</p>
+                <p class="text-xs text-gray-500 mt-1">החלף מ${route.line1.nameHe} ל${route.line2.nameHe}</p>
+              </div>
+            `);
+          allMarkers.push(transferMarker);
+          routeCoords.push(transferCoords);
+        }
+      }
+
+      // טיפול במסלול עם שתי החלפות
+      if (route.transfer1) {
+        const transfer1Coords = getStationCoords(route.transfer1);
+        if (transfer1Coords) {
+          const transfer1Marker = L.marker(transfer1Coords, {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: '<div style="background-color: #f59e0b; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">1️⃣</div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          })
+            .addTo(map)
+            .bindPopup(`
+              <div class="text-center">
+                <h3 class="font-bold">${route.transfer1.nameHe}</h3>
+                <p class="text-sm text-gray-600">${route.transfer1.nameEn}</p>
+                <p class="text-xs text-orange-600 font-medium">🔄 החלפה ראשונה</p>
+                <p class="text-xs text-gray-500 mt-1">החלף מ${route.line1.nameHe} ל${route.line2.nameHe}</p>
+              </div>
+            `);
+          allMarkers.push(transfer1Marker);
+          routeCoords.push(transfer1Coords);
+        }
+      }
+
+      if (route.transfer2) {
+        const transfer2Coords = getStationCoords(route.transfer2);
+        if (transfer2Coords) {
+          const transfer2Marker = L.marker(transfer2Coords, {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: '<div style="background-color: #8b5cf6; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">2️⃣</div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          })
+            .addTo(map)
+            .bindPopup(`
+              <div class="text-center">
+                <h3 class="font-bold">${route.transfer2.nameHe}</h3>
+                <p class="text-sm text-gray-600">${route.transfer2.nameEn}</p>
+                <p class="text-xs text-purple-600 font-medium">🔄 החלפה שנייה</p>
+                <p class="text-xs text-gray-500 mt-1">החלף מ${route.line2.nameHe} ל${route.line3.nameHe}</p>
+              </div>
+            `);
+          allMarkers.push(transfer2Marker);
+          routeCoords.push(transfer2Coords);
+        }
+      }
+
+      // הוספת תחנת היעד לקואורדינטות המסלול
+      routeCoords.push(toCoords);
+
+      // ציור קו המסלול עם צבעים משתנים
+      if (routeCoords.length >= 2) {
+        // אם יש החלפות, נצייר קטעים נפרדים בצבעים שונים
+        if (route.transfer || route.transfer1) {
+          // קטע ראשון
+          if (routeCoords.length >= 2) {
+            L.polyline([routeCoords[0], routeCoords[1]], {
+              color: route.line1 ? route.line1.color : '#666',
+              weight: 5,
+              opacity: 0.8
+            }).addTo(map);
+          }
+          
+          // קטע שני (אם יש החלפה)
+          if (routeCoords.length >= 3) {
+            const line2Color = route.line2 ? route.line2.color : '#666';
+            L.polyline([routeCoords[1], routeCoords[2]], {
+              color: line2Color,
+              weight: 5,
+              opacity: 0.8
+            }).addTo(map);
+          }
+          
+          // קטע שלישי (אם יש שתי החלפות)
+          if (routeCoords.length >= 4) {
+            const line3Color = route.line3 ? route.line3.color : '#666';
+            L.polyline([routeCoords[2], routeCoords[3]], {
+              color: line3Color,
+              weight: 5,
+              opacity: 0.8
+            }).addTo(map);
+          }
+        } else {
+          // מסלול ישיר - קו אחד
+          L.polyline(routeCoords, {
+            color: route.line ? route.line.color : '#666',
+            weight: 5,
+            opacity: 0.8
+          }).addTo(map);
+        }
+      }
+
+      // התאמת התצוגה לכלול את כל הנקודות
+      if (allMarkers.length > 0) {
+        const group = new L.featureGroup(allMarkers);
+        map.fitBounds(group.getBounds().pad(0.15));
+      }
+    }
+
+    function hideMap() {
+      document.getElementById('mapContainer').classList.add('hidden');
+    }
+
+    // בדיקת מצב אופליין
+    function checkOfflineStatus() {
+      const badge = document.getElementById('offlineBadge');
+      if (!navigator.onLine) {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    window.addEventListener('online', checkOfflineStatus);
+    window.addEventListener('offline', checkOfflineStatus);
+    
+    // אתחול האפליקציה
+    document.addEventListener('DOMContentLoaded', function() {
+      checkOfflineStatus();
+    });
+
+    // הוספת פונקציות לחלון הגלובלי
+    window.showRouteOnMap = showRouteOnMap;
+    window.hideMap = hideMap;
+  </script>
+</body>
+</html>
 
 // החלפת הפונקציה הקיימת findOneTransferRoute בגרסה משופרת
 function findOneTransferRoute(fromStation, toStation) {
