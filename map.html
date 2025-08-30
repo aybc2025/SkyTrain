@@ -624,21 +624,18 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
         if (!position) return;
         
         let labelSide = position.labelSide;
-
-// תחנות חיבור: תמיד מעל (כדי לא לכסות את הסימון הרב-קווי)
-if (stationData.lines.length > 1) labelSide = 'top';
-
-// Override נקודתי
-if (labelOverrides[stationId]) labelSide = labelOverrides[stationId];
-
-addStationUnique(
-  position.x,
-  position.y,
-  stationId,
-  stationData.lines,
-  stationData.nameHe,
-  labelSide
-);
+        if (stationData.lines.length > 1) {
+          labelSide = 'center';
+        }
+        
+        addStationUnique(
+          position.x, 
+          position.y, 
+          stationId, 
+          stationData.lines,
+          stationData.nameHe, 
+          labelSide
+        );
       });
     }
 
