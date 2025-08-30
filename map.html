@@ -20,11 +20,15 @@
     @media (max-width: 640px){ .svg-wrap{min-width:700px} }
     #schemaSvg { touch-action: pan-x pinch-zoom; }
     /* תוויות */
-    .station-label{ font-size:11px; fill:#111827; font-weight:600; }
-    .label-bg{ fill:#fff; stroke:#e5e7eb; stroke-width:1; rx:3 }
+    .station-label{ font-size:11px; fill:#111827; font-weight:600; pointer-events:none; }
+    .label-bg{ fill:#fff; stroke:#e5e7eb; stroke-width:1; rx:3; pointer-events:none; }
     /* תחנות חיבור */
     .transfer-station{ cursor:pointer; }
     .transfer-station:hover .station{ transform:scale(1.15); }
+    /* וודא שהתחנות ניתנות לקליק */
+    .taparea { cursor: pointer; user-select: none; }
+    .taparea * { pointer-events: none; }
+    .taparea { pointer-events: all; }
   </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -85,7 +89,7 @@
               <circle r="7" cx="150" cy="6" fill="#0060A9"/>
               <!-- שורה 2 -->
               <text x="70" y="40" font-size="13" fill="#111827" text-anchor="end">קו המילניום</text>
-              <circle r="7" cx="150" cy="36" fill="#ffcd00"/>
+              <circle r="7" cx="150" cy="36" fill="#FED100"/>
               <!-- שורה 3 -->
               <text x="90" y="70" font-size="13" fill="#111827" text-anchor="end">קו קנדה</text>
               <circle r="7" cx="150" cy="66" fill="#009AC8"/>
@@ -162,73 +166,73 @@
       expo: {
         nameHe:'קו אקספו', nameEn:'Expo Line', color:'#0060A9',
         stations:[
-          {id:'waterfront',nameHe:'ווטרפרונט',nameEn:'Waterfront',zone:1,platforms:2,accessibility:true,transfers:['canada','seabus','westcoast']},
-          {id:'burrard',nameHe:'בוררד',nameEn:'Burrard',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'granville',nameHe:'גרנוויל',nameEn:'Granville',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'stadium',nameHe:'איצטדיון-צ\'יינטאון',nameEn:'Stadium–Chinatown',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'main-street',nameHe:'מיין סטריט-אמטאון',nameEn:'Main Street–Science World',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'commercial',nameHe:'קומרשיאל-ברודוויי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['millennium']},
-          {id:'nanaimo',nameHe:'ננאימו',nameEn:'Nanaimo',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'29th-ave',nameHe:'שדרה 29',nameEn:'29th Avenue',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'joyce',nameHe:'ג\'ויס-קולינגווד',nameEn:'Joyce–Collingwood',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'patterson',nameHe:'פטרסון',nameEn:'Patterson',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'metrotown',nameHe:'מטרוטאון',nameEn:'Metrotown',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'royal-oak',nameHe:'רויאל אוק',nameEn:'Royal Oak',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'edmonds',nameHe:'אדמונדס',nameEn:'Edmonds',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'22nd-street',nameHe:'רחוב 22',nameEn:'22nd Street',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'new-west',nameHe:'ניו ווסטמינסטר',nameEn:'New Westminster',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'columbia',nameHe:'קולומביה',nameEn:'Columbia',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'scott-road',nameHe:'דרך סקוט',nameEn:'Scott Road',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'gateway',nameHe:'גייטוויי',nameEn:'Gateway',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'surrey-central',nameHe:'מרכז סארי',nameEn:'Surrey Central',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'king-george',nameHe:'קינג ג\'ורג\'',nameEn:'King George',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'sapperton',nameHe:'סאפרטון',nameEn:'Sapperton',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'braid',nameHe:'ברייד',nameEn:'Braid',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'lougheed',nameHe:'לאוהיד',nameEn:'Lougheed Town Centre',zone:2,platforms:2,accessibility:true,transfers:['millennium']},
-          {id:'production-way',nameHe:'פרודקשן וויי',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['millennium']}
+          {id:'waterfront',nameHe:'ווטרפרונט',nameEn:'Waterfront',zone:1,platforms:2,accessibility:true,transfers:['canada','seabus','westcoast'],busLines:['004','007','014']},
+          {id:'burrard',nameHe:'בוררד',nameEn:'Burrard',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['005','006']},
+          {id:'granville',nameHe:'גרנוויל',nameEn:'Granville',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['010','016','050']},
+          {id:'stadium',nameHe:'איצטדיון-צ\'יינטאון',nameEn:'Stadium–Chinatown',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['019','022']},
+          {id:'main-street',nameHe:'מיין סטריט-אמטאון',nameEn:'Main Street–Science World',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['003','008','019']},
+          {id:'commercial',nameHe:'קומרשיאל-ברודוויי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['millennium'],busLines:['009','020','025']},
+          {id:'nanaimo',nameHe:'ננאימו',nameEn:'Nanaimo',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['025','029']},
+          {id:'29th-ave',nameHe:'שדרה 29',nameEn:'29th Avenue',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['029']},
+          {id:'joyce',nameHe:'ג\'ויס-קולינגווד',nameEn:'Joyce–Collingwood',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['026','027']},
+          {id:'patterson',nameHe:'פטרסון',nameEn:'Patterson',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['148']},
+          {id:'metrotown',nameHe:'מטרוטאון',nameEn:'Metrotown',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['110','116','144']},
+          {id:'royal-oak',nameHe:'רויאל אוק',nameEn:'Royal Oak',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['106']},
+          {id:'edmonds',nameHe:'אדמונדס',nameEn:'Edmonds',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['106','128']},
+          {id:'22nd-street',nameHe:'רחוב 22',nameEn:'22nd Street',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['123']},
+          {id:'new-west',nameHe:'ניו ווסטמינסטר',nameEn:'New Westminster',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['155','156','157']},
+          {id:'columbia',nameHe:'קולומביה',nameEn:'Columbia',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['155']},
+          {id:'scott-road',nameHe:'דרך סקוט',nameEn:'Scott Road',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['319','320']},
+          {id:'gateway',nameHe:'גייטוויי',nameEn:'Gateway',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['319','375']},
+          {id:'surrey-central',nameHe:'מרכז סארי',nameEn:'Surrey Central',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['321','335','345']},
+          {id:'king-george',nameHe:'קינג ג\'ורג\'',nameEn:'King George',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['321','375']},
+          {id:'sapperton',nameHe:'סאפרטון',nameEn:'Sapperton',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['155']},
+          {id:'braid',nameHe:'ברייד',nameEn:'Braid',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['155']},
+          {id:'lougheed',nameHe:'לאוהיד',nameEn:'Lougheed Town Centre',zone:2,platforms:2,accessibility:true,transfers:['millennium'],busLines:['134','136']},
+          {id:'production-way',nameHe:'פרודקשן וויי',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['millennium'],busLines:['145','169']}
         ]
       },
       millennium: {
         nameHe:'קו המילניום', nameEn:'Millennium Line', color:'#FED100',
         stations:[
-          {id:'vcc-clark',nameHe:'VCC-קלארק',nameEn:'VCC–Clark',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'commercial',nameHe:'קומרשיאל-ברודוויי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['expo']},
-          {id:'renfrew',nameHe:'רנפרו',nameEn:'Renfrew',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'rupert',nameHe:'רופרט',nameEn:'Rupert',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'gilmore',nameHe:'גילמור',nameEn:'Gilmore',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'brentwood',nameHe:'ברנטווד',nameEn:'Brentwood Town Centre',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'holdom',nameHe:'הולדום',nameEn:'Holdom',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'sperling',nameHe:'ספרלינג',nameEn:'Sperling–Burnaby Lake',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'lake-city-way',nameHe:'דרך עיר האגם',nameEn:'Lake City Way',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'production-way',nameHe:'פרודקשן וויי',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['expo']},
-          {id:'lougheed',nameHe:'לאוהיד',nameEn:'Lougheed Town Centre',zone:2,platforms:2,accessibility:true,transfers:['expo']},
-          {id:'burquitlam',nameHe:'ברקיטלם',nameEn:'Burquitlam',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'moody-centre',nameHe:'מרכז מודי',nameEn:'Moody Centre',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'inlet-centre',nameHe:'מרכז אינלט',nameEn:'Inlet Centre',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'coquitlam-central',nameHe:'מרכז קוקיטלם',nameEn:'Coquitlam Central',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'lincoln',nameHe:'לינקולן',nameEn:'Lincoln',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'lafarge-lake',nameHe:'אגם לאפארג\'',nameEn:'Lafarge Lake–Douglas',zone:3,platforms:2,accessibility:true,transfers:[]}
+          {id:'vcc-clark',nameHe:'VCC-קלארק',nameEn:'VCC–Clark',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['020']},
+          {id:'commercial',nameHe:'קומרשיאל-ברודוויי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['expo'],busLines:['009','020','025']},
+          {id:'renfrew',nameHe:'רנפרו',nameEn:'Renfrew',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['016','025']},
+          {id:'rupert',nameHe:'רופרט',nameEn:'Rupert',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['025','027']},
+          {id:'gilmore',nameHe:'גילמור',nameEn:'Gilmore',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['027']},
+          {id:'brentwood',nameHe:'ברנטווד',nameEn:'Brentwood Town Centre',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['136','144']},
+          {id:'holdom',nameHe:'הולדום',nameEn:'Holdom',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['136']},
+          {id:'sperling',nameHe:'ספרלינג',nameEn:'Sperling–Burnaby Lake',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['134','136']},
+          {id:'lake-city-way',nameHe:'דרך עיר האגם',nameEn:'Lake City Way',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['134']},
+          {id:'production-way',nameHe:'פרודקשן וויי',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['expo'],busLines:['145','169']},
+          {id:'lougheed',nameHe:'לאוהיד',nameEn:'Lougheed Town Centre',zone:2,platforms:2,accessibility:true,transfers:['expo'],busLines:['134','136']},
+          {id:'burquitlam',nameHe:'ברקיטלם',nameEn:'Burquitlam',zone:3,platforms:2,accessibility:true,transfers:[],busLines:['180']},
+          {id:'moody-centre',nameHe:'מרכז מודי',nameEn:'Moody Centre',zone:3,platforms:2,accessibility:true,transfers:[],busLines:['183','184']},
+          {id:'inlet-centre',nameHe:'מרכז אינלט',nameEn:'Inlet Centre',zone:3,platforms:2,accessibility:true,transfers:[],busLines:['183']},
+          {id:'coquitlam-central',nameHe:'מרכז קוקיטלם',nameEn:'Coquitlam Central',zone:3,platforms:2,accessibility:true,transfers:[],busLines:['159','174','188']},
+          {id:'lincoln',nameHe:'לינקולן',nameEn:'Lincoln',zone:3,platforms:2,accessibility:true,transfers:[],busLines:['174']},
+          {id:'lafarge-lake',nameHe:'אגם לאפארג\'',nameEn:'Lafarge Lake–Douglas',zone:3,platforms:2,accessibility:true,transfers:[],busLines:['174']}
         ]
       },
       canada: {
         nameHe:'קו קנדה', nameEn:'Canada Line', color:'#009AC8',
         stations:[
-          {id:'waterfront',nameHe:'ווטרפרונט',nameEn:'Waterfront',zone:1,platforms:2,accessibility:true,transfers:['expo','seabus','westcoast']},
-          {id:'vancouver-city-centre',nameHe:'מרכז העיר ונקובר',nameEn:'Vancouver City Centre',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'yaletown',nameHe:'יילטאון',nameEn:'Yaletown–Roundhouse',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'olympic-village',nameHe:'הכפר האולימפי',nameEn:'Olympic Village',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'broadway-city-hall',nameHe:'ברודוויי-עיריית העיר',nameEn:'Broadway–City Hall',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'king-edward',nameHe:'קינג אדוארד',nameEn:'King Edward',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'oakridge',nameHe:'אוקרידג\'',nameEn:'Oakridge–41st Avenue',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'langara',nameHe:'לנגרה',nameEn:'Langara–49th Avenue',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'marine-drive',nameHe:'דרייב ימי',nameEn:'Marine Drive',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'bridgeport',nameHe:'ברידג\'פורט',nameEn:'Bridgeport',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'templeton',nameHe:'טמפלטון',nameEn:'Templeton',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'sea-island-centre',nameHe:'מרכז אי הים',nameEn:'Sea Island Centre',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'yvr-airport',nameHe:'נמל תעופה YVR',nameEn:'YVR–Airport',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'aberdeen',nameHe:'אברדין',nameEn:'Aberdeen',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'lansdowne',nameHe:'לנסדאון',nameEn:'Lansdowne',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'richmond-brighouse',nameHe:'ריצ\'מונד-בריגהאוס',nameEn:'Richmond-Brighouse',zone:2,platforms:2,accessibility:true,transfers:[]}
+          {id:'waterfront',nameHe:'ווטרפרונט',nameEn:'Waterfront',zone:1,platforms:2,accessibility:true,transfers:['expo','seabus','westcoast'],busLines:['004','007','014']},
+          {id:'vancouver-city-centre',nameHe:'מרכז העיר ונקובר',nameEn:'Vancouver City Centre',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['005','006','010']},
+          {id:'yaletown',nameHe:'יילטאון',nameEn:'Yaletown–Roundhouse',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['015','050']},
+          {id:'olympic-village',nameHe:'הכפר האולימפי',nameEn:'Olympic Village',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['015','017']},
+          {id:'broadway-city-hall',nameHe:'ברודוויי-עיריית העיר',nameEn:'Broadway–City Hall',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['009','099']},
+          {id:'king-edward',nameHe:'קינג אדוארד',nameEn:'King Edward',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['025','033']},
+          {id:'oakridge',nameHe:'אוקרידג\'',nameEn:'Oakridge–41st Avenue',zone:1,platforms:2,accessibility:true,transfers:[],busLines:['041','049']},
+          {id:'langara',nameHe:'לנגרה',nameEn:'Langara–49th Avenue',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['049']},
+          {id:'marine-drive',nameHe:'דרייב ימי',nameEn:'Marine Drive',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['100']},
+          {id:'bridgeport',nameHe:'ברידג\'פורט',nameEn:'Bridgeport',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['405','407','410']},
+          {id:'templeton',nameHe:'טמפלטון',nameEn:'Templeton',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['405']},
+          {id:'sea-island-centre',nameHe:'מרכז אי הים',nameEn:'Sea Island Centre',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['403','412']},
+          {id:'yvr-airport',nameHe:'נמל תעופה YVR',nameEn:'YVR–Airport',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['424']},
+          {id:'aberdeen',nameHe:'אברדין',nameEn:'Aberdeen',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['403','407']},
+          {id:'lansdowne',nameHe:'לנסדאון',nameEn:'Lansdowne',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['401','403']},
+          {id:'richmond-brighouse',nameHe:'ריצ\'מונד-בריגהאוס',nameEn:'Richmond-Brighouse',zone:2,platforms:2,accessibility:true,transfers:[],busLines:['401','402','407']}
         ]
       }
     };
@@ -316,8 +320,10 @@
       });
     }
 
-    /* ===== מודל תחנה - תיקון 1,2,3: הצגת קווים העוברים בתחנה וקווי אוטובוס ===== */
+    /* ===== מודל תחנה - תיקון: הצגת קווים העוברים בתחנה וקווי אוטובוס ===== */
     function getStationInfo(stationId){
+      console.log('מחפש מידע על תחנה:', stationId);
+      
       // יצירת מערך של כל הקווים שעוברים בתחנה
       const stationLines = [];
       let stationData = {};
@@ -340,9 +346,11 @@
       });
       
       if (stationLines.length > 0) {
+        console.log('נמצא מידע על התחנה:', stationData);
         return { ...stationData, lines: stationLines, busLines: busLines };
       }
       
+      console.log('לא נמצא מידע על התחנה');
       return null;
     }
 
@@ -350,8 +358,14 @@
     const stationContent = document.getElementById('stationContent');
 
     function handleStationClick(stationId){
+      console.log('נלחץ על תחנה:', stationId);
       const st = getStationInfo(stationId);
-      if (!st) return;
+      if (!st) {
+        console.log('לא נמצא מידע על התחנה');
+        return;
+      }
+      
+      console.log('מציג מידע על התחנה:', st);
       
       stationContent.innerHTML = `
         <div><h4 class="font-bold text-lg text-gray-800 mb-1">${st.nameHe}</h4><p class="text-gray-600">${st.nameEn}</p></div>
@@ -368,17 +382,26 @@
             </div>`).join('')}
           </div>
         </div>
+        ${st.busLines && st.busLines.length ? `<div>
+          <h5 class="font-medium text-gray-800 mb-2">קווי אוטובוס:</h5>
+          <div class="flex flex-wrap gap-1">
+            ${st.busLines.map(bus => `<span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">${bus}</span>`).join('')}
+          </div>
+        </div>` : ''}
         ${st.transfers && st.transfers.length?`<div><h5 class="font-medium text-gray-800 mb-2">חיבורים:</h5>
           <div class="flex flex-wrap gap-2">${st.transfers.map(t=>`<span class="text-sm text-blue-700 bg-blue-50 px-2 py-1 rounded">${transferTypeMap[t]||t}</span>`).join('')}</div></div>`:''}
         <div class="flex items-center gap-2 ${st.accessibility?'text-green-600':'text-red-600'}"><span>♿︎</span>
           <span class="text-sm font-medium">${st.accessibility?'נגיש לכיסאות גלגלים':'לא נגיש'}</span></div>
         <div class="bg-yellow-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-yellow-800">מידע כללי</div>
           <p class="text-xs text-yellow-700">הסקייטריין פועל בקירוב 05:00–01:30 (ש׳ ~06:00, א׳/חגים ~07:00–00:30). תדירות ~2–7 דק׳ בשעות העומס.</p></div>`;
+      
       stationModal.classList.remove('hidden'); 
       stationModal.classList.add('flex');
+      console.log('המודל נפתח');
     }
 
     function closeStationInfo(){
+      console.log('סוגר מודל');
       stationModal.classList.add('hidden'); 
       stationModal.classList.remove('flex');
     }
@@ -471,103 +494,114 @@
       return uniqueStations;
     }
 
-function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
-  const NS = 'http://www.w3.org/2000/svg';
-  const g = document.createElementNS(NS, 'g');
-  g.classList.add('taparea');
-  // נצרף מיד ל-DOM (מוסתר זמנית) כדי שמדידות getBBox יהיו מדויקות
-  g.setAttribute('visibility', 'hidden');
-  gStations.appendChild(g);
+    function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
+      console.log('יוצר תחנה:', id, 'במיקום:', x, y);
+      
+      const NS = 'http://www.w3.org/2000/svg';
+      const g = document.createElementNS(NS, 'g');
+      g.classList.add('taparea');
+      g.setAttribute('data-station-id', id); // להוספת מידע דיבוג
+      
+      // נצרף מיד ל-DOM (מוסתר זמנית) כדי שמדידות getBBox יהיו מדויקות
+      g.setAttribute('visibility', 'hidden');
+      gStations.appendChild(g);
 
-  const isTransfer = linesData.length > 1;
+      const isTransfer = linesData.length > 1;
 
-  // ---- ציור התחנה ----
-  if (isTransfer) {
-    const outer = document.createElementNS(NS, 'circle');
-    outer.setAttribute('cx', x); outer.setAttribute('cy', y);
-    outer.setAttribute('r', 10); outer.setAttribute('fill', '#fff');
-    outer.setAttribute('stroke', '#333'); outer.setAttribute('stroke-width', 2);
-    outer.classList.add('station');
-    g.appendChild(outer);
+      // ---- ציור התחנה ----
+      if (isTransfer) {
+        const outer = document.createElementNS(NS, 'circle');
+        outer.setAttribute('cx', x); outer.setAttribute('cy', y);
+        outer.setAttribute('r', 10); outer.setAttribute('fill', '#fff');
+        outer.setAttribute('stroke', '#333'); outer.setAttribute('stroke-width', 2);
+        outer.classList.add('station');
+        g.appendChild(outer);
 
-    linesData.forEach((ln, i) => {
-      const ang = (2*Math.PI*i)/linesData.length, r = 5;
-      const c = document.createElementNS(NS, 'circle');
-      c.setAttribute('cx', x + Math.cos(ang)*r);
-      c.setAttribute('cy', y + Math.sin(ang)*r);
-      c.setAttribute('r', 3); c.setAttribute('fill', ln.color);
-      g.appendChild(c);
-    });
-  } else {
-    const c = document.createElementNS(NS, 'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', y);
-    c.setAttribute('r', 7);
-    c.setAttribute('fill', linesData[0].color);
-    c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
-    c.classList.add('station');
-    g.appendChild(c);
-  }
+        linesData.forEach((ln, i) => {
+          const ang = (2*Math.PI*i)/linesData.length, r = 5;
+          const c = document.createElementNS(NS, 'circle');
+          c.setAttribute('cx', x + Math.cos(ang)*r);
+          c.setAttribute('cy', y + Math.sin(ang)*r);
+          c.setAttribute('r', 3); c.setAttribute('fill', ln.color);
+          g.appendChild(c);
+        });
+      } else {
+        const c = document.createElementNS(NS, 'circle');
+        c.setAttribute('cx', x); c.setAttribute('cy', y);
+        c.setAttribute('r', 7);
+        c.setAttribute('fill', linesData[0].color);
+        c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
+        c.classList.add('station');
+        g.appendChild(c);
+      }
 
-  // ---- תווית: מדידה ומיקום ----
-  const padding = 6;
-  const sideOffset = 22;   // מרווח אופקי מהעיגול
-  const topOffset  = 18;   // מרווח אנכי מעל העיגול (לתחנות חיבור)
-  const mode = isTransfer ? 'top' : (preferred === 'left' ? 'left' : 'right');
+      // ---- תווית: מדידה ומיקום ----
+      const padding = 6;
+      const sideOffset = 22;   // מרווח אופקי מהעיגול
+      const topOffset  = 18;   // מרווח אנכי מעל העיגול (לתחנות חיבור)
+      const mode = isTransfer ? 'top' : (preferred === 'left' ? 'left' : 'right');
 
-  const t = document.createElementNS(NS, 'text');
-  t.classList.add('station-label');
-  t.textContent = label;
-  // מגדירים RTL אבל מעגנים במרכז כדי שהטקסט יהיה ממורכז במדויק
-  t.setAttribute('direction', 'rtl');
-  t.setAttribute('unicode-bidi', 'plaintext');
-  t.setAttribute('text-anchor', 'middle');
-  t.setAttribute('dominant-baseline', 'middle');
-  t.setAttribute('pointer-events', 'none');
-  // מיקום זמני (יעודכן אחרי מדידה)
-  t.setAttribute('x', x);
-  t.setAttribute('y', y);
-  g.appendChild(t);
+      const t = document.createElementNS(NS, 'text');
+      t.classList.add('station-label');
+      t.textContent = label;
+      // מגדירים RTL אבל מעגנים במרכז כדי שהטקסט יהיה ממורכז במדויק
+      t.setAttribute('direction', 'rtl');
+      t.setAttribute('unicode-bidi', 'plaintext');
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('dominant-baseline', 'middle');
+      t.setAttribute('pointer-events', 'none');
+      // מיקום זמני (יעודכן אחרי מדידה)
+      t.setAttribute('x', x);
+      t.setAttribute('y', y);
+      g.appendChild(t);
 
-  // מדידה אמיתית – עכשיו כשהטקסט ב-DOM
-  const bb = t.getBBox();
-  const w = Math.max(60, Math.ceil(bb.width)  + 2*padding);
-  const h = Math.max(18, Math.ceil(bb.height) + 2*padding);
+      // מדידה אמיתית – עכשיו כשהטקסט ב-DOM
+      const bb = t.getBBox();
+      const w = Math.max(60, Math.ceil(bb.width)  + 2*padding);
+      const h = Math.max(18, Math.ceil(bb.height) + 2*padding);
 
-  // חישוב מיקום המלבן לפי מצב
-  let rx, ry;
-  if (mode === 'right') {
-    rx = (x + sideOffset) - padding;
-    ry = y - h/2;
-  } else if (mode === 'left') {
-    rx = (x - sideOffset) - (w - padding);
-    ry = y - h/2;
-  } else { // top
-    rx = x - w/2;
-    ry = (y - 10) - topOffset - h/2; // 10 = רדיוס תחנת חיבור
-  }
+      // חישוב מיקום המלבן לפי מצב
+      let rx, ry;
+      if (mode === 'right') {
+        rx = (x + sideOffset) - padding;
+        ry = y - h/2;
+      } else if (mode === 'left') {
+        rx = (x - sideOffset) - (w - padding);
+        ry = y - h/2;
+      } else { // top
+        rx = x - w/2;
+        ry = (y - 10) - topOffset - h/2; // 10 = רדיוס תחנת חיבור
+      }
 
-  const r = document.createElementNS(NS, 'rect');
-  r.setAttribute('x', rx);
-  r.setAttribute('y', ry);
-  r.setAttribute('width',  w);
-  r.setAttribute('height', h);
-  r.setAttribute('rx', 6);
-  r.setAttribute('fill', '#fff');
-  r.setAttribute('stroke', '#e5e7eb');
-  r.setAttribute('stroke-width', 1);
-  r.setAttribute('pointer-events', 'none');
+      const r = document.createElementNS(NS, 'rect');
+      r.setAttribute('x', rx);
+      r.setAttribute('y', ry);
+      r.setAttribute('width',  w);
+      r.setAttribute('height', h);
+      r.setAttribute('rx', 6);
+      r.setAttribute('fill', '#fff');
+      r.setAttribute('stroke', '#e5e7eb');
+      r.setAttribute('stroke-width', 1);
+      r.setAttribute('pointer-events', 'none');
 
-  // מלבן מתחת לטקסט
-  g.insertBefore(r, t);
+      // מלבן מתחת לטקסט
+      g.insertBefore(r, t);
 
-  // מרכזים את הטקסט בתוך המלבן
-  t.setAttribute('x', rx + w/2);
-  t.setAttribute('y', ry + h/2);
+      // מרכזים את הטקסט בתוך המלבן
+      t.setAttribute('x', rx + w/2);
+      t.setAttribute('y', ry + h/2);
 
-  // חשיפה וקליק
-  g.setAttribute('visibility', 'visible');
-  g.addEventListener('click', () => handleStationClick(id));
-}
+      // חשיפה וקליק - התיקון החשוב!
+      g.setAttribute('visibility', 'visible');
+      g.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('נלחץ על תחנה במפה:', id);
+        handleStationClick(id);
+      });
+      
+      console.log('תחנה נוצרה בהצלחה:', id);
+    }
 
     function drawUniqueStations() {
       const uniqueStations = createUniqueStationsMap();
@@ -612,16 +646,19 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
       
       // מיקומים מיוחדים לתחנות חיבור
       const specialPositions = {
-  'waterfront':     { x: (X.canadaMain + X.expoMain) / 2, y: Y(row['waterfront']),     labelSide: 'top' },
-  'commercial':     { x: (X.expoMain   + X.millennium) / 2, y: Y(row['commercial']),    labelSide: 'top' },
-  'lougheed':       { x: (X.expoBranch + X.millennium) / 2, y: Y(row['lougheed']),      labelSide: 'top' },
-  'production-way': { x: (X.expoBranch + X.millennium) / 2, y: Y(row['production-way']),labelSide: 'top' }
-};
+        'waterfront':     { x: (X.canadaMain + X.expoMain) / 2, y: Y(row['waterfront']),     labelSide: 'top' },
+        'commercial':     { x: (X.expoMain   + X.millennium) / 2, y: Y(row['commercial']),    labelSide: 'top' },
+        'lougheed':       { x: (X.expoBranch + X.millennium) / 2, y: Y(row['lougheed']),      labelSide: 'top' },
+        'production-way': { x: (X.expoBranch + X.millennium) / 2, y: Y(row['production-way']),labelSide: 'top' }
+      };
       
       // ציור התחנות
       uniqueStations.forEach((stationData, stationId) => {
         const position = specialPositions[stationId] || stationPositions[stationId];
-        if (!position) return;
+        if (!position) {
+          console.log('לא נמצא מיקום לתחנה:', stationId);
+          return;
+        }
         
         let labelSide = position.labelSide;
         if (stationData.lines.length > 1) {
@@ -641,6 +678,8 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
 
     // פונקציית ציור מעודכנת
     function drawMap() {
+      console.log('מתחיל ציור המפה');
+      
       // ציור הקווים
       addPath(canadaMain.map(id => ({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
       addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id => ({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
@@ -661,10 +700,13 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
 
       // ציור תחנות ייחודיות
       drawUniqueStations();
+      
+      console.log('ציור המפה הושלם');
     }
 
     // אתחול האפליקציה
     window.addEventListener('load', () => {
+      console.log('טוען את האפליקציה');
       drawMap();
       renderLines();
     });
