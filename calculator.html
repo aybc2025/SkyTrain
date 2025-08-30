@@ -125,7 +125,7 @@
     <div id="stationSelection" class="bg-white rounded-2xl shadow-lg p-6 mb-6 hidden">
       <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">איפה אתה רוצה לנסוע?</h2>
       
-      <!-- סינון לפי קו - תיקון 5: סינון נפרד לכל בחירה -->
+      <!-- סינון לפי קו -->
       <div class="mb-6 p-4 bg-gray-50 rounded-lg">
         <h3 class="text-sm font-medium text-gray-700 mb-3">סינון תחנות:</h3>
         
@@ -242,7 +242,7 @@
     window.addEventListener('offline', updateOfflineBadge);
     updateOfflineBadge();
 
-    // נתוני תחנות מעודכנים עם מידע על קווים מרובים ושלוחות - תיקון 4
+    // נתוני תחנות מעודכנים עם מידע על קווים מרובים ושלוחות
     const stations = {
       // קו אקספו - ציר ראשי
       'waterfront': {nameHe: 'ווטרפרונט', nameEn: 'Waterfront', lines: ['expo', 'canada'], zone: 1, accessibility: true, transfers: ['canada', 'seabus', 'westcoast'], branch: 'expo-main'},
@@ -347,7 +347,7 @@
       window.scrollTo({top: document.getElementById('stationSelection').offsetTop - 20, behavior: 'smooth'});
     }
 
-    // תיקון 5: הגדרת סינון נפרד לכל בחירה
+    // הגדרת סינון נפרד לכל בחירה
     function setupLineFilters() {
       const fromFilters = document.querySelectorAll('#fromLineFilters .line-filter');
       const toFilters = document.querySelectorAll('#toLineFilters .line-filter');
@@ -505,7 +505,9 @@
         return;
       }
 
+      console.log('מתחיל חישוב מסלול:', fromId, '→', toId);
       const route = findRouteImproved(fromId, toId);
+      console.log('מסלול שנמצא:', route);
       displayResults(route);
     }
 
@@ -516,38 +518,43 @@
       
       console.log(`חיפוש מסלול: ${fromStation.nameHe} → ${toStation.nameHe}`);
       
-      // 1. בדיקה אם באותו קו (מסלול ישיר) - תיקון 9: עדיפות למסלול ישיר
+      // 1. בדיקה אם באותו קו (מסלול ישיר)
       const directRoutes = findDirectRoutes(fromStation, toStation);
       if (directRoutes.length > 0) {
+        console.log('נמצא מסלול ישיר');
         return directRoutes[0]; // מחזיר את המסלול הישיר הראשון
       }
 
       // 2. חיפוש מסלול עם החלפה אחת
       const oneTransferRoute = findOneTransferRoute(fromStation, toStation);
       if (oneTransferRoute) {
+        console.log('נמצא מסלול עם החלפה אחת');
         return oneTransferRoute;
       }
 
-      // 3. מסלול עם שתי החלפות (מקסימום בSkyTrain)
+      // 3. מסלול עם שתי החלפות
       const twoTransferRoute = findTwoTransferRoute(fromStation, toStation);
       if (twoTransferRoute) {
+        console.log('נמצא מסלול עם שתי החלפות');
         return twoTransferRoute;
       }
 
       // 4. אם הכל נכשל, מחזירים מסלול "יצירתי" דרך waterfront
+      console.log('יוצר מסלול חירום');
       return createFallbackRoute(fromStation, toStation);
     }
 
-    // תיקון 9: פונקציה למציאת מסלולים ישירים - מתחשבת בשלוחות
+    // פונקציה למציאת מסלולים ישירים - פשוטה יותר
     function findDirectRoutes(fromStation, toStation) {
       const directRoutes = [];
       
       // בדיקה של כל הקווים המשותפים
       const sharedLines = fromStation.lines.filter(line => toStation.lines.includes(line));
+      console.log('קווים משותפים:', sharedLines);
       
       sharedLines.forEach(line => {
-        // תיקון 4: בדיקה אם התחנות באותה שלוחה
-        if (areInSameBranch(fromStation, toStation, line)) {
+        // בדיקה פשוטה - אם יש קו משותף ו...
+        if (canTravelDirectly(fromStation, toStation, line)) {
           directRoutes.push({
             type: 'direct',
             from: fromStation,
@@ -561,65 +568,26 @@
       return directRoutes;
     }
 
-    // תיקון 4: פונקציה לבדיקה אם שתי תחנות באותה שלוחה
-    function areInSameBranch(station1, station2, line) {
-      // אם אחת התחנות היא נקודת התחברות, אז הן באותה שלוחה
-      const junctionPoints = {
-        'expo': ['columbia'], // נקודת התפצלות אקספו
-        'canada': ['bridgeport'] // נקודת התפצלות קנדה
-      };
+    // פונקציה פשוטה לבדיקה אם אפשר לנסוע ישירות
+    function canTravelDirectly(fromStation, toStation, line) {
+      // אם זה אותה שלוחה, אפשר לנסוע ישירות
+      if (fromStation.branch === toStation.branch) {
+        return true;
+      }
       
-      if (junctionPoints[line]) {
-        const junction = junctionPoints[line][0];
-        if (station1.id === junction || station2.id === junction) {
-          return true; // אם אחת התחנות היא נקודת התחברות
+      // בדיקה מיוחדת לנקודות חיבור
+      const stationIds = getStationIds(fromStation, toStation);
+      
+      if (line === 'expo') {
+        // בקו אקספו, columbia מחברת בין השלוחות
+        if (stationIds.includes('columbia')) {
+          return true;
         }
       }
       
-      // אחרת בודקים אם הן באותה שלוחה
-      return station1.branch === station2.branch;
-    }
-
-    function findOneTransferRoute(fromStation, toStation) {
-      // תיקון 4: בדיקה של תחנות חיבור ונקודות התפצלות
-      const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way', 'columbia', 'bridgeport'];
-      
-      for (const transferId of transferStations) {
-        const transferStation = stations[transferId];
-        if (!transferStation) continue;
-        
-        // בדיקה אם תחנת המעבר יכולה לחבר בין התחנות
-        const canReachTransfer = canReachStationWithBranches(fromStation, transferStation);
-        const canReachDestination = canReachStationWithBranches(transferStation, toStation);
-        
-        if (canReachTransfer && canReachDestination) {
-          // מציאת הקווים הנכונים
-          const line1 = findBestLineWithBranches(fromStation, transferStation);
-          const line2 = findBestLineWithBranches(transferStation, toStation);
-          
-          if (line1 && line2) {
-            return {
-              type: 'transfer',
-              from: fromStation,
-              to: toStation,
-              transfer: transferStation,
-              line1: lineInfo[line1],
-              line2: lineInfo[line2],
-              steps: 2
-            };
-          }
-        }
-      }
-      
-      return null;
-    }
-
-    // תיקון 4: פונקציה משופרת לבדיקה אם אפשר להגיע בין תחנות
-    function canReachStationWithBranches(from, to) {
-      const sharedLines = from.lines.filter(line => to.lines.includes(line));
-      
-      for (const line of sharedLines) {
-        if (areInSameBranch(from, to, line)) {
+      if (line === 'canada') {
+        // בקו קנדה, bridgeport מחברת בין השלוחות  
+        if (stationIds.includes('bridgeport')) {
           return true;
         }
       }
@@ -627,12 +595,52 @@
       return false;
     }
 
-    // תיקון 4: פונקציה משופרת למציאת הקו הטוב ביותר
-    function findBestLineWithBranches(from, to) {
-      const sharedLines = from.lines.filter(line => to.lines.includes(line));
+    // פונקציה עזר לקבלת IDs של תחנות
+    function getStationIds(station1, station2) {
+      const ids = [];
+      for (const [id, station] of Object.entries(stations)) {
+        if (station === station1 || station === station2) {
+          ids.push(id);
+        }
+      }
+      return ids;
+    }
+
+    function findOneTransferRoute(fromStation, toStation) {
+      // בדיקה של תחנות חיבור ונקודות התפצלות
+      const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way', 'columbia', 'bridgeport'];
+      
+      for (const transferId of transferStations) {
+        const transferStation = stations[transferId];
+        if (!transferStation) continue;
+        
+        // בדיקה אם תחנת המעבר יכולה לחבר בין התחנות
+        const line1 = findConnectingLine(fromStation, transferStation);
+        const line2 = findConnectingLine(transferStation, toStation);
+        
+        if (line1 && line2 && line1 !== line2) {
+          console.log(`נמצא מסלול דרך ${transferStation.nameHe}: ${line1} → ${line2}`);
+          return {
+            type: 'transfer',
+            from: fromStation,
+            to: toStation,
+            transfer: transferStation,
+            line1: lineInfo[line1],
+            line2: lineInfo[line2],
+            steps: 2
+          };
+        }
+      }
+      
+      return null;
+    }
+
+    // פונקציה לחיפוש קו מחבר בין שתי תחנות
+    function findConnectingLine(station1, station2) {
+      const sharedLines = station1.lines.filter(line => station2.lines.includes(line));
       
       for (const line of sharedLines) {
-        if (areInSameBranch(from, to, line)) {
+        if (canTravelDirectly(station1, station2, line)) {
           return line;
         }
       }
@@ -641,72 +649,59 @@
     }
 
     function findTwoTransferRoute(fromStation, toStation) {
-  // מציאת מסלול עם שתי החלפות
-  const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way', 'columbia', 'bridgeport'];
-  
-  // בדיקה של כל צירופי תחנות החלפה אפשריים
-  for (let i = 0; i < transferStations.length; i++) {
-    for (let j = i + 1; j < transferStations.length; j++) {
-      const transfer1Station = stations[transferStations[i]];
-      const transfer2Station = stations[transferStations[j]];
+      // מציאת מסלול עם שתי החלפות
+      const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way', 'columbia', 'bridgeport'];
       
-      if (!transfer1Station || !transfer2Station) continue;
-      
-      // בדיקה אם אפשר להגיע: מקור → תחנה1 → תחנה2 → יעד
-      const canReachTransfer1 = canReachStationWithBranches(fromStation, transfer1Station);
-      const canConnectTransfers = canReachStationWithBranches(transfer1Station, transfer2Station);
-      const canReachDestination = canReachStationWithBranches(transfer2Station, toStation);
-      
-      if (canReachTransfer1 && canConnectTransfers && canReachDestination) {
-        // מציאת הקווים הנכונים
-        const line1 = findBestLineWithBranches(fromStation, transfer1Station);
-        const line2 = findBestLineWithBranches(transfer1Station, transfer2Station);
-        const line3 = findBestLineWithBranches(transfer2Station, toStation);
-        
-        if (line1 && line2 && line3) {
-          return {
-            type: 'double-transfer',
-            from: fromStation,
-            to: toStation,
-            transfer1: transfer1Station,
-            transfer2: transfer2Station,
-            line1: lineInfo[line1],
-            line2: lineInfo[line2],
-            line3: lineInfo[line3],
-            steps: 3
-          };
+      // בדיקה של כל צירופי תחנות החלפה אפשריים
+      for (let i = 0; i < transferStations.length; i++) {
+        for (let j = i + 1; j < transferStations.length; j++) {
+          const transfer1Station = stations[transferStations[i]];
+          const transfer2Station = stations[transferStations[j]];
+          
+          if (!transfer1Station || !transfer2Station) continue;
+          
+          // בדיקה אם אפשר להגיע: מקור → תחנה1 → תחנה2 → יעד
+          const line1 = findConnectingLine(fromStation, transfer1Station);
+          const line2 = findConnectingLine(transfer1Station, transfer2Station);
+          const line3 = findConnectingLine(transfer2Station, toStation);
+          
+          if (line1 && line2 && line3) {
+            return {
+              type: 'double-transfer',
+              from: fromStation,
+              to: toStation,
+              transfer1: transfer1Station,
+              transfer2: transfer2Station,
+              line1: lineInfo[line1],
+              line2: lineInfo[line2],
+              line3: lineInfo[line3],
+              steps: 3
+            };
+          }
+          
+          // בדיקה גם בכיוון ההפוך: מקור → תחנה2 → תחנה1 → יעד
+          const line1Rev = findConnectingLine(fromStation, transfer2Station);
+          const line2Rev = findConnectingLine(transfer2Station, transfer1Station);
+          const line3Rev = findConnectingLine(transfer1Station, toStation);
+          
+          if (line1Rev && line2Rev && line3Rev) {
+            return {
+              type: 'double-transfer',
+              from: fromStation,
+              to: toStation,
+              transfer1: transfer2Station,
+              transfer2: transfer1Station,
+              line1: lineInfo[line1Rev],
+              line2: lineInfo[line2Rev],
+              line3: lineInfo[line3Rev],
+              steps: 3
+            };
+          }
         }
       }
       
-      // בדיקה גם בכיוון ההפוך: מקור → תחנה2 → תחנה1 → יעד
-      const canReachTransfer2 = canReachStationWithBranches(fromStation, transfer2Station);
-      const canConnectReverse = canReachStationWithBranches(transfer2Station, transfer1Station);
-      const canReachFromTransfer1 = canReachStationWithBranches(transfer1Station, toStation);
-      
-      if (canReachTransfer2 && canConnectReverse && canReachFromTransfer1) {
-        const line1 = findBestLineWithBranches(fromStation, transfer2Station);
-        const line2 = findBestLineWithBranches(transfer2Station, transfer1Station);
-        const line3 = findBestLineWithBranches(transfer1Station, toStation);
-        
-        if (line1 && line2 && line3) {
-          return {
-            type: 'double-transfer',
-            from: fromStation,
-            to: toStation,
-            transfer1: transfer2Station,
-            transfer2: transfer1Station,
-            line1: lineInfo[line1],
-            line2: lineInfo[line2],
-            line3: lineInfo[line3],
-            steps: 3
-          };
-        }
-      }
+      return null;
     }
-  }
-  
-  return null;
-}
     
     function createFallbackRoute(fromStation, toStation) {
       // מסלול "חירום" דרך waterfront (הכי מרכזי)
@@ -732,10 +727,12 @@
         html = generateDirectRouteHTML(route);
       } else if (route.type === 'transfer') {
         html = generateTransferRouteHTML(route);
-      } else if (route.type === 'double-transfer' || route.type === 'guaranteed-complex') {
+      } else if (route.type === 'double-transfer') {
         html = generateDoubleTransferRouteHTML(route);
-      } else if (route.type === 'guaranteed-simple') {
-        html = generateTransferRouteHTML(route); // משתמש באותה תבנית כמו transfer רגיל
+      } else if (route.type === 'complex-but-possible') {
+        html = generateFallbackRouteHTML(route);
+      } else {
+        html = generateFallbackRouteHTML(route);
       }
 
       resultsDiv.innerHTML = html;
@@ -848,89 +845,99 @@
     }
 
     function generateDoubleTransferRouteHTML(route) {
-  const isGuaranteed = route.type === 'guaranteed-complex';
-  const title = isGuaranteed ? "מסלול מורכב אך אמין" : "מסלול עם שתי החלפות";
-  const emoji = isGuaranteed ? "✅" : "🔄🔄";
-  
-  return `
-    <div class="bg-white rounded-2xl shadow-lg p-6">
-      <div class="text-center mb-6">
-        <div class="text-4xl mb-2">${emoji}</div>
-        <h2 class="text-2xl font-bold text-orange-600">${title}</h2>
-        <p class="text-gray-600">מסלול בן 4 שלבים עם שתי החלפות</p>
-      </div>
-      
-      <div class="bg-gray-50 rounded-xl p-6 mb-6">
-        <div class="grid grid-cols-4 items-center gap-3 text-center text-sm">
-          <div>
-            <div class="font-bold">${route.from.nameHe}</div>
-            <div class="text-xs text-gray-600">${route.from.nameEn}</div>
-            <div class="w-3 h-3 rounded-full ${route.line1.colorClass}-bg mx-auto mt-1"></div>
+      return `
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">🔄🔄</div>
+            <h2 class="text-2xl font-bold text-orange-600">מסלול עם שתי החלפות</h2>
+            <p class="text-gray-600">מסלול בן 5 שלבים עם שתי החלפות</p>
           </div>
-          <div>
-            <div class="text-lg mb-1">🔄</div>
-            <div class="font-medium text-orange-600 text-xs">${route.transfer1.nameHe}</div>
-            <div class="text-xs text-gray-500">החלפה 1</div>
+          
+          <div class="bg-gray-50 rounded-xl p-6 mb-6">
+            <div class="grid grid-cols-4 items-center gap-3 text-center text-sm">
+              <div>
+                <div class="font-bold">${route.from.nameHe}</div>
+                <div class="text-xs text-gray-600">${route.from.nameEn}</div>
+                <div class="w-3 h-3 rounded-full ${route.line1.colorClass}-bg mx-auto mt-1"></div>
+              </div>
+              <div>
+                <div class="text-lg mb-1">🔄</div>
+                <div class="font-medium text-orange-600 text-xs">${route.transfer1.nameHe}</div>
+                <div class="text-xs text-gray-500">החלפה 1</div>
+              </div>
+              <div>
+                <div class="text-lg mb-1">🔄</div>
+                <div class="font-medium text-orange-600 text-xs">${route.transfer2.nameHe}</div>
+                <div class="text-xs text-gray-500">החלפה 2</div>
+              </div>
+              <div>
+                <div class="font-bold">${route.to.nameHe}</div>
+                <div class="text-xs text-gray-600">${route.to.nameEn}</div>
+                <div class="w-3 h-3 rounded-full ${route.line3.colorClass}-bg mx-auto mt-1"></div>
+              </div>
+            </div>
           </div>
-          <div>
-            <div class="text-lg mb-1">🔄</div>
-            <div class="font-medium text-orange-600 text-xs">${route.transfer2.nameHe}</div>
-            <div class="text-xs text-gray-500">החלפה 2</div>
+          
+          <div class="space-y-4">
+            <div class="route-step ${route.line1.colorClass} step-animation bg-green-50 rounded-xl p-4">
+              <h4 class="font-bold text-green-800 mb-2">🚇 שלב 1: נסיעה ל${route.transfer1.nameHe}</h4>
+              <p class="text-green-700">קח את ${route.line1.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line1.colorClass}-bg mx-1"></span> מ${route.from.nameHe} עד ${route.transfer1.nameHe}</p>
+            </div>
+            
+            <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.3s">
+              <h4 class="font-bold text-gray-800 mb-2">🔄 שלב 2: החלפה ראשונה</h4>
+              <p class="text-gray-700">רד מהרכבת ועבור לרציף של ${route.line2.nameHe}</p>
+            </div>
+            
+            <div class="route-step ${route.line2.colorClass} step-animation bg-blue-50 rounded-xl p-4" style="animation-delay: 0.6s">
+              <h4 class="font-bold text-blue-800 mb-2">🚇 שלב 3: נסיעה ל${route.transfer2.nameHe}</h4>
+              <p class="text-blue-700">קח את ${route.line2.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line2.colorClass}-bg mx-1"></span> מ${route.transfer1.nameHe} עד ${route.transfer2.nameHe}</p>
+            </div>
+            
+            <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.9s">
+              <h4 class="font-bold text-gray-800 mb-2">🔄 שלב 4: החלפה שנייה</h4>
+              <p class="text-gray-700">רד מהרכבת ועבור לרציף של ${route.line3.nameHe}</p>
+            </div>
+            
+            <div class="route-step ${route.line3.colorClass} step-animation bg-purple-50 rounded-xl p-4" style="animation-delay: 1.2s">
+              <h4 class="font-bold text-purple-800 mb-2">🚇 שלב 5: נסיעה ליעד</h4>
+              <p class="text-purple-700">קח את ${route.line3.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line3.colorClass}-bg mx-1"></span> מ${route.transfer2.nameHe} עד ${route.to.nameHe} 🎯</p>
+            </div>
           </div>
-          <div>
-            <div class="font-bold">${route.to.nameHe}</div>
-            <div class="text-xs text-gray-600">${route.to.nameEn}</div>
-            <div class="w-3 h-3 rounded-full ${route.line3.colorClass}-bg mx-auto mt-1"></div>
+          
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+            <h4 class="font-bold text-yellow-800 mb-2">⚠️ חשוב לזכור:</h4>
+            <ul class="text-sm text-yellow-700 space-y-1">
+              <li>• מסלול זה דורש זמן ותשומת לב נוספים</li>
+              <li>• וודא שאתה יודע לאן לפנות בכל תחנת החלפה</li>
+              <li>• שמור על הכרטיס שלך לאורך כל הנסיעה</li>
+            </ul>
           </div>
-        </div>
-      </div>
-      
-      <div class="space-y-4">
-        <div class="route-step ${route.line1.colorClass} step-animation bg-green-50 rounded-xl p-4">
-          <h4 class="font-bold text-green-800 mb-2">🚇 שלב 1: נסיעה ל${route.transfer1.nameHe}</h4>
-          <p class="text-green-700">קח את ${route.line1.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line1.colorClass}-bg mx-1"></span> מ${route.from.nameHe} עד ${route.transfer1.nameHe}</p>
-        </div>
-        
-        <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.3s">
-          <h4 class="font-bold text-gray-800 mb-2">🔄 שלב 2: החלפה ראשונה</h4>
-          <p class="text-gray-700">רד מהרכבת ועבור לרציף של ${route.line2.nameHe}</p>
-        </div>
-        
-        <div class="route-step ${route.line2.colorClass} step-animation bg-blue-50 rounded-xl p-4" style="animation-delay: 0.6s">
-          <h4 class="font-bold text-blue-800 mb-2">🚇 שלב 3: נסיעה ל${route.transfer2.nameHe}</h4>
-          <p class="text-blue-700">קח את ${route.line2.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line2.colorClass}-bg mx-1"></span> מ${route.transfer1.nameHe} עד ${route.transfer2.nameHe}</p>
-        </div>
-        
-        <div class="route-step transfer step-animation bg-gray-50 rounded-xl p-4" style="animation-delay: 0.9s">
-          <h4 class="font-bold text-gray-800 mb-2">🔄 שלב 4: החלפה שנייה</h4>
-          <p class="text-gray-700">רד מהרכבת ועבור לרציף של ${route.line3.nameHe}</p>
-        </div>
-        
-        <div class="route-step ${route.line3.colorClass} step-animation bg-purple-50 rounded-xl p-4" style="animation-delay: 1.2s">
-          <h4 class="font-bold text-purple-800 mb-2">🚇 שלב 5: נסיעה ליעד</h4>
-          <p class="text-purple-700">קח את ${route.line3.nameHe} <span class="inline-block w-4 h-4 rounded-full ${route.line3.colorClass}-bg mx-1"></span> מ${route.transfer2.nameHe} עד ${route.to.nameHe} 🎯</p>
-        </div>
-      </div>
-      
-      ${isGuaranteed ? `
-        <div class="bg-orange-50 rounded-lg p-4 mt-4">
-          <h4 class="font-bold text-orange-800 mb-2">💡 למה המסלול הזה?</h4>
-          <p class="text-orange-700 text-sm">${route.note || 'זה המסלול הבטוח והאמין ביותר בין שתי התחנות האלה.'}</p>
-        </div>
-        ` : ''}
-      
-      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
-        <h4 class="font-bold text-yellow-800 mb-2">⚠️ חשוב לזכור:</h4>
-        <ul class="text-sm text-yellow-700 space-y-1">
-          <li>• מסלול זה דורש זמן ותשומת לב נוספים</li>
-          <li>• וודא שאתה יודע לאן לפנות בכל תחנת החלפה</li>
-          <li>• שמור על הכרטיס שלך לאורך כל הנסיעה</li>
-        </ul>
-      </div>
-      
-      ${generateRouteInfo(route)}
-    </div>`;
-}
+          
+          ${generateRouteInfo(route)}
+        </div>`;
+    }
+
+    // פונקציה חדשה להצגת מסלולי חירום
+    function generateFallbackRouteHTML(route) {
+      return `
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">🚀</div>
+            <h2 class="text-2xl font-bold text-purple-600">מסלול חכם נמצא!</h2>
+            <p class="text-gray-600">${route.note}</p>
+          </div>
+          
+          <div class="bg-purple-50 rounded-lg p-4 mt-4">
+            <h4 class="font-bold text-purple-800 mb-2">💡 המסלול המוצע:</h4>
+            <p class="text-purple-700 text-sm">נסיעה מ${route.from.nameHe} ל${route.to.nameHe} ${route.note}</p>
+            <p class="text-purple-600 text-xs mt-2">זה לא המסלול המדויק, אבל כיוון כללי שיעזור לך להתמצא</p>
+          </div>
+          
+          ${generateRouteInfo(route)}
+        </div>`;
+    }
+
     function generateRouteInfo(route) {
       return `
         <div class="bg-gray-50 rounded-lg p-4 mt-4">
