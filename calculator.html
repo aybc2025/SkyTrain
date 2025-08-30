@@ -630,23 +630,169 @@
     }
 
     function findDirectRoutes(fromStation, toStation) {
-      const directRoutes = [];
-      
-      const sharedLines = fromStation.lines.filter(line => toStation.lines.includes(line));
-      console.log('קווים משותפים:', sharedLines);
-      
-      sharedLines.forEach(line => {
-        directRoutes.push({
-          type: 'direct',
-          from: fromStation,
-          to: toStation,
-          line: lineInfo[line],
-          steps: 1
-        });
+  const directRoutes = [];
+  
+  const sharedLines = fromStation.lines.filter(line => toStation.lines.includes(line));
+  console.log('קווים משותפים:', sharedLines);
+  
+  sharedLines.forEach(line => {
+    // בדיקה נוספת - האם התחנות באמת מחוברות ישירות בקו זה
+    if (areStationsDirectlyConnected(getStationId(fromStation), getStationId(toStation), line)) {
+      directRoutes.push({
+        type: 'direct',
+        from: fromStation,
+        to: toStation,
+        line: lineInfo[line],
+        steps: 1
       });
-      
-      return directRoutes;
+    } else {
+      console.log(`תחנות ${fromStation.nameHe} ו-${toStation.nameHe} באותו קו (${line}) אבל לא מחוברות ישירות`);
     }
+  });
+  
+  return directRoutes;
+}
+
+// פונקציה חדשה לבדיקה אם שתי תחנות מחוברות ישירות באותו קו
+function areStationsDirectlyConnected(stationId1, stationId2, lineKey) {
+  const lineData = getAllLinesData()[lineKey];
+  if (!lineData) {
+    console.warn(`לא נמצא מידע על הקו ${lineKey}`);
+    return false;
+  }
+  
+  // בדיקה בכל סגמנט של הקו (ציר ראשי ושלוחות)
+  const segments = [];
+  
+  // הוספת כל הסגמנטים של הקו
+  Object.keys(lineData).forEach(segmentKey => {
+    segments.push(lineData[segmentKey]);
+  });
+  
+  for (const segment of segments) {
+    const stationIds = segment.map(s => s.id);
+    const index1 = stationIds.indexOf(stationId1);
+    const index2 = stationIds.indexOf(stationId2);
+    
+    // אם שתי התחנות נמצאות באותו סגמנט
+    if (index1 !== -1 && index2 !== -1) {
+      // בדיקה שאין פערים ברצף
+      const minIndex = Math.min(index1, index2);
+      const maxIndex = Math.max(index1, index2);
+      
+      let isConnected = true;
+      for (let i = minIndex; i <= maxIndex; i++) {
+        const stationInPath = stationIds[i];
+        if (!stations[stationInPath]) {
+          isConnected = false;
+          break;
+        }
+      }
+      
+      if (isConnected) {
+        console.log(`תחנות ${stationId1} ו-${stationId2} מחוברות ישירות בקו ${lineKey}`);
+        return true;
+      }
+    }
+  }
+  
+  console.log(`תחנות ${stationId1} ו-${stationId2} לא מחוברות ישירות בקו ${lineKey} (נמצאות בשלוחות שונות או לא ברצף)`);
+  return false;
+}
+
+// פונקציה עזר לקבלת מידע על כל הקווים עם שלוחות
+function getAllLinesData() {
+  return {
+    'expo': {
+      // ציר ראשי - עד נקודת ההסתעפות
+      main: [
+        { id: 'waterfront' },
+        { id: 'burrard' },
+        { id: 'granville' },
+        { id: 'stadium' },
+        { id: 'main-street' },
+        { id: 'commercial' },
+        { id: 'nanaimo' },
+        { id: '29th-ave' },
+        { id: 'joyce' },
+        { id: 'patterson' },
+        { id: 'metrotown' },
+        { id: 'royal-oak' },
+        { id: 'edmonds' },
+        { id: '22nd-street' },
+        { id: 'new-west' },
+        { id: 'columbia' } // נקודת הסתעפות
+      ],
+      // שלוחה 1: לכיוון קינג ג'ורג'
+      kinggeorge: [
+        { id: 'columbia' }, // נקודת הסתעפות
+        { id: 'scott-road' },
+        { id: 'gateway' },
+        { id: 'surrey-central' },
+        { id: 'king-george' }
+      ],
+      // שלוחה 2: לכיוון לוהיד
+      lougheed: [
+        { id: 'columbia' }, // נקודת הסתעפות
+        { id: 'sapperton' },
+        { id: 'braid' },
+        { id: 'lougheed' },
+        { id: 'production-way' }
+      ]
+    },
+    'millennium': {
+      // קו המילניום אין לו שלוחות - רק ציר אחד
+      main: [
+        { id: 'vcc-clark' },
+        { id: 'commercial' },
+        { id: 'renfrew' },
+        { id: 'rupert' },
+        { id: 'gilmore' },
+        { id: 'brentwood' },
+        { id: 'holdom' },
+        { id: 'sperling' },
+        { id: 'lake-city-way' },
+        { id: 'production-way' },
+        { id: 'lougheed' },
+        { id: 'burquitlam' },
+        { id: 'moody-centre' },
+        { id: 'inlet-centre' },
+        { id: 'coquitlam-central' },
+        { id: 'lincoln' },
+        { id: 'lafarge-lake' }
+      ]
+    },
+    'canada': {
+      // ציר ראשי
+      main: [
+        { id: 'waterfront' },
+        { id: 'vancouver-city-centre' },
+        { id: 'yaletown' },
+        { id: 'olympic-village' },
+        { id: 'broadway-city-hall' },
+        { id: 'king-edward' },
+        { id: 'oakridge' },
+        { id: 'langara' },
+        { id: 'marine-drive' },
+        { id: 'bridgeport' }
+      ],
+      // שלוחת נמל תעופה
+      airport: [
+        { id: 'bridgeport' }, // נקודת הסתעפות
+        { id: 'templeton' },
+        { id: 'sea-island-centre' },
+        { id: 'yvr-airport' }
+      ],
+      // שלוחת ריצ'מונד
+      richmond: [
+        { id: 'bridgeport' }, // נקודת הסתעפות
+        { id: 'aberdeen' },
+        { id: 'lansdowne' },
+        { id: 'richmond-brighouse' }
+      ]
+    }
+  };
+}
 
     function getStationId(station) {
       for (const [id, stationData] of Object.entries(stations)) {
