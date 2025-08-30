@@ -522,7 +522,7 @@
       const directRoutes = findDirectRoutes(fromStation, toStation);
       if (directRoutes.length > 0) {
         console.log('נמצא מסלול ישיר');
-        return directRoutes[0]; // מחזיר את המסלול הישיר הראשון
+        return directRoutes[0];
       }
 
       // 2. חיפוש מסלול עם החלפה אחת
@@ -539,12 +539,12 @@
         return twoTransferRoute;
       }
 
-      // 4. אם הכל נכשל, מחזירים מסלול "יצירתי" דרך waterfront
+      // 4. אם הכל נכשל, מחזירים מסלול "יצירתי"
       console.log('יוצר מסלול חירום');
       return createFallbackRoute(fromStation, toStation);
     }
 
-    // פונקציה למציאת מסלולים ישירים - פשוטה יותר
+    // פונקציה פשוטה למציאת מסלולים ישירים
     function findDirectRoutes(fromStation, toStation) {
       const directRoutes = [];
       
@@ -553,158 +553,141 @@
       console.log('קווים משותפים:', sharedLines);
       
       sharedLines.forEach(line => {
-        // בדיקה פשוטה - אם יש קו משותף ו...
-        if (canTravelDirectly(fromStation, toStation, line)) {
-          directRoutes.push({
-            type: 'direct',
-            from: fromStation,
-            to: toStation,
-            line: lineInfo[line],
-            steps: 1
-          });
-        }
+        directRoutes.push({
+          type: 'direct',
+          from: fromStation,
+          to: toStation,
+          line: lineInfo[line],
+          steps: 1
+        });
       });
       
       return directRoutes;
     }
 
-    // פונקציה פשוטה לבדיקה אם אפשר לנסוע ישירות
-    function canTravelDirectly(fromStation, toStation, line) {
-      // אם זה אותה שלוחה, אפשר לנסוע ישירות
-      if (fromStation.branch === toStation.branch) {
-        return true;
-      }
-      
-      // בדיקה מיוחדת לנקודות חיבור
-      const stationIds = getStationIds(fromStation, toStation);
-      
-      if (line === 'expo') {
-        // בקו אקספו, columbia מחברת בין השלוחות
-        if (stationIds.includes('columbia')) {
-          return true;
+    // פונקציה עזר לקבלת ID של תחנה
+    function getStationId(station) {
+      for (const [id, stationData] of Object.entries(stations)) {
+        if (stationData === station) {
+          return id;
         }
       }
-      
-      if (line === 'canada') {
-        // בקו קנדה, bridgeport מחברת בין השלוחות  
-        if (stationIds.includes('bridgeport')) {
-          return true;
-        }
-      }
-      
-      return false;
+      return null;
     }
 
-    // פונקציה עזר לקבלת IDs של תחנות
-    function getStationIds(station1, station2) {
-      const ids = [];
-      for (const [id, station] of Object.entries(stations)) {
-        if (station === station1 || station === station2) {
-          ids.push(id);
-        }
-      }
-      return ids;
-    }
-
-    function findOneTransferRoute(fromStation, toStation) {
-      // בדיקה של תחנות חיבור ונקודות התפצלות
+    // פונקציה לבדיקה אם תחנה היא תחנת חיבור
+    function isTransferStation(stationId) {
       const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way', 'columbia', 'bridgeport'];
+      return transferStations.includes(stationId);
+    }
+
+    // פונקציה משופרת למציאת מסלול עם החלפה אחת
+    function findOneTransferRoute(fromStation, toStation) {
+      console.log('מחפש מסלול עם החלפה אחת');
       
-      for (const transferId of transferStations) {
+      // קבלת כל תחנות החיבור הפוטנציאליות
+      const allTransferStations = Object.keys(stations).filter(stationId => {
+        const station = stations[stationId];
+        // תחנה יכולה להיות תחנת חיבור אם יש לה יותר מקו אחד או אם היא ידועה כתחנת חיבור
+        return station.lines.length > 1 || isTransferStation(stationId);
+      });
+      
+      console.log('תחנות חיבור פוטנציאליות:', allTransferStations);
+      
+      for (const transferId of allTransferStations) {
         const transferStation = stations[transferId];
         if (!transferStation) continue;
         
-        // בדיקה אם תחנת המעבר יכולה לחבר בין התחנות
-        const line1 = findConnectingLine(fromStation, transferStation);
-        const line2 = findConnectingLine(transferStation, toStation);
+        // בדיקה אם יש קו משותף בין המקור לתחנת החיבור
+        const line1Options = fromStation.lines.filter(line => transferStation.lines.includes(line));
+        // בדיקה אם יש קו משותף בין תחנת החיבור ליעד
+        const line2Options = transferStation.lines.filter(line => toStation.lines.includes(line));
         
-        if (line1 && line2 && line1 !== line2) {
-          console.log(`נמצא מסלול דרך ${transferStation.nameHe}: ${line1} → ${line2}`);
-          return {
-            type: 'transfer',
-            from: fromStation,
-            to: toStation,
-            transfer: transferStation,
-            line1: lineInfo[line1],
-            line2: lineInfo[line2],
-            steps: 2
-          };
+        console.log(`בדיקת תחנת חיבור ${transferStation.nameHe}:`, 
+                   `קווים מקור-חיבור: ${line1Options}`, 
+                   `קווים חיבור-יעד: ${line2Options}`);
+        
+        if (line1Options.length > 0 && line2Options.length > 0) {
+          const line1 = line1Options[0];
+          const line2 = line2Options[0];
+          
+          // וודא שזה לא אותו קו (אחרת זה לא חיבור)
+          if (line1 !== line2) {
+            console.log(`נמצא מסלול דרך ${transferStation.nameHe}: ${line1} → ${line2}`);
+            return {
+              type: 'transfer',
+              from: fromStation,
+              to: toStation,
+              transfer: transferStation,
+              line1: lineInfo[line1],
+              line2: lineInfo[line2],
+              steps: 2
+            };
+          }
         }
       }
       
+      console.log('לא נמצא מסלול עם החלפה אחת');
       return null;
     }
 
-    // פונקציה לחיפוש קו מחבר בין שתי תחנות
-    function findConnectingLine(station1, station2) {
-      const sharedLines = station1.lines.filter(line => station2.lines.includes(line));
-      
-      for (const line of sharedLines) {
-        if (canTravelDirectly(station1, station2, line)) {
-          return line;
-        }
-      }
-      
-      return null;
-    }
-
+    // פונקציה משופרת למציאת מסלול עם שתי החלפות
     function findTwoTransferRoute(fromStation, toStation) {
-      // מציאת מסלול עם שתי החלפות
-      const transferStations = ['waterfront', 'commercial', 'lougheed', 'production-way', 'columbia', 'bridgeport'];
+      console.log('מחפש מסלול עם שתי החלפות');
       
-      // בדיקה של כל צירופי תחנות החלפה אפשריים
-      for (let i = 0; i < transferStations.length; i++) {
-        for (let j = i + 1; j < transferStations.length; j++) {
-          const transfer1Station = stations[transferStations[i]];
-          const transfer2Station = stations[transferStations[j]];
+      // קבלת כל תחנות החיבור
+      const allTransferStations = Object.keys(stations).filter(stationId => {
+        const station = stations[stationId];
+        return station.lines.length > 1 || isTransferStation(stationId);
+      });
+      
+      // בדיקה של כל צירופי תחנות החלפה
+      for (let i = 0; i < allTransferStations.length; i++) {
+        for (let j = 0; j < allTransferStations.length; j++) {
+          if (i === j) continue; // לא אותה תחנה
+          
+          const transfer1Id = allTransferStations[i];
+          const transfer2Id = allTransferStations[j];
+          const transfer1Station = stations[transfer1Id];
+          const transfer2Station = stations[transfer2Id];
           
           if (!transfer1Station || !transfer2Station) continue;
           
-          // בדיקה אם אפשר להגיע: מקור → תחנה1 → תחנה2 → יעד
-          const line1 = findConnectingLine(fromStation, transfer1Station);
-          const line2 = findConnectingLine(transfer1Station, transfer2Station);
-          const line3 = findConnectingLine(transfer2Station, toStation);
+          // בדיקה: מקור → תחנה1 → תחנה2 → יעד
+          const line1Options = fromStation.lines.filter(line => transfer1Station.lines.includes(line));
+          const line2Options = transfer1Station.lines.filter(line => transfer2Station.lines.includes(line));
+          const line3Options = transfer2Station.lines.filter(line => toStation.lines.includes(line));
           
-          if (line1 && line2 && line3) {
-            return {
-              type: 'double-transfer',
-              from: fromStation,
-              to: toStation,
-              transfer1: transfer1Station,
-              transfer2: transfer2Station,
-              line1: lineInfo[line1],
-              line2: lineInfo[line2],
-              line3: lineInfo[line3],
-              steps: 3
-            };
-          }
-          
-          // בדיקה גם בכיוון ההפוך: מקור → תחנה2 → תחנה1 → יעד
-          const line1Rev = findConnectingLine(fromStation, transfer2Station);
-          const line2Rev = findConnectingLine(transfer2Station, transfer1Station);
-          const line3Rev = findConnectingLine(transfer1Station, toStation);
-          
-          if (line1Rev && line2Rev && line3Rev) {
-            return {
-              type: 'double-transfer',
-              from: fromStation,
-              to: toStation,
-              transfer1: transfer2Station,
-              transfer2: transfer1Station,
-              line1: lineInfo[line1Rev],
-              line2: lineInfo[line2Rev],
-              line3: lineInfo[line3Rev],
-              steps: 3
-            };
+          if (line1Options.length > 0 && line2Options.length > 0 && line3Options.length > 0) {
+            const line1 = line1Options[0];
+            const line2 = line2Options[0];
+            const line3 = line3Options[0];
+            
+            // ודוא שיש לפחות שני קווים שונים במסלול
+            if (line1 !== line2 || line2 !== line3 || line1 !== line3) {
+              console.log(`נמצא מסלול עם שתי החלפות: ${fromStation.nameHe} → ${transfer1Station.nameHe} → ${transfer2Station.nameHe} → ${toStation.nameHe}`);
+              return {
+                type: 'double-transfer',
+                from: fromStation,
+                to: toStation,
+                transfer1: transfer1Station,
+                transfer2: transfer2Station,
+                line1: lineInfo[line1],
+                line2: lineInfo[line2],
+                line3: lineInfo[line3],
+                steps: 3
+              };
+            }
           }
         }
       }
       
+      console.log('לא נמצא מסלול עם שתי החלפות');
       return null;
     }
     
     function createFallbackRoute(fromStation, toStation) {
-      // מסלול "חירום" דרך waterfront (הכי מרכזי)
+      // מסלול "חירום"
       const waterfront = stations['waterfront'];
       
       return {
@@ -918,7 +901,7 @@
         </div>`;
     }
 
-    // פונקציה חדשה להצגת מסלולי חירום
+    // פונקציה להצגת מסלולי חירום
     function generateFallbackRouteHTML(route) {
       return `
         <div class="bg-white rounded-2xl shadow-lg p-6">
