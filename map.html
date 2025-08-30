@@ -475,29 +475,27 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
   const NS = 'http://www.w3.org/2000/svg';
   const g = document.createElementNS(NS, 'g');
   g.classList.add('taparea');
+  // נצרף מיד ל-DOM (מוסתר זמנית) כדי שמדידות getBBox יהיו מדויקות
+  g.setAttribute('visibility', 'hidden');
+  gStations.appendChild(g);
 
   const isTransfer = linesData.length > 1;
 
-  // ----- ציור התחנה -----
+  // ---- ציור התחנה ----
   if (isTransfer) {
     const outer = document.createElementNS(NS, 'circle');
     outer.setAttribute('cx', x); outer.setAttribute('cy', y);
-    outer.setAttribute('r', 10);
-    outer.setAttribute('fill', '#fff');
-    outer.setAttribute('stroke', '#333');
-    outer.setAttribute('stroke-width', 2);
+    outer.setAttribute('r', 10); outer.setAttribute('fill', '#fff');
+    outer.setAttribute('stroke', '#333'); outer.setAttribute('stroke-width', 2);
     outer.classList.add('station');
     g.appendChild(outer);
 
-    // עיגולים קטנים לפי מספר הקווים (שומרים את הסימון!)
     linesData.forEach((ln, i) => {
-      const ang = (2 * Math.PI * i) / linesData.length;
-      const r = 5;
+      const ang = (2*Math.PI*i)/linesData.length, r = 5;
       const c = document.createElementNS(NS, 'circle');
-      c.setAttribute('cx', x + Math.cos(ang) * r);
-      c.setAttribute('cy', y + Math.sin(ang) * r);
-      c.setAttribute('r', 3);
-      c.setAttribute('fill', ln.color);
+      c.setAttribute('cx', x + Math.cos(ang)*r);
+      c.setAttribute('cy', y + Math.sin(ang)*r);
+      c.setAttribute('r', 3); c.setAttribute('fill', ln.color);
       g.appendChild(c);
     });
   } else {
@@ -505,77 +503,70 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
     c.setAttribute('cx', x); c.setAttribute('cy', y);
     c.setAttribute('r', 7);
     c.setAttribute('fill', linesData[0].color);
-    c.setAttribute('stroke', '#fff');
-    c.setAttribute('stroke-width', 2);
+    c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
     c.classList.add('station');
     g.appendChild(c);
   }
 
-  // ----- תווית מדודה וממוקמת נכון -----
+  // ---- תווית: מדידה ומיקום ----
   const padding = 6;
-  const sideOffset = 14;   // מרחק אופקי מהעיגול
-  const topOffset  = 18;   // מרחק אנכי מעל העיגול (לתחנות חיבור)
-
-  // תחנות חיבור תמיד יקבלו תווית "מעל", אחרת לפי preferred
+  const sideOffset = 22;   // מרווח אופקי מהעיגול
+  const topOffset  = 18;   // מרווח אנכי מעל העיגול (לתחנות חיבור)
   const mode = isTransfer ? 'top' : (preferred === 'left' ? 'left' : 'right');
 
   const t = document.createElementNS(NS, 'text');
   t.classList.add('station-label');
   t.textContent = label;
+  // מגדירים RTL אבל מעגנים במרכז כדי שהטקסט יהיה ממורכז במדויק
   t.setAttribute('direction', 'rtl');
   t.setAttribute('unicode-bidi', 'plaintext');
+  t.setAttribute('text-anchor', 'middle');
   t.setAttribute('dominant-baseline', 'middle');
-  t.setAttribute('pointer-events', 'none');   // לא חוסם לחיצה על התחנה
-
-  if (mode === 'right')      t.setAttribute('text-anchor', 'start');
-  else if (mode === 'left')  t.setAttribute('text-anchor', 'end');
-  else                       t.setAttribute('text-anchor', 'middle'); // top
-
-  // מיקום זמני למדידה
-  let tx = x, ty = y;
-  if (mode === 'right') tx = x + sideOffset;
-  if (mode === 'left')  tx = x - sideOffset;
-  if (mode === 'top')   { tx = x; ty = y - (10 + topOffset); } // מעל התחנה
-
-  t.setAttribute('x', tx);
-  t.setAttribute('y', ty);
-  t.setAttribute('opacity', '0');
+  t.setAttribute('pointer-events', 'none');
+  // מיקום זמני (יעודכן אחרי מדידה)
+  t.setAttribute('x', x);
+  t.setAttribute('y', y);
   g.appendChild(t);
 
-  // מדידה
+  // מדידה אמיתית – עכשיו כשהטקסט ב-DOM
   const bb = t.getBBox();
-  const w = Math.max(60, Math.ceil(bb.width)  + 2 * padding);
-  const h = Math.max(18, Math.ceil(bb.height) + 2 * padding);
+  const w = Math.max(60, Math.ceil(bb.width)  + 2*padding);
+  const h = Math.max(18, Math.ceil(bb.height) + 2*padding);
 
-  // חישוב מלבן
-  let rx = tx - w / 2, ry = ty - h / 2; // ברירת מחדל (top = ממורכז מעל)
-  if (mode === 'right') rx = (x + sideOffset) - padding;
-  if (mode === 'left')  rx = (x - sideOffset) - (w - padding);
+  // חישוב מיקום המלבן לפי מצב
+  let rx, ry;
+  if (mode === 'right') {
+    rx = (x + sideOffset) - padding;
+    ry = y - h/2;
+  } else if (mode === 'left') {
+    rx = (x - sideOffset) - (w - padding);
+    ry = y - h/2;
+  } else { // top
+    rx = x - w/2;
+    ry = (y - 10) - topOffset - h/2; // 10 = רדיוס תחנת חיבור
+  }
 
-  const rect = document.createElementNS(NS, 'rect');
-  rect.setAttribute('x', rx);
-  rect.setAttribute('y', ry);
-  rect.setAttribute('width',  w);
-  rect.setAttribute('height', h);
-  rect.setAttribute('rx', 6);
-  rect.setAttribute('fill', '#fff');
-  rect.setAttribute('stroke', '#e5e7eb');
-  rect.setAttribute('stroke-width', 1);
-  rect.setAttribute('pointer-events', 'none'); // שלא יחסום לחיצה
+  const r = document.createElementNS(NS, 'rect');
+  r.setAttribute('x', rx);
+  r.setAttribute('y', ry);
+  r.setAttribute('width',  w);
+  r.setAttribute('height', h);
+  r.setAttribute('rx', 6);
+  r.setAttribute('fill', '#fff');
+  r.setAttribute('stroke', '#e5e7eb');
+  r.setAttribute('stroke-width', 1);
+  r.setAttribute('pointer-events', 'none');
 
   // מלבן מתחת לטקסט
-  g.insertBefore(rect, t);
+  g.insertBefore(r, t);
 
-  // מיקום סופי של הטקסט בתוך המלבן
-  if (mode === 'right')      t.setAttribute('x', rx + padding);
-  else if (mode === 'left')  t.setAttribute('x', rx + w - padding);
-  else                       t.setAttribute('x', rx + w / 2);
-  t.setAttribute('y', ry + h / 2);
-  t.setAttribute('opacity', '1');
+  // מרכזים את הטקסט בתוך המלבן
+  t.setAttribute('x', rx + w/2);
+  t.setAttribute('y', ry + h/2);
 
-  // אינטראקציה
+  // חשיפה וקליק
+  g.setAttribute('visibility', 'visible');
   g.addEventListener('click', () => handleStationClick(id));
-  gStations.appendChild(g);
 }
 
     function drawUniqueStations() {
@@ -621,12 +612,11 @@ function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
       
       // מיקומים מיוחדים לתחנות חיבור
       const specialPositions = {
-  'waterfront':      { x: (X.canadaMain + X.expoMain) / 2, y: Y(row['waterfront']),      labelSide: 'top' },
-  'commercial':      { x: (X.expoMain   + X.millennium) / 2, y: Y(row['commercial']),     labelSide: 'top' },
-  'lougheed':        { x: (X.expoBranch + X.millennium) / 2, y: Y(row['lougheed']),       labelSide: 'top' },
-  'production-way':  { x: (X.expoBranch + X.millennium) / 2, y: Y(row['production-way']), labelSide: 'top' }
+  'waterfront':     { x: (X.canadaMain + X.expoMain) / 2, y: Y(row['waterfront']),     labelSide: 'top' },
+  'commercial':     { x: (X.expoMain   + X.millennium) / 2, y: Y(row['commercial']),    labelSide: 'top' },
+  'lougheed':       { x: (X.expoBranch + X.millennium) / 2, y: Y(row['lougheed']),      labelSide: 'top' },
+  'production-way': { x: (X.expoBranch + X.millennium) / 2, y: Y(row['production-way']),labelSide: 'top' }
 };
-
       
       // ציור התחנות
       uniqueStations.forEach((stationData, stationId) => {
