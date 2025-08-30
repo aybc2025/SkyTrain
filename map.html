@@ -471,102 +471,95 @@
       return uniqueStations;
     }
 
-    // פונקציה מעודכנת לציור תחנה עם תמיכה בכמה קווים - תיקון 1: תוויות מתוקנות
-    function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.classList.add('taparea');
-      
-      if (linesData.length > 1) {
-        g.classList.add('transfer-station');
-      }
+function addStationUnique(x, y, id, linesData, label, preferred = 'right') {
+  const svgns = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(svgns, 'g');
+  g.classList.add('taparea');
+  if (linesData.length > 1) g.classList.add('transfer-station');
 
-      // ציור התחנה לפי מספר הקווים
-      if (linesData.length > 1) {
-        // תחנת חיבור - עיגול חיצוני לבן עם עיגולים קטנים בצבעי הקווים
-        const outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        outerCircle.setAttribute('cx', x);
-        outerCircle.setAttribute('cy', y);
-        outerCircle.setAttribute('r', 10);
-        outerCircle.setAttribute('fill', '#fff');
-        outerCircle.setAttribute('stroke', '#333');
-        outerCircle.setAttribute('stroke-width', 2);
-        outerCircle.classList.add('station');
-        g.appendChild(outerCircle);
-        
-        // עיגולים קטנים לכל קו
-        linesData.forEach((lineData, index) => {
-          const angle = (2 * Math.PI * index) / linesData.length;
-          const innerRadius = 5;
-          const innerX = x + Math.cos(angle) * innerRadius;
-          const innerY = y + Math.sin(angle) * innerRadius;
-          
-          const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          innerCircle.setAttribute('cx', innerX);
-          innerCircle.setAttribute('cy', innerY);
-          innerCircle.setAttribute('r', 3);
-          innerCircle.setAttribute('fill', lineData.color);
-          g.appendChild(innerCircle);
-        });
-      } else {
-        // תחנה רגילה - עיגול בצבע הקו
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', 7);
-        circle.setAttribute('fill', linesData[0].color);
-        circle.setAttribute('stroke', '#fff');
-        circle.setAttribute('stroke-width', 2);
-        circle.classList.add('station');
-        g.appendChild(circle);
-      }
+  // ציור נקודת התחנה
+  if (linesData.length > 1) {
+    const outer = document.createElementNS(svgns, 'circle');
+    outer.setAttribute('cx', x); outer.setAttribute('cy', y);
+    outer.setAttribute('r', 10); outer.setAttribute('fill', '#fff');
+    outer.setAttribute('stroke', '#333'); outer.setAttribute('stroke-width', 2);
+    outer.classList.add('station'); g.appendChild(outer);
+    linesData.forEach((ln, i) => {
+      const ang = (2*Math.PI*i)/linesData.length, r=5;
+      const c = document.createElementNS(svgns, 'circle');
+      c.setAttribute('cx', x + Math.cos(ang)*r);
+      c.setAttribute('cy', y + Math.sin(ang)*r);
+      c.setAttribute('r', 3); c.setAttribute('fill', ln.color);
+      g.appendChild(c);
+    });
+  } else {
+    const c = document.createElementNS(svgns, 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', 7); c.setAttribute('fill', linesData[0].color);
+    c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', 2);
+    c.classList.add('station'); g.appendChild(c);
+  }
 
-      // תיקון 1: הוספת תווית עם חישוב מדויק יותר של הגודל
-      const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      
-      // חישוב מדויק יותר של גודל התווית
-      const avgCharWidth = 6.5; // רוחב ממוצע של תו
-      const labelWidth = Math.max(label.length * avgCharWidth, 60); // מינימום רוחב
-      const labelHeight = 18;
-      const padding = 4;
-      
-      let labelX, labelY, textX, textAnchor;
-      
-      if (preferred === 'right') {
-        labelX = x + 15;
-        labelY = y - 9;
-        textX = labelX + padding;
-        textAnchor = 'start';
-      } else if (preferred === 'left') {
-        labelX = x - 15 - labelWidth;
-        labelY = y - 9;
-        textX = labelX + labelWidth - padding;
-        textAnchor = 'end';
-      } else { // center
-        labelX = x - labelWidth/2;
-        labelY = y - 25;
-        textX = x;
-        textAnchor = 'middle';
-      }
-      
-      labelBg.classList.add('label-bg');
-      labelBg.setAttribute('x', labelX);
-      labelBg.setAttribute('y', labelY);
-      labelBg.setAttribute('width', labelWidth);
-      labelBg.setAttribute('height', labelHeight);
-      
-      labelText.classList.add('station-label');
-      labelText.setAttribute('x', textX);
-      labelText.setAttribute('y', labelY + 13);
-      labelText.setAttribute('text-anchor', textAnchor);
-      labelText.textContent = label;
-      
-      g.appendChild(labelBg);
-      g.appendChild(labelText);
-      g.addEventListener('click', () => handleStationClick(id));
-      
-      gStations.appendChild(g);
-    }
+  // ----- תווית: בנייה לפי מדידה אמיתית -----
+  const padding = 6;
+  const offset  = 14;
+
+  // קובע עוגן לפי הצד שביקשנו, אלא אם זו תחנת חיבור -> מרכז
+  let anchor = (linesData.length > 1 || preferred === 'center') ? 'middle'
+             : (preferred === 'left' ? 'end' : 'start');
+
+  // יוצרים טקסט נסתר למדידה
+  const t = document.createElementNS(svgns, 'text');
+  t.classList.add('station-label');
+  t.textContent = label;
+  t.setAttribute('direction', 'rtl');
+  t.setAttribute('unicode-bidi', 'plaintext');
+  t.setAttribute('text-anchor', anchor);
+  t.setAttribute('dominant-baseline', 'middle');   // מרכז אנכי מדויק
+  t.setAttribute('opacity', '0');                  // לא מראה בזמן מדידה
+
+  // מיקום זמני לטובת getBBox
+  let textX = x, textY = y;
+  if (anchor === 'start') textX = x + offset;
+  if (anchor === 'end')   textX = x - offset;
+  t.setAttribute('x', textX);
+  t.setAttribute('y', textY);
+
+  g.appendChild(t);                 // חייב להיות ב-DOM לפני מדידה
+  const bbox = t.getBBox();         // מדידה אמיתית של הטקסט
+
+  const rectW = Math.max(60, Math.ceil(bbox.width)  + 2*padding);
+  const rectH = Math.max(18, Math.ceil(bbox.height) + 2*padding);
+
+  // חישוב מיקום המלבן לפי העוגן
+  let rx = x - rectW/2, ry = y - rectH/2; // אמצע כברירת מחדל
+  if (anchor === 'start') rx = (x + offset) - padding;
+  if (anchor === 'end')   rx = (x - offset) - (rectW - padding);
+
+  const r = document.createElementNS(svgns, 'rect');
+  r.setAttribute('x', rx);
+  r.setAttribute('y', ry);
+  r.setAttribute('width', rectW);
+  r.setAttribute('height', rectH);
+  r.setAttribute('rx', 6);
+  r.setAttribute('fill', '#fff');
+  r.setAttribute('stroke', '#e5e7eb');
+  r.setAttribute('stroke-width', 1);
+
+  // מלבן מתחת לטקסט
+  g.insertBefore(r, t);
+
+  // מיקום סופי של הטקסט בתוך המלבן
+  if (anchor === 'start')      t.setAttribute('x', rx + padding);
+  else if (anchor === 'end')   t.setAttribute('x', rx + rectW - padding);
+  else                         t.setAttribute('x', rx + rectW/2);
+  t.setAttribute('y', ry + rectH/2);
+  t.setAttribute('opacity', '1');     // מציגים את הטקסט לאחר המיקום
+
+  // אינטראקציה
+  g.addEventListener('click', () => handleStationClick(id));
+  gStations.appendChild(g);
+}
 
     function drawUniqueStations() {
       const uniqueStations = createUniqueStationsMap();
