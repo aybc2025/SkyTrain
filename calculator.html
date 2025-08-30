@@ -1057,47 +1057,158 @@ function findOneTransferRoute(fromStation, toStation) {
         </div>`;
     }
 
-    function generateRouteInfo(route) {
-  let distanceText = '';
+   function generateRouteInfo(route) {
+  const estimatedTime = estimateTime(route);
+  const transfers = (route.steps || 1) - 1;
   
+  // יצירת טקסט זמן עם פירוט
+  let timeText = `⏱️ ${estimatedTime} דקות`;
+  if (route.type === 'direct') {
+    timeText += ' (נסיעה ישירה)';
+  } else if (transfers === 1) {
+    timeText += ` (כולל החלפה אחת)`;
+  } else if (transfers === 2) {
+    timeText += ` (כולל שתי החלפות)`;
+  }
+  
+  // הוספת מידע על מרחק אם יש
+  let distanceInfo = '';
   if (route.distance) {
-    distanceText = `<div class="text-center text-sm text-gray-600">
+    distanceInfo = `<div class="text-center text-sm text-gray-600">
       📏 מרחק: ${route.distance} תחנות
     </div>`;
   }
   
+  // טקסט רמת קושי
+  const getDifficultyText = () => {
+    if (transfers === 0) return 'קל ⭐';
+    if (transfers === 1) return 'בינוני ⭐⭐';
+    if (transfers === 2) return 'מאתגר ⭐⭐⭐';
+    return 'מורכב ⭐⭐⭐⭐';
+  };
+  
   return `
     <div class="bg-blue-50 rounded-xl p-4 mt-4">
-      <h4 class="font-bold text-blue-800 mb-2 text-center">📊 פרטי המסלול</h4>
+      <h4 class="font-bold text-blue-800 mb-3 text-center">📊 פרטי המסלול</h4>
+      
+      <!-- זמן משוער בולט -->
+      <div class="bg-white rounded-lg p-3 mb-3 text-center border-2 border-blue-200">
+        <div class="text-lg font-bold text-blue-700">${timeText}</div>
+        <div class="text-xs text-gray-500 mt-1">זמן משוער כולל המתנות</div>
+      </div>
+      
       <div class="grid grid-cols-3 gap-4 text-center text-sm">
         <div>
-          <div class="font-bold text-blue-600">${route.steps || 1}</div>
-          <div class="text-gray-600">שלבים</div>
+          <div class="font-bold text-blue-600">${transfers}</div>
+          <div class="text-gray-600">החלפות</div>
         </div>
         <div>
-          <div class="font-bold text-blue-600">${(route.steps || 1) - 1}</div>
-          <div class="text-gray-600">החלפות</div>
+          <div class="font-bold text-blue-600">${getDifficultyText()}</div>
+          <div class="text-gray-600">רמת קושי</div>
         </div>
         <div>
           <div class="font-bold text-blue-600">אזור ${route.to.zone}</div>
           <div class="text-gray-600">יעד</div>
         </div>
       </div>
-      ${distanceText}
-      <div class="text-xs text-center text-gray-500 mt-2">
-        💡 טיפ: זמן נסיעה משוער כ-2 דקות לתחנה + זמן החלפה
+      
+      ${distanceInfo}
+      
+      <div class="text-xs text-center text-gray-500 mt-3 bg-yellow-50 p-2 rounded">
+        💡 הזמנים כוללים נסיעה, עצירות ומעברים בין רכבות
       </div>
     </div>
   `;
 }
 
+
     function estimateTime(route) {
-      const baseTime = 5; // זמן בסיס
-      const transferTime = 3; // זמן החלפה
-      const travelTime = 15; // זמן נסיעה בין תחנות
-      
-      return baseTime + (route.steps * travelTime) + ((route.steps - 1) * transferTime);
-    }
+  let totalMinutes = 0;
+  
+  // זמני נסיעה בסיסיים לפי סוג קו (בדקות לתחנה)
+  const timePerStation = {
+    'expo': 2.1,     // קו אקספו - מהיר יותר, מרחקים ארוכים
+    'millennium': 1.8, // קו המילניום - קומפקטי יותר
+    'canada': 2.3     // קו קנדה - כולל מנהרות וגשרים
+  };
+  
+  // זמני החלפה לפי תחנה (בדקות)
+  const transferTimes = {
+    'waterfront': 6,      // תחנה גדולה ומרכזית
+    'commercial': 5,      // תחנת חיבור עמוסה
+    'lougheed': 4,        // תחנת חיבור רגילה
+    'production-way': 4,  // תחנת חיבור רגילה
+    'bridgeport': 5,      // תחנת חיבור לקו קנדה
+    'columbia': 4,        // תחנת חיבור קטנה יותר
+    'default': 4          // זמן החלפה ברירת מחדל
+  };
+
+  if (route.type === 'direct') {
+    // נסיעה ישירה
+    const lineKey = route.line.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                   route.line.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    
+    // אם יש מידע על מרחק בתחנות, השתמש בו
+    const distance = route.distance || estimateDirectDistance(route);
+    totalMinutes = distance * timePerStation[lineKey] + 2; // +2 דקות זמן עלייה/ירידה
+    
+  } else if (route.type === 'transfer') {
+    // נסיעה עם החלפה אחת
+    const line1Key = route.line1.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line1.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    const line2Key = route.line2.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line2.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    
+    // חישוב מרחקים אם יש, אחרת הערכה
+    const segment1Distance = route.segment1Distance || 8; // הערכה ממוצעת
+    const segment2Distance = route.segment2Distance || 6; // הערכה ממוצעת
+    
+    const segment1Time = segment1Distance * timePerStation[line1Key];
+    const segment2Time = segment2Distance * timePerStation[line2Key];
+    const transferId = getStationId(route.transfer);
+    const transferTime = transferTimes[transferId] || transferTimes['default'];
+    
+    totalMinutes = segment1Time + transferTime + segment2Time + 2;
+    
+  } else if (route.type === 'double-transfer') {
+    // נסיעה עם שתי החלפות
+    const line1Key = route.line1.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line1.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    const line2Key = route.line2.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line2.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    const line3Key = route.line3.nameEn.toLowerCase().includes('expo') ? 'expo' : 
+                    route.line3.nameEn.toLowerCase().includes('millennium') ? 'millennium' : 'canada';
+    
+    // הערכות מרחק לכל מקטע
+    const segment1Time = 6 * timePerStation[line1Key];
+    const segment2Time = 4 * timePerStation[line2Key]; 
+    const segment3Time = 5 * timePerStation[line3Key];
+    
+    const transfer1Id = getStationId(route.transfer1);
+    const transfer2Id = getStationId(route.transfer2);
+    const transfer1Time = transferTimes[transfer1Id] || transferTimes['default'];
+    const transfer2Time = transferTimes[transfer2Id] || transferTimes['default'];
+    
+    totalMinutes = segment1Time + transfer1Time + segment2Time + transfer2Time + segment3Time + 3;
+    
+  } else {
+    // מסלול חירום/מורכב
+    totalMinutes = 35; // הערכה גסה למסלול מורכב
+  }
+  
+  // עיגול לדקה הקרובה
+  return Math.round(totalMinutes);
+}
+
+// פונקציה עזר להערכת מרחק בנסיעה ישירה
+function estimateDirectDistance(route) {
+  // ניסיון חכם להעריך מרחק על בסיס אזורי תעריף
+  const zoneDiff = Math.abs((route.to.zone || 2) - (route.from.zone || 1));
+  
+  if (zoneDiff === 0) return 3; // באותו אזור - קרוב
+  if (zoneDiff === 1) return 7; // אזור אחד הפרש - בינוני
+  return 12; // הפרש של 2+ אזורים - רחוק
+}
 
     function getDifficultyLevel(route) {
       if (route.steps === 1) return 'קל ⭐';
