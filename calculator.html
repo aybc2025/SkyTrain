@@ -1047,84 +1047,193 @@
     }
 
     function plotRouteOnMap(map, route) {
-      const getStationCoords = (stationId) => {
-        const fromKey = Object.keys(stations).find(key => 
-          stations[key] === route.from || key === stationId
-        );
-        return stationCoordinates[fromKey] || stationCoordinates[stationId];
+      // פונקציה לקבלת קואורדינטות של תחנה
+      const getStationCoords = (station) => {
+        if (!station) return null;
+        
+        // חיפוש מזהה התחנה
+        const stationId = Object.keys(stations).find(key => stations[key] === station);
+        return stationId ? stationCoordinates[stationId] : null;
       };
 
-      const fromCoords = getStationCoords(Object.keys(stations).find(key => stations[key] === route.from));
-      const toCoords = getStationCoords(Object.keys(stations).find(key => stations[key] === route.to));
+      const fromCoords = getStationCoords(route.from);
+      const toCoords = getStationCoords(route.to);
       
       if (!fromCoords || !toCoords) {
         console.error('לא נמצאו קואורדינטות עבור התחנות');
         return;
       }
 
+      const allMarkers = []; // מערך לכל הסמנים עבור fitBounds
+
       // סימון תחנת מקור
-      const fromMarker = L.marker(fromCoords)
+      const fromMarker = L.marker(fromCoords, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background-color: #22c55e; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">🚉</div>',
+          iconSize: [25, 25],
+          iconAnchor: [12, 12]
+        })
+      })
         .addTo(map)
         .bindPopup(`
           <div class="text-center">
             <h3 class="font-bold">${route.from.nameHe}</h3>
-            <p class="text-sm">${route.from.nameEn}</p>
-            <p class="text-xs text-green-600">🚉 תחנת התחלה</p>
+            <p class="text-sm text-gray-600">${route.from.nameEn}</p>
+            <p class="text-xs text-green-600 font-medium">🚉 תחנת התחלה</p>
           </div>
         `);
+      allMarkers.push(fromMarker);
 
       // סימון תחנת יעד  
-      const toMarker = L.marker(toCoords)
+      const toMarker = L.marker(toCoords, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background-color: #ef4444; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">🎯</div>',
+          iconSize: [25, 25],
+          iconAnchor: [12, 12]
+        })
+      })
         .addTo(map)
         .bindPopup(`
           <div class="text-center">
             <h3 class="font-bold">${route.to.nameHe}</h3>
-            <p class="text-sm">${route.to.nameEn}</p>
-            <p class="text-xs text-red-600">🎯 תחנת יעד</p>
+            <p class="text-sm text-gray-600">${route.to.nameEn}</p>
+            <p class="text-xs text-red-600 font-medium">🎯 תחנת יעד</p>
           </div>
         `);
+      allMarkers.push(toMarker);
 
-      // סימון תחנות חיבור אם יש
+      // בניית רשימת הקואורדינטות למסלול
+      const routeCoords = [fromCoords];
+
+      // טיפול במסלול עם החלפה אחת
       if (route.transfer) {
-        const transferCoords = getStationCoords(Object.keys(stations).find(key => stations[key] === route.transfer));
+        const transferCoords = getStationCoords(route.transfer);
         if (transferCoords) {
-          L.marker(transferCoords)
+          const transferMarker = L.marker(transferCoords, {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: '<div style="background-color: #3b82f6; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">🔄</div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          })
             .addTo(map)
             .bindPopup(`
               <div class="text-center">
                 <h3 class="font-bold">${route.transfer.nameHe}</h3>
-                <p class="text-sm">${route.transfer.nameEn}</p>
-                <p class="text-xs text-blue-600">🔄 תחנת חיבור</p>
+                <p class="text-sm text-gray-600">${route.transfer.nameEn}</p>
+                <p class="text-xs text-blue-600 font-medium">🔄 תחנת חיבור</p>
+                <p class="text-xs text-gray-500 mt-1">החלף מ${route.line1.nameHe} ל${route.line2.nameHe}</p>
               </div>
             `);
+          allMarkers.push(transferMarker);
+          routeCoords.push(transferCoords);
         }
       }
 
-      // הוספת קו המסלול
-      const routeCoords = [fromCoords];
-      if (route.transfer) {
-        const transferCoords = getStationCoords(Object.keys(stations).find(key => stations[key] === route.transfer));
-        if (transferCoords) routeCoords.push(transferCoords);
-      }
+      // טיפול במסלול עם שתי החלפות
       if (route.transfer1) {
-        const transfer1Coords = getStationCoords(Object.keys(stations).find(key => stations[key] === route.transfer1));
-        if (transfer1Coords) routeCoords.push(transfer1Coords);
+        const transfer1Coords = getStationCoords(route.transfer1);
+        if (transfer1Coords) {
+          const transfer1Marker = L.marker(transfer1Coords, {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: '<div style="background-color: #f59e0b; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">1️⃣</div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          })
+            .addTo(map)
+            .bindPopup(`
+              <div class="text-center">
+                <h3 class="font-bold">${route.transfer1.nameHe}</h3>
+                <p class="text-sm text-gray-600">${route.transfer1.nameEn}</p>
+                <p class="text-xs text-orange-600 font-medium">🔄 החלפה ראשונה</p>
+                <p class="text-xs text-gray-500 mt-1">החלף מ${route.line1.nameHe} ל${route.line2.nameHe}</p>
+              </div>
+            `);
+          allMarkers.push(transfer1Marker);
+          routeCoords.push(transfer1Coords);
+        }
       }
+
       if (route.transfer2) {
-        const transfer2Coords = getStationCoords(Object.keys(stations).find(key => stations[key] === route.transfer2));
-        if (transfer2Coords) routeCoords.push(transfer2Coords);
+        const transfer2Coords = getStationCoords(route.transfer2);
+        if (transfer2Coords) {
+          const transfer2Marker = L.marker(transfer2Coords, {
+            icon: L.divIcon({
+              className: 'custom-marker',
+              html: '<div style="background-color: #8b5cf6; color: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">2️⃣</div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 12]
+            })
+          })
+            .addTo(map)
+            .bindPopup(`
+              <div class="text-center">
+                <h3 class="font-bold">${route.transfer2.nameHe}</h3>
+                <p class="text-sm text-gray-600">${route.transfer2.nameEn}</p>
+                <p class="text-xs text-purple-600 font-medium">🔄 החלפה שנייה</p>
+                <p class="text-xs text-gray-500 mt-1">החלף מ${route.line2.nameHe} ל${route.line3.nameHe}</p>
+              </div>
+            `);
+          allMarkers.push(transfer2Marker);
+          routeCoords.push(transfer2Coords);
+        }
       }
+
+      // הוספת תחנת היעד לקואורדינטות המסלול
       routeCoords.push(toCoords);
 
-      L.polyline(routeCoords, {
-        color: route.line ? route.line.color : '#666',
-        weight: 4,
-        opacity: 0.7
-      }).addTo(map);
+      // ציור קו המסלול עם צבעים משתנים
+      if (routeCoords.length >= 2) {
+        // אם יש החלפות, נצייר קטעים נפרדים בצבעים שונים
+        if (route.transfer || route.transfer1) {
+          // קטע ראשון
+          if (routeCoords.length >= 2) {
+            L.polyline([routeCoords[0], routeCoords[1]], {
+              color: route.line1 ? route.line1.color : '#666',
+              weight: 5,
+              opacity: 0.8
+            }).addTo(map);
+          }
+          
+          // קטע שני (אם יש החלפה)
+          if (routeCoords.length >= 3) {
+            const line2Color = route.line2 ? route.line2.color : '#666';
+            L.polyline([routeCoords[1], routeCoords[2]], {
+              color: line2Color,
+              weight: 5,
+              opacity: 0.8
+            }).addTo(map);
+          }
+          
+          // קטע שלישי (אם יש שתי החלפות)
+          if (routeCoords.length >= 4) {
+            const line3Color = route.line3 ? route.line3.color : '#666';
+            L.polyline([routeCoords[2], routeCoords[3]], {
+              color: line3Color,
+              weight: 5,
+              opacity: 0.8
+            }).addTo(map);
+          }
+        } else {
+          // מסלול ישיר - קו אחד
+          L.polyline(routeCoords, {
+            color: route.line ? route.line.color : '#666',
+            weight: 5,
+            opacity: 0.8
+          }).addTo(map);
+        }
+      }
 
       // התאמת התצוגה לכלול את כל הנקודות
-      const group = new L.featureGroup([fromMarker, toMarker]);
-      map.fitBounds(group.getBounds().pad(0.1));
+      if (allMarkers.length > 0) {
+        const group = new L.featureGroup(allMarkers);
+        map.fitBounds(group.getBounds().pad(0.15));
+      }
     }
 
     function hideMap() {
