@@ -95,7 +95,7 @@
       </div>
     </section>
 
-    <!-- רשימות תחנות לפי קו -->
+    <!-- רשימות תחנות לפי קו - מעודכן לתיקון 2 -->
     <section class="px-0 pb-8 mt-6">
       <div class="max-w-6xl mx-auto space-y-6" id="linesContainer"></div>
     </section>
@@ -146,14 +146,18 @@
 
     /* Offline badge */
     function updateOfflineBadge(){
-      const b=document.getElementById('offlineBadge');
-      if(!navigator.onLine){b.classList.remove('hidden')}else{b.classList.add('hidden')}
+      const b = document.getElementById('offlineBadge');
+      if (!navigator.onLine) {
+        b.classList.remove('hidden');
+      } else {
+        b.classList.add('hidden');
+      }
     }
-    window.addEventListener('online',updateOfflineBadge);
-    window.addEventListener('offline',updateOfflineBadge);
+    window.addEventListener('online', updateOfflineBadge);
+    window.addEventListener('offline', updateOfflineBadge);
     updateOfflineBadge();
 
-    /* Data: lines & stations */
+    /* Data: lines & stations - מעודכן עם קווים מרובים */
     const lines = {
       expo: {
         nameHe:'קו אקספו', nameEn:'Expo Line', color:'#0060A9',
@@ -162,48 +166,48 @@
           {id:'burrard',nameHe:'בוררד',nameEn:'Burrard',zone:1,platforms:2,accessibility:true,transfers:[]},
           {id:'granville',nameHe:'גרנוויל',nameEn:'Granville',zone:1,platforms:2,accessibility:true,transfers:[]},
           {id:'stadium',nameHe:'איצטדיון-צ\'יינטאון',nameEn:'Stadium–Chinatown',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'main-street',nameHe:'מיין סטריט-עולם המדע',nameEn:'Main Street–Science World',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'commercial',nameHe:'קומרשיאל-ברודווי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['millennium']},
-          {id:'nanaimo',nameHe:'ננאימו',nameEn:'Nanaimo',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'29th-ave',nameHe:'שדרה 29',nameEn:'29th Avenue',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'joyce',nameHe:'ג\'ויס-קולינגווד',nameEn:'Joyce–Collingwood',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'main-street',nameHe:'מיין סטריט-אמטאון',nameEn:'Main Street–Science World',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'commercial',nameHe:'קומרשיאל-ברודוויי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['millennium']},
+          {id:'nanaimo',nameHe:'ננאימו',nameEn:'Nanaimo',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'29th-ave',nameHe:'שדרה 29',nameEn:'29th Avenue',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'joyce',nameHe:'ג\'ויס-קולינגווד',nameEn:'Joyce–Collingwood',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'patterson',nameHe:'פטרסון',nameEn:'Patterson',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'metrotown',nameHe:'מטרוטאון',nameEn:'Metrotown',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'royal-oak',nameHe:'רויאל אוק',nameEn:'Royal Oak',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'edmonds',nameHe:'אדמונדס',nameEn:'Edmonds',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'22nd-street',nameHe:'רחוב 22',nameEn:'22nd Street',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'new-west',nameHe:'ניו ווסטמינסטר',nameEn:'New Westminster',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'columbia',nameHe:'קולומביה',nameEn:'Columbia',zone:2,platforms:3,accessibility:true,transfers:['millennium']},
-          {id:'scott-road',nameHe:'סקוט רוד',nameEn:'Scott Road',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'gateway',nameHe:'גייטווי',nameEn:'Gateway',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'surrey-central',nameHe:'מרכז סארי',nameEn:'Surrey Central',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'king-george',nameHe:'קינג ג\'ורג\'',nameEn:'King George',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'sapperton',nameHe:'ספרטון',nameEn:'Sapperton',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'columbia',nameHe:'קולומביה',nameEn:'Columbia',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'scott-road',nameHe:'דרך סקוט',nameEn:'Scott Road',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'gateway',nameHe:'גייטוויי',nameEn:'Gateway',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'surrey-central',nameHe:'מרכז סארי',nameEn:'Surrey Central',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'king-george',nameHe:'קינג ג\'ורג\'',nameEn:'King George',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'sapperton',nameHe:'סאפרטון',nameEn:'Sapperton',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'braid',nameHe:'ברייד',nameEn:'Braid',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'lougheed',nameHe:'לוהיד טאון סנטר',nameEn:'Lougheed Town Centre',zone:2,platforms:3,accessibility:true,transfers:['millennium']},
-          {id:'production-way',nameHe:'פרודקשן וויי-אוניברסיטה',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['millennium']}
+          {id:'lougheed',nameHe:'לאוהיד',nameEn:'Lougheed Town Centre',zone:2,platforms:2,accessibility:true,transfers:['millennium']},
+          {id:'production-way',nameHe:'פרודקשן וויי',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['millennium']}
         ]
       },
       millennium: {
         nameHe:'קו המילניום', nameEn:'Millennium Line', color:'#FED100',
         stations:[
           {id:'vcc-clark',nameHe:'VCC-קלארק',nameEn:'VCC–Clark',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'commercial',nameHe:'קומרשיאל-ברודווי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['expo']},
+          {id:'commercial',nameHe:'קומרשיאל-ברודוויי',nameEn:'Commercial–Broadway',zone:1,platforms:2,accessibility:true,transfers:['expo']},
           {id:'renfrew',nameHe:'רנפרו',nameEn:'Renfrew',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'rupert',nameHe:'רופרט',nameEn:'Rupert',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'rupert',nameHe:'רופרט',nameEn:'Rupert',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'gilmore',nameHe:'גילמור',nameEn:'Gilmore',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'brentwood',nameHe:'ברנטווד טאון סנטר',nameEn:'Brentwood Town Centre',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'brentwood',nameHe:'ברנטווד',nameEn:'Brentwood Town Centre',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'holdom',nameHe:'הולדום',nameEn:'Holdom',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'sperling',nameHe:'ספרלינג-אגם ברנבי',nameEn:'Sperling–Burnaby Lake',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'lake-city-way',nameHe:'לייק סיטי וויי',nameEn:'Lake City Way',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'production-way',nameHe:'פרודקשן וויי-אוניברסיטה',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['expo']},
-          {id:'lougheed',nameHe:'לוהיד טאון סנטר',nameEn:'Lougheed Town Centre',zone:2,platforms:3,accessibility:true,transfers:['expo']},
-          {id:'burquitlam',nameHe:'ברקיטלם',nameEn:'Burquitlam',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'moody-centre',nameHe:'מודי סנטר',nameEn:'Moody Centre',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'inlet-centre',nameHe:'אינלט סנטר',nameEn:'Inlet Centre',zone:3,platforms:2,accessibility:true,transfers:[]},
+          {id:'sperling',nameHe:'ספרלינג',nameEn:'Sperling–Burnaby Lake',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'lake-city-way',nameHe:'דרך עיר האגם',nameEn:'Lake City Way',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'production-way',nameHe:'פרודקשן וויי',nameEn:'Production Way–University',zone:2,platforms:2,accessibility:true,transfers:['expo']},
+          {id:'lougheed',nameHe:'לאוהיד',nameEn:'Lougheed Town Centre',zone:2,platforms:2,accessibility:true,transfers:['expo']},
+          {id:'burquitlam',nameHe:'ברקיטלם',nameEn:'Burquitlam',zone:3,platforms:2,accessibility:true,transfers:[]},
+          {id:'moody-centre',nameHe:'מרכז מודי',nameEn:'Moody Centre',zone:3,platforms:2,accessibility:true,transfers:[]},
+          {id:'inlet-centre',nameHe:'מרכז אינלט',nameEn:'Inlet Centre',zone:3,platforms:2,accessibility:true,transfers:[]},
           {id:'coquitlam-central',nameHe:'מרכז קוקיטלם',nameEn:'Coquitlam Central',zone:3,platforms:2,accessibility:true,transfers:[]},
           {id:'lincoln',nameHe:'לינקולן',nameEn:'Lincoln',zone:3,platforms:2,accessibility:true,transfers:[]},
-          {id:'lafarge-lake',nameHe:'אגם לאפארג\'-דגלס',nameEn:'Lafarge Lake–Douglas',zone:3,platforms:2,accessibility:true,transfers:[]}
+          {id:'lafarge-lake',nameHe:'אגם לאפארג\'',nameEn:'Lafarge Lake–Douglas',zone:3,platforms:2,accessibility:true,transfers:[]}
         ]
       },
       canada: {
@@ -211,13 +215,13 @@
         stations:[
           {id:'waterfront',nameHe:'ווטרפרונט',nameEn:'Waterfront',zone:1,platforms:2,accessibility:true,transfers:['expo','seabus','westcoast']},
           {id:'vancouver-city-centre',nameHe:'מרכז העיר ונקובר',nameEn:'Vancouver City Centre',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'yaletown',nameHe:'יילטאון-ראונדהאוס',nameEn:'Yaletown–Roundhouse',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'yaletown',nameHe:'יילטאון',nameEn:'Yaletown–Roundhouse',zone:1,platforms:2,accessibility:true,transfers:[]},
           {id:'olympic-village',nameHe:'הכפר האולימפי',nameEn:'Olympic Village',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'broadway-city-hall',nameHe:'ברודווי-עיריית העיר',nameEn:'Broadway–City Hall',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'king-edward',nameHe:'קינג אדוורד',nameEn:'King Edward',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'oakridge',nameHe:'אוקריג\'-שדרה 41',nameEn:'Oakridge–41st Avenue',zone:1,platforms:2,accessibility:true,transfers:[]},
-          {id:'langara',nameHe:'לנגרה-שדרה 49',nameEn:'Langara–49th Avenue',zone:2,platforms:2,accessibility:true,transfers:[]},
-          {id:'marine-drive',nameHe:'מרין דרייב',nameEn:'Marine Drive',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'broadway-city-hall',nameHe:'ברודוויי-עיריית העיר',nameEn:'Broadway–City Hall',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'king-edward',nameHe:'קינג אדוארד',nameEn:'King Edward',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'oakridge',nameHe:'אוקרידג\'',nameEn:'Oakridge–41st Avenue',zone:1,platforms:2,accessibility:true,transfers:[]},
+          {id:'langara',nameHe:'לנגרה',nameEn:'Langara–49th Avenue',zone:2,platforms:2,accessibility:true,transfers:[]},
+          {id:'marine-drive',nameHe:'דרייב ימי',nameEn:'Marine Drive',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'bridgeport',nameHe:'ברידג\'פורט',nameEn:'Bridgeport',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'templeton',nameHe:'טמפלטון',nameEn:'Templeton',zone:2,platforms:2,accessibility:true,transfers:[]},
           {id:'sea-island-centre',nameHe:'מרכז אי הים',nameEn:'Sea Island Centre',zone:2,platforms:2,accessibility:true,transfers:[]},
@@ -237,9 +241,31 @@
       'westcoast': 'רכבת חוף מערבי'
     };
 
-    /* ===== רשימת תחנות לפי קו ===== */
+    /* ===== רשימת תחנות לפי קו - תיקון 2: תחנות בשני קווים תופענה פעמיים ===== */
     function renderLines() {
       const container = document.getElementById('linesContainer');
+      
+      // יצירת מערך של כל התחנות עם הקווים שלהן
+      const stationsWithLines = new Map();
+      
+      Object.entries(lines).forEach(([lineKey, lineData]) => {
+        lineData.stations.forEach(station => {
+          if (!stationsWithLines.has(station.id)) {
+            stationsWithLines.set(station.id, {
+              ...station,
+              lines: []
+            });
+          }
+          
+          const stationData = stationsWithLines.get(station.id);
+          stationData.lines.push({
+            key: lineKey,
+            nameHe: lineData.nameHe,
+            nameEn: lineData.nameEn,
+            color: lineData.color
+          });
+        });
+      });
       
       Object.entries(lines).forEach(([lineKey, lineData]) => {
         const lineDiv = document.createElement('div');
@@ -259,39 +285,70 @@
         
         const grid = document.getElementById(`stations-${lineKey}`);
         lineData.stations.forEach(st => {
+          const stationData = stationsWithLines.get(st.id);
           const btn = document.createElement('button');
           btn.className = 'text-right p-3 rounded-lg border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-colors';
+          
+          // תיקון 1: הצגת קווי האוטובוס שעוברים בתחנה
+          const linesInfo = stationData.lines.map(line => 
+            `<span class="inline-flex items-center gap-1">
+              <span class="w-3 h-3 rounded-full" style="background-color: ${line.color}"></span>
+              <span class="text-xs">${line.nameHe}</span>
+            </span>`
+          ).join(' ');
+          
           btn.innerHTML = `
             <div class="font-medium text-gray-800">${st.nameHe}</div>
             <div class="text-sm text-gray-600">${st.nameEn}</div>
             <div class="text-xs text-gray-500 mt-1">
               אזור ${st.zone} • ${st.platforms} רציפים
-              ${st.accessibility ? '<span class="text-xs text-green-700">♿︎</span>':''}
+              ${st.accessibility ? '<span class="text-xs text-green-700">♿︎</span>' : ''}
+            </div>
+            <div class="text-xs mt-1">
+              קווים: ${linesInfo}
             </div>`;
-          btn.addEventListener('click',()=>handleStationClick(st.id));
+          btn.addEventListener('click',() => handleStationClick(st.id));
           grid.appendChild(btn);
         });
       });
     }
 
-    /* ===== מודל תחנה ===== */
+    /* ===== מודל תחנה - תיקון 1: הצגת קווים העוברים בתחנה ===== */
     function getStationInfo(stationId){
-      for(const [_,lineData] of Object.entries(lines)){
-        const station=lineData.stations.find(s=>s.id===stationId);
-        if(station){
-          const stationLines=Object.entries(lines)
-           .filter(([_,l])=>l.stations.some(s=>s.id===stationId))
-           .map(([k,l])=>({key:k,nameHe:l.nameHe,nameEn:l.nameEn,color:l.color}));
-          return {...station,lines:stationLines};
+      // יצירת מערך של כל הקווים שעוברים בתחנה
+      const stationLines = [];
+      const stationData = {};
+      
+      Object.entries(lines).forEach(([lineKey, lineData]) => {
+        const station = lineData.stations.find(s => s.id === stationId);
+        if (station) {
+          if (!stationData.nameHe) {
+            Object.assign(stationData, station);
+          }
+          stationLines.push({
+            key: lineKey,
+            nameHe: lineData.nameHe,
+            nameEn: lineData.nameEn,
+            color: lineData.color
+          });
         }
+      });
+      
+      if (stationLines.length > 0) {
+        return { ...stationData, lines: stationLines };
       }
+      
       return null;
     }
-    const stationModal=document.getElementById('stationModal');
-    const stationContent=document.getElementById('stationContent');
+
+    const stationModal = document.getElementById('stationModal');
+    const stationContent = document.getElementById('stationContent');
+
     function handleStationClick(stationId){
-      const st=getStationInfo(stationId); if(!st) return;
-      stationContent.innerHTML=`
+      const st = getStationInfo(stationId);
+      if (!st) return;
+      
+      stationContent.innerHTML = `
         <div><h4 class="font-bold text-lg text-gray-800 mb-1">${st.nameHe}</h4><p class="text-gray-600">${st.nameEn}</p></div>
         <div class="grid grid-cols-2 gap-4">
           <div class="bg-blue-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-blue-800">אזור תעריף</div><p class="text-xl font-bold text-blue-600">אזור ${st.zone}</p></div>
@@ -312,37 +369,42 @@
           <span class="text-sm font-medium">${st.accessibility?'נגיש לכיסאות גלגלים':'לא נגיש'}</span></div>
         <div class="bg-yellow-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-yellow-800">מידע כללי</div>
           <p class="text-xs text-yellow-700">הסקייטריין פועל בקירוב 05:00–01:30 (ש׳ ~06:00, א׳/חגים ~07:00–00:30). תדירות ~2–7 דק׳ בשעות העומס.</p></div>`;
-      stationModal.classList.remove('hidden'); stationModal.classList.add('flex');
+      stationModal.classList.remove('hidden'); 
+      stationModal.classList.add('flex');
     }
-    function closeStationInfo(){stationModal.classList.add('hidden'); stationModal.classList.remove('flex')}
-    window.closeStationInfo=closeStationInfo;
+
+    function closeStationInfo(){
+      stationModal.classList.add('hidden'); 
+      stationModal.classList.remove('flex');
+    }
+    window.closeStationInfo = closeStationInfo;
 
     /* ===== ציור ה-SVG המתוקן ===== */
-    const svg=document.getElementById('schemaSvg');
-    const gPaths=document.getElementById('paths');
-    const gStations=document.getElementById('stations');
+    const svg = document.getElementById('schemaSvg');
+    const gPaths = document.getElementById('paths');
+    const gStations = document.getElementById('stations');
 
     const X = { canadaMain:210, canadaAir:170, canadaRich:250, expoMain:410, expoBranch:520, millennium:630 };
-    const yStart=100, yStep=56;
+    const yStart = 100, yStep = 56;
     const row = {};
     
     // הגדרת תחנות לפי שורות
     const expoMain = ['waterfront','burrard','granville','stadium','main-street','commercial','nanaimo','29th-ave','joyce','patterson','metrotown','royal-oak','edmonds','22nd-street','new-west','columbia','scott-road','gateway','surrey-central','king-george'];
-    expoMain.forEach((id,i)=>row[id]=i);
-    ['sapperton','braid','lougheed','production-way'].forEach((id,i)=>row[id]=row['columbia']+1+i);
+    expoMain.forEach((id,i) => row[id] = i);
+    ['sapperton','braid','lougheed','production-way'].forEach((id,i) => row[id] = row['columbia']+1+i);
     
     const canadaMain = ['waterfront','vancouver-city-centre','yaletown','olympic-village','broadway-city-hall','king-edward','oakridge','langara','marine-drive','bridgeport'];
-    canadaMain.forEach((id,i)=>row[id]=Math.min(row[id]??Infinity, i));
+    canadaMain.forEach((id,i) => row[id] = Math.min(row[id]??Infinity, i));
     
     const canadaAir = ['templeton','sea-island-centre','yvr-airport'];
-    canadaAir.forEach((id,i)=>row[id]=row['bridgeport']+1+i);
+    canadaAir.forEach((id,i) => row[id] = row['bridgeport']+1+i);
     
     const canadaRich = ['aberdeen','lansdowne','richmond-brighouse'];
-    canadaRich.forEach((id,i)=>row[id]=row['bridgeport']+1+i);
+    canadaRich.forEach((id,i) => row[id] = row['bridgeport']+1+i);
     
-      const milli = ['vcc-clark','commercial','renfrew','rupert','gilmore','brentwood','holdom','sperling','lake-city-way','production-way','lougheed','burquitlam','moody-centre','inlet-centre','coquitlam-central','lincoln','lafarge-lake'];
+    const milli = ['vcc-clark','commercial','renfrew','rupert','gilmore','brentwood','holdom','sperling','lake-city-way','production-way','lougheed','burquitlam','moody-centre','inlet-centre','coquitlam-central','lincoln','lafarge-lake'];
     const mStart = row['commercial'] - 1;
-    milli.forEach((id,i)=>row[id]=row[id]??(mStart+i));
+    milli.forEach((id,i) => row[id] = row[id]??(mStart+i));
 
     const Y = r => yStart + r*yStep;
 
@@ -360,15 +422,18 @@
     }
 
     function link(a,b){
-      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path');
       p.setAttribute('d',`M ${a.x} ${a.y} L ${b.x} ${b.y}`);
-      p.setAttribute('stroke','#111827'); p.setAttribute('stroke-width','2'); p.setAttribute('stroke-dasharray','4 4'); p.setAttribute('opacity','0.35');
+      p.setAttribute('stroke','#111827'); 
+      p.setAttribute('stroke-width','2'); 
+      p.setAttribute('stroke-dasharray','4 4'); 
+      p.setAttribute('opacity','0.35');
       gPaths.appendChild(p);
     }
 
     function findLabel(id){
       for(const l of Object.values(lines)){
-        const s=l.stations.find(s=>s.id===id);
+        const s = l.stations.find(s => s.id === id);
         if(s) return s.nameHe || s.nameEn;
       }
       return id;
@@ -425,24 +490,24 @@
         
         // עיגולים קטנים לכל קו
         linesData.forEach((lineData, index) => {
-          const angle = (index / linesData.length) * 2 * Math.PI;
-          const radius = 5;
-          const cx = x + Math.cos(angle) * radius;
-          const cy = y + Math.sin(angle) * radius;
+          const angle = (2 * Math.PI * index) / linesData.length;
+          const innerRadius = 5;
+          const innerX = x + Math.cos(angle) * innerRadius;
+          const innerY = y + Math.sin(angle) * innerRadius;
           
           const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          innerCircle.setAttribute('cx', cx);
-          innerCircle.setAttribute('cy', cy);
+          innerCircle.setAttribute('cx', innerX);
+          innerCircle.setAttribute('cy', innerY);
           innerCircle.setAttribute('r', 3);
           innerCircle.setAttribute('fill', lineData.color);
           g.appendChild(innerCircle);
         });
       } else {
-        // תחנה רגילה - עיגול אחד בצבע הקו
+        // תחנה רגילה - עיגול בצבע הקו
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', x);
         circle.setAttribute('cy', y);
-        circle.setAttribute('r', 8);
+        circle.setAttribute('r', 7);
         circle.setAttribute('fill', linesData[0].color);
         circle.setAttribute('stroke', '#fff');
         circle.setAttribute('stroke-width', 2);
@@ -451,66 +516,62 @@
       }
 
       // הוספת תווית
-      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      bg.classList.add('label-bg');
-      const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      tx.classList.add('station-label');
-      tx.textContent = label;
+      const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       
-      const offset = linesData.length > 1 ? 18 : 15;
-      if (preferred === 'center') {
-        tx.setAttribute('x', x);
-        tx.setAttribute('y', y - offset);
-        tx.setAttribute('text-anchor', 'middle');
-      } else if (preferred === 'right') {
-        tx.setAttribute('x', x + offset);
-        tx.setAttribute('y', y);
-        tx.setAttribute('text-anchor', 'start');
-      } else {
-        tx.setAttribute('x', x - offset);
-        tx.setAttribute('y', y);
-        tx.setAttribute('text-anchor', 'end');
+      let labelX, labelY, textAnchor;
+      const labelWidth = label.length * 5.5;
+      const labelHeight = 16;
+      
+      if (preferred === 'right') {
+        labelX = x + 15;
+        labelY = y - 8;
+        textAnchor = 'start';
+      } else if (preferred === 'left') {
+        labelX = x - 15 - labelWidth;
+        labelY = y - 8;
+        textAnchor = 'end';
+      } else { // center
+        labelX = x - labelWidth/2;
+        labelY = y - 20;
+        textAnchor = 'middle';
       }
       
-      g.appendChild(bg);
-      g.appendChild(tx);
-      gStations.appendChild(g);
+      labelBg.classList.add('label-bg');
+      labelBg.setAttribute('x', labelX - 2);
+      labelBg.setAttribute('y', labelY);
+      labelBg.setAttribute('width', labelWidth + 4);
+      labelBg.setAttribute('height', labelHeight);
       
-      // חישוב גבולות הטקסט לרקע
-      setTimeout(() => {
-        try {
-          const bbox = tx.getBBox();
-          const padding = 2;
-          bg.setAttribute('x', bbox.x - padding);
-          bg.setAttribute('y', bbox.y - padding);
-          bg.setAttribute('width', bbox.width + padding * 2);
-          bg.setAttribute('height', bbox.height + padding * 2);
-        } catch(e) {
-          console.warn('Could not calculate text bounds for', label);
-        }
-      }, 0);
-
+      labelText.classList.add('station-label');
+      labelText.setAttribute('x', preferred === 'center' ? x : (labelX + (textAnchor === 'end' ? labelWidth : 2)));
+      labelText.setAttribute('y', labelY + 12);
+      labelText.setAttribute('text-anchor', textAnchor);
+      labelText.textContent = label;
+      
+      g.appendChild(labelBg);
+      g.appendChild(labelText);
       g.addEventListener('click', () => handleStationClick(id));
+      
+      gStations.appendChild(g);
     }
 
-    // פונקציה חדשה: ציור תחנות ייחודיות
     function drawUniqueStations() {
       const uniqueStations = createUniqueStationsMap();
       
-      // הגדרת מיקומים לכל תחנה
       const stationPositions = {
         // תחנות קו קנדה - ציר ראשי
         ...canadaMain.reduce((acc, id) => {
           acc[id] = { x: X.canadaMain, y: Y(row[id]), labelSide: 'left' };
           return acc;
         }, {}),
-        
+   
         // תחנות קו קנדה - נמל תעופה
         ...canadaAir.reduce((acc, id) => {
           acc[id] = { x: X.canadaAir, y: Y(row[id]), labelSide: 'left' };
           return acc;
         }, {}),
-     
+   
         // תחנות קו קנדה - ריצ'מונד
         ...canadaRich.reduce((acc, id) => {
           acc[id] = { x: X.canadaRich, y: Y(row[id]), labelSide: 'right' };
@@ -568,14 +629,14 @@
     // פונקציית ציור מעודכנת
     function drawMap() {
       // ציור הקווים
-      addPath(canadaMain.map(id=>({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
-      addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id=>({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
-      addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaRich.map(id=>({x:X.canadaRich,y:Y(row[id])})) ], lines.canada.color);
+      addPath(canadaMain.map(id => ({x:X.canadaMain,y:Y(row[id])})), lines.canada.color);
+      addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaAir.map(id => ({x:X.canadaAir,y:Y(row[id])})) ], lines.canada.color);
+      addPath([ {x:X.canadaMain,y:Y(row['bridgeport'])}, ...canadaRich.map(id => ({x:X.canadaRich,y:Y(row[id])})) ], lines.canada.color);
 
-      addPath(expoMain.map(id=>({x:X.expoMain,y:Y(row[id])})), lines.expo.color);
-      addPath([ {x:X.expoMain,y:Y(row['columbia'])}, ...['sapperton','braid','lougheed','production-way'].map(id=>({x:X.expoBranch,y:Y(row[id])})) ], lines.expo.color);
+      addPath(expoMain.map(id => ({x:X.expoMain,y:Y(row[id])})), lines.expo.color);
+      addPath([ {x:X.expoMain,y:Y(row['columbia'])}, ...['sapperton','braid','lougheed','production-way'].map(id => ({x:X.expoBranch,y:Y(row[id])})) ], lines.expo.color);
 
-      addPath(milli.map(id=>({x:X.millennium,y:Y(row[id])})), lines.millennium.color);
+      addPath(milli.map(id => ({x:X.millennium,y:Y(row[id])})), lines.millennium.color);
 
       // חיבורים
       link({x:X.canadaMain,y:Y(row['waterfront'])},{x:X.expoMain,y:Y(row['waterfront'])});
