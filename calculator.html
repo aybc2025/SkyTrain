@@ -862,69 +862,128 @@ function getAllLinesDataOld() {
   };
 }
 
-// החלפת הפונקציה הקיימת findOneTransferRoute בגרסה משופרת
-function findOneTransferRoute(fromStation, toStation) {
-  console.log('מחפש מסלול עם החלפה אחת');
-  
-  const allTransferStations = Object.keys(stations).filter(stationId => {
-    const station = stations[stationId];
-    return station.lines.length > 1 || isTransferStation(stationId);
-  });
-  
-  console.log('תחנות חיבור פוטנציאליות:', allTransferStations);
-  
-  let bestRoute = null;
-  let shortestDistance = Infinity;
-  
-  for (const transferId of allTransferStations) {
-    const transferStation = stations[transferId];
-    if (!transferStation) continue;
-    
-    const line1Options = fromStation.lines.filter(line => transferStation.lines.includes(line));
-    const line2Options = transferStation.lines.filter(line => toStation.lines.includes(line));
-    
-    if (line1Options.length > 0 && line2Options.length > 0) {
-      // בדיקת כל הצירופים האפשריים של קווים
-      for (const line1 of line1Options) {
-        for (const line2 of line2Options) {
-          if (line1 !== line2) {
-            // חישוב מרחק כולל של המסלול
-            const fromId = getStationId(fromStation);
-            const toId = getStationId(toStation);
-            
-            const distance1 = calculateStationDistance(fromId, transferId, line1);
-            const distance2 = calculateStationDistance(transferId, toId, line2);
-            const totalDistance = distance1 + distance2;
-            
-            console.log(`מסלול דרך ${transferStation.nameHe}: ${line1} (${distance1}) + ${line2} (${distance2}) = ${totalDistance}`);
-            
-            if (totalDistance < shortestDistance) {
-              shortestDistance = totalDistance;
-              bestRoute = {
-                type: 'transfer',
-                from: fromStation,
-                to: toStation,
-                transfer: transferStation,
-                line1: lineInfo[line1],
-                line2: lineInfo[line2],
-                steps: 2,
-                distance: totalDistance
-              };
+    // ** פונקציה מתוקנת לחיפוש מסלול עם החלפה אחת **
+    function findOneTransferRoute(fromStation, toStation) {
+      console.log('מחפש מסלול עם החלפה אחת');
+      
+      const allTransferStations = Object.keys(stations).filter(stationId => {
+        const station = stations[stationId];
+        return station.lines.length > 1 || isTransferStation(stationId);
+      });
+      
+      console.log('תחנות חיבור פוטנציאליות:', allTransferStations);
+      
+      let bestRoute = null;
+      let shortestDistance = Infinity;
+      
+      for (const transferId of allTransferStations) {
+        const transferStation = stations[transferId];
+        if (!transferStation) continue;
+        
+        const line1Options = fromStation.lines.filter(line => transferStation.lines.includes(line));
+        const line2Options = transferStation.lines.filter(line => toStation.lines.includes(line));
+        
+        if (line1Options.length > 0 && line2Options.length > 0) {
+          // בדיקת כל הצירופים האפשריים של קווים
+          for (const line1 of line1Options) {
+            for (const line2 of line2Options) {
+              if (line1 !== line2) {
+                // בדיקה שהתחנות מחוברות באמת בכל קטע
+                const fromId = getStationId(fromStation);
+                const toId = getStationId(toStation);
+                
+                // *** התיקון החשוב: בדיקה מפורטת של חיבור בכל קטע ***
+                const segment1Connected = areStationsDirectlyConnectedInLine(fromId, transferId, line1);
+                const segment2Connected = areStationsDirectlyConnectedInLine(transferId, toId, line2);
+                
+                console.log(`בדיקה: ${fromStation.nameHe} -> ${transferStation.nameHe} בקו ${line1}: ${segment1Connected}`);
+                console.log(`בדיקה: ${transferStation.nameHe} -> ${toStation.nameHe} בקו ${line2}: ${segment2Connected}`);
+                
+                if (segment1Connected && segment2Connected) {
+                  const distance1 = calculateStationDistanceInLine(fromId, transferId, line1);
+                  const distance2 = calculateStationDistanceInLine(transferId, toId, line2);
+                  const totalDistance = distance1 + distance2;
+                  
+                  console.log(`מסלול תקין דרך ${transferStation.nameHe}: ${line1} (${distance1}) + ${line2} (${distance2}) = ${totalDistance}`);
+                  
+                  if (totalDistance < shortestDistance && totalDistance < Infinity) {
+                    shortestDistance = totalDistance;
+                    bestRoute = {
+                      type: 'transfer',
+                      from: fromStation,
+                      to: toStation,
+                      transfer: transferStation,
+                      line1: lineInfo[line1],
+                      line2: lineInfo[line2],
+                      steps: 2,
+                      distance: totalDistance
+                    };
+                  }
+                } else {
+                  console.log(`מסלול דרך ${transferStation.nameHe} לא תקין - לא ניתן להגיע`);
+                }
+              }
             }
           }
         }
       }
+      
+      if (bestRoute) {
+        console.log(`נמצא מסלול הכי קצר דרך ${bestRoute.transfer.nameHe} במרחק ${bestRoute.distance} תחנות`);
+        return bestRoute;
+      }
+      
+      console.log('לא נמצא מסלול עם החלפה אחת');
+      return null;
     }
-  }
-  
-  if (bestRoute) {
-    console.log(`נמצא מסלול הכי קצר דרך ${bestRoute.transfer.nameHe} במרחק ${bestRoute.distance} תחנות`);
-    return bestRoute;
-  }
-  
-  console.log('לא נמצא מסלול עם החלפה אחת');
-  return null;
-}
+
+    // ** פונקציה חדשה לבדיקה מדויקת של חיבור בין שתי תחנות בקו ספציפי **
+    function areStationsDirectlyConnectedInLine(stationId1, stationId2, lineKey) {
+      const lineData = getAllLinesData()[lineKey];
+      if (!lineData) {
+        console.warn(`לא נמצא מידע על הקו ${lineKey}`);
+        return false;
+      }
+      
+      // בדיקה בכל סגמנט של הקו
+      const segments = Object.values(lineData);
+      
+      for (const segment of segments) {
+        const stationIds = segment.map(s => s.id);
+        const index1 = stationIds.indexOf(stationId1);
+        const index2 = stationIds.indexOf(stationId2);
+        
+        // אם שתי התחנות נמצאות באותו סגמנט
+        if (index1 !== -1 && index2 !== -1) {
+          console.log(`תחנות ${stationId1} ו-${stationId2} נמצאו באותו סגמנט של קו ${lineKey}`);
+          return true;
+        }
+      }
+      
+      console.log(`תחנות ${stationId1} ו-${stationId2} לא נמצאות באותו סגמנט של קו ${lineKey}`);
+      return false;
+    }
+
+    // ** פונקציה חדשה לחישוב מרחק בקו ספציפי **
+    function calculateStationDistanceInLine(stationId1, stationId2, lineKey) {
+      const lineData = getAllLinesData()[lineKey];
+      if (!lineData) return Infinity;
+      
+      // חיפוש הסגמנט שמכיל את שתי התחנות
+      const segments = Object.values(lineData);
+      
+      for (const segment of segments) {
+        const stationIds = segment.map(s => s.id);
+        const index1 = stationIds.indexOf(stationId1);
+        const index2 = stationIds.indexOf(stationId2);
+        
+        if (index1 !== -1 && index2 !== -1) {
+          return Math.abs(index2 - index1);
+        }
+      }
+      
+      return Infinity; // התחנות לא נמצאות באותו סגמנט
+    }
 
     function findTwoTransferRoute(fromStation, toStation) {
       console.log('מחפש מסלול עם שתי החלפות');
