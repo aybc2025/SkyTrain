@@ -230,6 +230,87 @@
     let routeMap = null;
     let currentRoute = null;
 
+    // פונקציות ניווט - מוגדרות בתחילת הסקריפט
+    function goHome() {
+      window.location.href = './index.html';
+    }
+
+    function goToMap() {
+      window.location.href = './map.html';
+    }
+
+    // בחירת רמת קושי
+    function setDifficulty(difficulty) {
+      currentDifficulty = difficulty;
+      document.getElementById('difficultySelection').classList.add('hidden');
+      document.getElementById('stationSelection').classList.remove('hidden');
+      
+      if (difficulty === 'easy') {
+        setupEasyMode();
+      } else {
+        setupMediumMode();
+      }
+    }
+
+    function resetSelection() {
+      document.getElementById('stationSelection').classList.add('hidden');
+      document.getElementById('difficultySelection').classList.remove('hidden');
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('mapContainer').classList.add('hidden');
+      
+      // איפוס בחירות
+      document.getElementById('fromStation').value = '';
+      document.getElementById('toStation').value = '';
+      currentFromLineFilter = 'all';
+      currentToLineFilter = 'all';
+      
+      // איפוס פילטרים
+      document.querySelectorAll('#fromLineFilters .line-filter').forEach(f => f.classList.remove('active'));
+      document.querySelectorAll('#toLineFilters .line-filter').forEach(f => f.classList.remove('active'));
+      document.querySelector('#fromLineFilters .line-filter[data-line="all"]').classList.add('active');
+      document.querySelector('#toLineFilters .line-filter[data-line="all"]').classList.add('active');
+    }
+
+    function calculateRoute() {
+      const fromId = document.getElementById('fromStation').value;
+      const toId = document.getElementById('toStation').value;
+      
+      if (!fromId || !toId) return;
+      
+      if (fromId === toId) {
+        showError('אתה כבר בתחנה הזו! 😄');
+        return;
+      }
+
+      console.log('מתחיל חישוב מסלול:', fromId, '→', toId);
+      const route = findRouteImproved(fromId, toId);
+      console.log('מסלול שנמצא:', route);
+      currentRoute = route;
+      displayResults(route);
+    }
+
+    // פונקציות מפה
+    function showRouteOnMap() {
+      if (!currentRoute) return;
+      
+      document.getElementById('mapContainer').classList.remove('hidden');
+      
+      setTimeout(() => {
+        const map = initMap();
+        plotRouteOnMap(map, currentRoute);
+        
+        // גלילה למפה
+        document.getElementById('mapContainer').scrollIntoView({
+          behavior: 'smooth', 
+          block: 'start'
+        });
+      }, 100);
+    }
+
+    function hideMap() {
+      document.getElementById('mapContainer').classList.add('hidden');
+    }
+
     // נתוני קווים
     const lineInfo = {
       'expo': {
@@ -1554,4 +1635,27 @@
       const badge = document.getElementById('offlineBadge');
       if (!navigator.onLine) {
         badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
       }
+    }
+
+    window.addEventListener('online', checkOfflineStatus);
+    window.addEventListener('offline', checkOfflineStatus);
+    
+    // אתחול האפליקציה
+    document.addEventListener('DOMContentLoaded', function() {
+      checkOfflineStatus();
+    });
+
+    // הוספת פונקציות לחלון הגלובלי כדי שיהיו נגישות לכל onclick handlers
+    window.goHome = goHome;
+    window.goToMap = goToMap;
+    window.setDifficulty = setDifficulty;
+    window.resetSelection = resetSelection;
+    window.calculateRoute = calculateRoute;
+    window.showRouteOnMap = showRouteOnMap;
+    window.hideMap = hideMap;
+  </script>
+</body>
+</html>
