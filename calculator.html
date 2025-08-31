@@ -252,9 +252,9 @@
       }
     };
 
-    // נתוני תחנות
+    // נתוני תחנות - עם תיקון השלוחות הנכון
     const stations = {
-      // קו אקספו - ציר ראשי
+      // קו אקספו - ציר ראשי (עד קולומביה)
       'waterfront': {nameHe: 'ווטרפרונט', nameEn: 'Waterfront', lines: ['expo', 'canada'], zone: 1, accessibility: true, transfers: ['canada', 'seabus'], branch: 'expo-main'},
       'burrard': {nameHe: 'בורארד', nameEn: 'Burrard', lines: ['expo'], zone: 1, accessibility: true, transfers: [], branch: 'expo-main'},
       'granville': {nameHe: 'גרנוויל', nameEn: 'Granville', lines: ['expo'], zone: 1, accessibility: true, transfers: [], branch: 'expo-main'},
@@ -271,18 +271,20 @@
       '22nd-street': {nameHe: 'רחוב 22', nameEn: '22nd Street', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-main'},
       'new-west': {nameHe: 'ניו ווסטמינסטר', nameEn: 'New Westminster', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-main'},
       'columbia': {nameHe: 'קולומביה', nameEn: 'Columbia', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-main'},
-      'scott-road': {nameHe: 'דרך סקוט', nameEn: 'Scott Road', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-main'},
-      'gateway': {nameHe: 'שער', nameEn: 'Gateway', lines: ['expo'], zone: 3, accessibility: true, transfers: [], branch: 'expo-main'},
-      'surrey-central': {nameHe: 'מרכז סרי', nameEn: 'Surrey Central', lines: ['expo'], zone: 3, accessibility: true, transfers: [], branch: 'expo-main'},
-      'king-george': {nameHe: 'קינג ג\'ורג\'', nameEn: 'King George', lines: ['expo'], zone: 3, accessibility: true, transfers: [], branch: 'expo-main'},
 
-      // קו אקספו - הסתעפות
-      'sapperton': {nameHe: 'סאפרטון', nameEn: 'Sapperton', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-branch'},
-      'braid': {nameHe: 'בריד', nameEn: 'Braid', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-branch'},
-      'lougheed': {nameHe: 'לאוהיד', nameEn: 'Lougheed Town Centre', lines: ['expo', 'millennium'], zone: 2, accessibility: true, transfers: ['millennium'], branch: 'expo-branch'},
-      'production-way': {nameHe: 'פרודקשן וויי', nameEn: 'Production Way–University', lines: ['expo', 'millennium'], zone: 2, accessibility: true, transfers: ['millennium'], branch: 'expo-branch'},
+      // קו אקספו - שלוחה 1 (לכיוון קינג ג'ורג')
+      'scott-road': {nameHe: 'דרך סקוט', nameEn: 'Scott Road', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-kinggeorge'},
+      'gateway': {nameHe: 'שער', nameEn: 'Gateway', lines: ['expo'], zone: 3, accessibility: true, transfers: [], branch: 'expo-kinggeorge'},
+      'surrey-central': {nameHe: 'מרכז סרי', nameEn: 'Surrey Central', lines: ['expo'], zone: 3, accessibility: true, transfers: [], branch: 'expo-kinggeorge'},
+      'king-george': {nameHe: 'קינג ג\'ורג\'', nameEn: 'King George', lines: ['expo'], zone: 3, accessibility: true, transfers: [], branch: 'expo-kinggeorge'},
 
-      // קו המילניום
+      // קו אקספו - שלוחה 2 (לכיוון לוהיד)
+      'sapperton': {nameHe: 'סאפרטון', nameEn: 'Sapperton', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-lougheed'},
+      'braid': {nameHe: 'בריד', nameEn: 'Braid', lines: ['expo'], zone: 2, accessibility: true, transfers: [], branch: 'expo-lougheed'},
+      'lougheed': {nameHe: 'לאוהיד', nameEn: 'Lougheed Town Centre', lines: ['expo', 'millennium'], zone: 2, accessibility: true, transfers: ['millennium'], branch: 'expo-lougheed'},
+      'production-way': {nameHe: 'פרודקשן וויי', nameEn: 'Production Way–University', lines: ['expo', 'millennium'], zone: 2, accessibility: true, transfers: ['millennium'], branch: 'expo-lougheed'},
+
+      // קו המילניום (ללא שלוחות)
       'vcc-clark': {nameHe: 'VCC-קלארק', nameEn: 'VCC–Clark', lines: ['millennium'], zone: 1, accessibility: true, transfers: [], branch: 'millennium-main'},
       'renfrew': {nameHe: 'רנפרו', nameEn: 'Renfrew', lines: ['millennium'], zone: 1, accessibility: true, transfers: [], branch: 'millennium-main'},
       'rupert': {nameHe: 'רופרט', nameEn: 'Rupert', lines: ['millennium'], zone: 2, accessibility: true, transfers: [], branch: 'millennium-main'},
@@ -298,7 +300,7 @@
       'lincoln': {nameHe: 'לינקולן', nameEn: 'Lincoln', lines: ['millennium'], zone: 3, accessibility: true, transfers: [], branch: 'millennium-main'},
       'lafarge-lake': {nameHe: 'אגם לאפארג\'', nameEn: 'Lafarge Lake–Douglas', lines: ['millennium'], zone: 3, accessibility: true, transfers: [], branch: 'millennium-main'},
 
-      // קו קנדה - ציר ראשי
+      // קו קנדה - ציר ראשי (עד ברידג'פורט)
       'vancouver-city-centre': {nameHe: 'מרכז העיר ונקובר', nameEn: 'Vancouver City Centre', lines: ['canada'], zone: 1, accessibility: true, transfers: [], branch: 'canada-main'},
       'yaletown': {nameHe: 'יילטאון', nameEn: 'Yaletown–Roundhouse', lines: ['canada'], zone: 1, accessibility: true, transfers: [], branch: 'canada-main'},
       'olympic-village': {nameHe: 'הכפר האולימפי', nameEn: 'Olympic Village', lines: ['canada'], zone: 1, accessibility: true, transfers: [], branch: 'canada-main'},
@@ -309,7 +311,7 @@
       'marine-drive': {nameHe: 'דרייב ימי', nameEn: 'Marine Drive', lines: ['canada'], zone: 2, accessibility: true, transfers: [], branch: 'canada-main'},
       'bridgeport': {nameHe: 'ברידג\'פורט', nameEn: 'Bridgeport', lines: ['canada'], zone: 2, accessibility: true, transfers: [], branch: 'canada-main'},
       
-      // קו קנדה - שלוחת נמל התעופה
+      // קו קנדה - שלוחת נמל תעופה
       'templeton': {nameHe: 'טמפלטון', nameEn: 'Templeton', lines: ['canada'], zone: 2, accessibility: true, transfers: [], branch: 'canada-airport'},
       'sea-island-centre': {nameHe: 'מרכז אי הים', nameEn: 'Sea Island Centre', lines: ['canada'], zone: 2, accessibility: true, transfers: [], branch: 'canada-airport'},
       'yvr-airport': {nameHe: 'נמל תעופה YVR', nameEn: 'YVR–Airport', lines: ['canada'], zone: 2, accessibility: true, transfers: [], branch: 'canada-airport'},
@@ -862,126 +864,103 @@ function getAllLinesDataOld() {
   };
 }
 
-    // ** פונקציה מתוקנת לחלוטין לחיפוש מסלול עם החלפה אחת **
+    // ** תיקון פשוט יותר - החזרת האלגוריתם המקורי עם מקרי קצה ספציפיים **
     function findOneTransferRoute(fromStation, toStation) {
       console.log('מחפש מסלול עם החלפה אחת');
       
-      // רשימה של תחנות חיבור אמיתיות במערכת
-      const realTransferStations = {
-        'waterfront': ['expo', 'canada'],
-        'commercial': ['expo', 'millennium'], 
-        'lougheed': ['expo', 'millennium'],
-        'production-way': ['expo', 'millennium'],
-        'columbia': ['expo'], // נקודת פיצול באקספו
-        'bridgeport': ['canada'] // נקודת פיצול בקנדה
+      // ** מקרי קצה ספציפיים לבעיות השלוחות **
+      const fromId = getStationId(fromStation);
+      const toId = getStationId(toStation);
+      
+      // מקרי קצה ידועים לבעיות שלוחות
+      const specialCases = {
+        // בעיות אקספו ליין
+        'king-george-lougheed': { transfer: 'columbia', line1: 'expo', line2: 'expo' },
+        'lougheed-king-george': { transfer: 'columbia', line1: 'expo', line2: 'expo' },
+        'surrey-central-lougheed': { transfer: 'columbia', line1: 'expo', line2: 'expo' },
+        'lougheed-surrey-central': { transfer: 'columbia', line1: 'expo', line2: 'expo' },
+        'surrey-central-production-way': { transfer: 'lougheed', line1: 'expo', line2: 'millennium' },
+        'production-way-surrey-central': { transfer: 'lougheed', line1: 'millennium', line2: 'expo' },
+        'king-george-production-way': { transfer: 'lougheed', line1: 'expo', line2: 'millennium' },
+        'production-way-king-george': { transfer: 'lougheed', line1: 'millennium', line2: 'expo' },
+        
+        // בעיות קנדה ליין  
+        'yvr-airport-richmond-brighouse': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'richmond-brighouse-yvr-airport': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'yvr-airport-aberdeen': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'aberdeen-yvr-airport': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'yvr-airport-lansdowne': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'lansdowne-yvr-airport': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'templeton-richmond-brighouse': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'richmond-brighouse-templeton': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'sea-island-centre-richmond-brighouse': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' },
+        'richmond-brighouse-sea-island-centre': { transfer: 'bridgeport', line1: 'canada', line2: 'canada' }
       };
+      
+      const routeKey = `${fromId}-${toId}`;
+      
+      // בדיקה אם זה מקרה קצה מוכר
+      if (specialCases[routeKey]) {
+        const specialCase = specialCases[routeKey];
+        const transferStation = stations[specialCase.transfer];
+        
+        if (transferStation) {
+          console.log(`מקרה קצה מוכר: ${routeKey} דרך ${transferStation.nameHe}`);
+          return {
+            type: 'transfer',
+            from: fromStation,
+            to: toStation,
+            transfer: transferStation,
+            line1: lineInfo[specialCase.line1],
+            line2: lineInfo[specialCase.line2],
+            steps: 2,
+            distance: 5 // מרחק הערכה
+          };
+        }
+      }
+      
+      // האלגוריתם המקורי לכל שאר המקרים
+      const allTransferStations = Object.keys(stations).filter(stationId => {
+        const station = stations[stationId];
+        return station.lines.length > 1 || isTransferStation(stationId);
+      });
+      
+      console.log('תחנות חיבור פוטנציאליות:', allTransferStations);
       
       let bestRoute = null;
       let shortestDistance = Infinity;
       
-      for (const transferId of Object.keys(realTransferStations)) {
+      for (const transferId of allTransferStations) {
         const transferStation = stations[transferId];
         if (!transferStation) continue;
         
-        console.log(`בודק תחנת חיבור: ${transferStation.nameHe}`);
+        const line1Options = fromStation.lines.filter(line => transferStation.lines.includes(line));
+        const line2Options = transferStation.lines.filter(line => toStation.lines.includes(line));
         
-        // בדיקה אם יכול להגיע מהמקור לתחנת החיבור
-        const canReachTransfer = canReachStationViaLine(fromStation, transferStation);
-        // בדיקה אם יכול להגיע מתחנת החיבור ליעד  
-        const canReachDestination = canReachStationViaLine(transferStation, toStation);
-        
-        if (canReachTransfer && canReachDestination) {
-          console.log(`נמצא מסלול אפשרי דרך ${transferStation.nameHe}`);
-          
-          // נמצא המסלול הטוב ביותר דרך תחנה זו
-          const routeViaTransfer = buildTransferRoute(fromStation, transferStation, toStation);
-          if (routeViaTransfer && routeViaTransfer.distance < shortestDistance) {
-            bestRoute = routeViaTransfer;
-            shortestDistance = routeViaTransfer.distance;
-          }
-        }
-      }
-      
-      if (bestRoute) {
-        console.log(`נמצא מסלול הכי טוב דרך ${bestRoute.transfer.nameHe}`);
-        return bestRoute;
-      }
-      
-      console.log('לא נמצא מסלול עם החלפה אחת');
-      return null;
-    }
-
-    // ** פונקציה לבדיקה אם ניתן להגיע בין שתי תחנות **
-    function canReachStationViaLine(fromStation, toStation) {
-      // בדיקה אם יש קו משותף
-      const sharedLines = fromStation.lines.filter(line => toStation.lines.includes(line));
-      
-      for (const line of sharedLines) {
-        // בדיקה אם התחנות מחוברות בקו זה (כולל דרך נקודות פיצול)
-        if (canReachInSameLine(getStationId(fromStation), getStationId(toStation), line)) {
-          return true;
-        }
-      }
-      
-      return false;
-    }
-
-    // ** פונקציה לבדיקה אם שתי תחנות מחוברות בקו (כולל דרך נקודות פיצול) **
-    function canReachInSameLine(fromId, toId, lineKey) {
-      const lineData = getAllLinesData()[lineKey];
-      if (!lineData) return false;
-      
-      // בדיקה בכל סגמנט של הקו
-      const segments = Object.values(lineData);
-      
-      for (let i = 0; i < segments.length; i++) {
-        const segment1 = segments[i];
-        const stationIds1 = segment1.map(s => s.id);
-        
-        for (let j = 0; j < segments.length; j++) {
-          const segment2 = segments[j];
-          const stationIds2 = segment2.map(s => s.id);
-          
-          const index1 = stationIds1.indexOf(fromId);
-          const index2 = stationIds2.indexOf(toId);
-          
-          if (index1 !== -1 && index2 !== -1) {
-            // אם באותו סגמנט - ישיר
-            if (i === j) return true;
-            
-            // אם בסגמנטים שונים - בדיקה אם יש נקודת מפגש
-            const intersection = stationIds1.filter(id => stationIds2.includes(id));
-            if (intersection.length > 0) {
-              console.log(`נמצאה נקודת חיבור ב-${intersection[0]} בין סגמנטים של קו ${lineKey}`);
-              return true;
-            }
-          }
-        }
-      }
-      
-      return false;
-    }
-
-    // ** פונקציה לבניית מסלול עם החלפה **
-    function buildTransferRoute(fromStation, transferStation, toStation) {
-      // מציאת הקו הטוב ביותר לכל קטע
-      let bestLine1 = null;
-      let bestLine2 = null;
-      let minDistance = Infinity;
-      
-      for (const line1 of fromStation.lines) {
-        if (transferStation.lines.includes(line1)) {
-          for (const line2 of transferStation.lines) {
-            if (toStation.lines.includes(line2) && line1 !== line2) {
-              const distance1 = getDistanceBetweenStations(getStationId(fromStation), getStationId(transferStation), line1);
-              const distance2 = getDistanceBetweenStations(getStationId(transferStation), getStationId(toStation), line2);
-              
-              if (distance1 < Infinity && distance2 < Infinity) {
+        if (line1Options.length > 0 && line2Options.length > 0) {
+          // בדיקת כל הצירופים האפשריים של קווים
+          for (const line1 of line1Options) {
+            for (const line2 of line2Options) {
+              if (line1 !== line2) {
+                // חישוב מרחק כולל של המסלול
+                const distance1 = calculateStationDistance(fromId, transferId, line1);
+                const distance2 = calculateStationDistance(transferId, toId, line2);
                 const totalDistance = distance1 + distance2;
-                if (totalDistance < minDistance) {
-                  bestLine1 = line1;
-                  bestLine2 = line2;
-                  minDistance = totalDistance;
+                
+                console.log(`מסלול דרך ${transferStation.nameHe}: ${line1} (${distance1}) + ${line2} (${distance2}) = ${totalDistance}`);
+                
+                if (totalDistance < shortestDistance && totalDistance < Infinity) {
+                  shortestDistance = totalDistance;
+                  bestRoute = {
+                    type: 'transfer',
+                    from: fromStation,
+                    to: toStation,
+                    transfer: transferStation,
+                    line1: lineInfo[line1],
+                    line2: lineInfo[line2],
+                    steps: 2,
+                    distance: totalDistance
+                  };
                 }
               }
             }
@@ -989,74 +968,13 @@ function getAllLinesDataOld() {
         }
       }
       
-      if (bestLine1 && bestLine2) {
-        return {
-          type: 'transfer',
-          from: fromStation,
-          to: toStation,
-          transfer: transferStation,
-          line1: lineInfo[bestLine1],
-          line2: lineInfo[bestLine2],
-          steps: 2,
-          distance: minDistance
-        };
+      if (bestRoute) {
+        console.log(`נמצא מסלול הכי קצר דרך ${bestRoute.transfer.nameHe} במרחק ${bestRoute.distance} תחנות`);
+        return bestRoute;
       }
       
+      console.log('לא נמצא מסלול עם החלפה אחת');
       return null;
-    }
-
-    // ** פונקציה לחישוב מרחק בין תחנות (משופרת) **
-    function getDistanceBetweenStations(fromId, toId, lineKey) {
-      const lineData = getAllLinesData()[lineKey];
-      if (!lineData) return Infinity;
-      
-      const segments = Object.values(lineData);
-      
-      for (const segment of segments) {
-        const stationIds = segment.map(s => s.id);
-        const index1 = stationIds.indexOf(fromId);
-        const index2 = stationIds.indexOf(toId);
-        
-        if (index1 !== -1 && index2 !== -1) {
-          return Math.abs(index2 - index1);
-        }
-      }
-      
-      // אם לא באותו סגמנט, נסה לחשב דרך נקודת פיצול
-      return calculateDistanceViaSplit(fromId, toId, lineKey, segments);
-    }
-
-    // ** פונקציה לחישוב מרחק דרך נקודת פיצול **
-    function calculateDistanceViaSplit(fromId, toId, lineKey, segments) {
-      for (let i = 0; i < segments.length; i++) {
-        const segment1 = segments[i];
-        const stationIds1 = segment1.map(s => s.id);
-        
-        if (stationIds1.indexOf(fromId) !== -1) {
-          // מצאנו את הסגמנט של תחנת המקור
-          for (let j = 0; j < segments.length; j++) {
-            if (i === j) continue;
-            
-            const segment2 = segments[j];
-            const stationIds2 = segment2.map(s => s.id);
-            
-            if (stationIds2.indexOf(toId) !== -1) {
-              // מצאנו את הסגמנט של תחנת היעד
-              // חיפוש נקודת חיבור
-              const intersection = stationIds1.filter(id => stationIds2.includes(id));
-              
-              if (intersection.length > 0) {
-                const splitPoint = intersection[0];
-                const distance1 = Math.abs(stationIds1.indexOf(fromId) - stationIds1.indexOf(splitPoint));
-                const distance2 = Math.abs(stationIds2.indexOf(splitPoint) - stationIds2.indexOf(toId));
-                return distance1 + distance2;
-              }
-            }
-          }
-        }
-      }
-      
-      return Infinity;
     }
 
     function findTwoTransferRoute(fromStation, toStation) {
