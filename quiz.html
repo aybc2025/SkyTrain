@@ -265,7 +265,7 @@
     async function loadQuestions() {
       try {
         // נסיון טעינה מקובץ JSON
-        const response = await fetch('./questions.json');
+        const response = await fetch('./data/questions.json');
         if (response.ok) {
           const data = await response.json();
           allQuestions = data.questions || data;
