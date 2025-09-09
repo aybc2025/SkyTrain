@@ -35,107 +35,106 @@
   <header class="bg-white shadow-lg">
     <div class="max-w-4xl mx-auto px-4 py-6">
       <div class="flex items-center justify-between">
-        <button onclick="goHome()" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-          🏠 <span>בית</span>
+        <button onclick="goHome()" class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium text-gray-700">
+          ← חזרה לדף הבית
         </button>
         <div class="text-center">
-          <h1 class="text-3xl font-bold text-gray-800">🧠 חידון הסקייטריין</h1>
-          <p class="text-gray-600">בדוק את הידע שלך!</p>
+          <h1 class="text-3xl font-bold text-gray-800">🚇 חידון סקייטריין</h1>
+          <p class="text-gray-600">בדקו את הידע שלכם על רכבת הסקייטריין!</p>
         </div>
-        <div class="flex items-center gap-2">
-          <div id="scoreBadge" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-            ציון: <span id="currentScore">0</span>/<span id="totalQuestions">0</span>
-          </div>
+        <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg">
+          <span class="text-blue-600 font-medium">ניקוד: <span id="currentScore">0</span></span>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- תוכן ראשי -->
   <main class="max-w-4xl mx-auto px-4 py-8">
-    
+
     <!-- מסך טעינה -->
     <div id="loadingScreen" class="text-center">
       <div class="bg-white rounded-2xl shadow-lg p-8">
         <div class="loading-spinner mb-4"></div>
-        <p class="text-gray-600">טוען שאלות...</p>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">טוען את השאלות...</h2>
+        <p class="text-gray-600">אנא המתינו רגע</p>
       </div>
     </div>
-    
+
     <!-- מסך התחלה -->
-    <div id="startScreen" class="text-center hidden">
-      <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-        <div class="text-6xl mb-6">🚇</div>
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">ברוכים הבאים לחידון הסקייטריין!</h2>
-        <p class="text-gray-600 mb-8">בדקו את הידע שלכם על מערכת הסקייטריין של ונקובר</p>
-        
-        <!-- הגדרות חידון -->
-        <div class="space-y-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 mb-4">בחרו רמת קושי:</h3>
-            <div class="grid md:grid-cols-3 gap-4">
-              <button onclick="setDifficulty('easy')" class="difficulty-btn bg-green-50 border-2 border-green-200 hover:border-green-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">😊</div>
-                <div class="font-bold text-green-800">קל</div>
-                <div class="text-sm text-green-600">מתאים למתחילים</div>
-              </button>
-              <button onclick="setDifficulty('medium')" class="difficulty-btn bg-yellow-50 border-2 border-yellow-200 hover:border-yellow-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">🤔</div>
-                <div class="font-bold text-yellow-800">בינוני</div>
-                <div class="text-sm text-yellow-600">לחובבי תחבורה</div>
-              </button>
-              <button onclick="setDifficulty('hard')" class="difficulty-btn bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">🎓</div>
-                <div class="font-bold text-red-800">קשה</div>
-                <div class="text-sm text-red-600">למומחים בלבד!</div>
-              </button>
-            </div>
-          </div>
+    <div id="startScreen" class="hidden text-center">
+      <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
+        <div class="text-6xl mb-4">🎯</div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">בואו נתחיל!</h2>
+        <p class="text-xl text-gray-600 mb-8">בחרו את ההגדרות של החידון:</p>
 
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 mb-4">בחרו נושא:</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-              <button onclick="setCategory('all')" class="category-btn bg-blue-50 border-2 border-blue-200 hover:border-blue-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">🌟</div>
-                <div class="font-bold text-blue-800">כל הנושאים</div>
-              </button>
-              <button onclick="setCategory('Timeline')" class="category-btn bg-purple-50 border-2 border-purple-200 hover:border-purple-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">📅</div>
-                <div class="font-bold text-purple-800">היסטוריה</div>
-              </button>
-              <button onclick="setCategory('Stations')" class="category-btn bg-emerald-50 border-2 border-emerald-200 hover:border-emerald-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">🚉</div>
-                <div class="font-bold text-emerald-800">תחנות</div>
-              </button>
-              <button onclick="setCategory('Lines')" class="category-btn bg-orange-50 border-2 border-orange-200 hover:border-orange-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">🚊</div>
-                <div class="font-bold text-orange-800">קווים</div>
-              </button>
-              <button onclick="setCategory('Fleet')" class="category-btn bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">🚇</div>
-                <div class="font-bold text-indigo-800">רכבות</div>
-              </button>
-              <button onclick="setCategory('Operations')" class="category-btn bg-teal-50 border-2 border-teal-200 hover:border-teal-400 rounded-xl p-4 transition-colors">
-                <div class="text-2xl mb-2">⚙️</div>
-                <div class="font-bold text-teal-800">תפעול</div>
-              </button>
-            </div>
+        <!-- בחירת רמת קושי -->
+        <div class="mb-8">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">רמת קושי:</h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <button onclick="setDifficulty('easy', this)" class="difficulty-btn bg-green-50 border-2 border-green-200 hover:border-green-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">😊</div>
+              <div class="font-bold text-green-800">קל</div>
+              <div class="text-sm text-green-600">מתחילים</div>
+            </button>
+            <button onclick="setDifficulty('medium', this)" class="difficulty-btn bg-yellow-50 border-2 border-yellow-200 hover:border-yellow-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">🤔</div>
+              <div class="font-bold text-yellow-800">בינוני</div>
+              <div class="text-sm text-yellow-600">לחובבי תחבורה</div>
+            </button>
+            <button onclick="setDifficulty('hard', this)" class="difficulty-btn bg-red-50 border-2 border-red-200 hover:border-red-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">🎓</div>
+              <div class="font-bold text-red-800">קשה</div>
+              <div class="text-sm text-red-600">למומחים בלבד!</div>
+            </button>
           </div>
-
-          <div>
-            <h3 class="text-lg font-bold text-gray-800 mb-4">כמה שאלות?</h3>
-            <div class="flex justify-center gap-4">
-              <button onclick="setQuestionCount(5)" class="count-btn bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg font-bold">5</button>
-              <button onclick="setQuestionCount(10)" class="count-btn bg-blue-500 text-white px-6 py-3 rounded-lg font-bold">10</button>
-              <button onclick="setQuestionCount(15)" class="count-btn bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg font-bold">15</button>
-              <button onclick="setQuestionCount(20)" class="count-btn bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-lg font-bold">20</button>
-            </div>
-          </div>
-
-          <button id="startQuizBtn" onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-            🚀 בואו נתחיל!
-          </button>
         </div>
+
+        <!-- בחירת קטגוריה -->
+        <div class="mb-8">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">בחרו נושא:</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <button onclick="setCategory('all', this)" class="category-btn bg-blue-50 border-2 border-blue-200 hover:border-blue-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">🌟</div>
+              <div class="font-bold text-blue-800">כל הנושאים</div>
+            </button>
+            <button onclick="setCategory('Timeline', this)" class="category-btn bg-purple-50 border-2 border-purple-200 hover:border-purple-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">📅</div>
+              <div class="font-bold text-purple-800">היסטוריה</div>
+            </button>
+            <button onclick="setCategory('Stations', this)" class="category-btn bg-emerald-50 border-2 border-emerald-200 hover:border-emerald-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">🚉</div>
+              <div class="font-bold text-emerald-800">תחנות</div>
+            </button>
+            <button onclick="setCategory('Lines', this)" class="category-btn bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">🚊</div>
+              <div class="font-bold text-indigo-800">קווים</div>
+            </button>
+            <button onclick="setCategory('Operations', this)" class="category-btn bg-cyan-50 border-2 border-cyan-200 hover:border-cyan-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">⚙️</div>
+              <div class="font-bold text-cyan-800">תפעול</div>
+            </button>
+            <button onclick="setCategory('Trivia', this)" class="category-btn bg-pink-50 border-2 border-pink-200 hover:border-pink-400 rounded-xl p-4 transition-colors">
+              <div class="text-2xl mb-2">🤓</div>
+              <div class="font-bold text-pink-800">טריוויה</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- בחירת מספר שאלות -->
+        <div class="mb-8">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">מספר שאלות:</h3>
+          <div class="flex justify-center gap-4">
+            <button onclick="setQuestionCount(5, this)" class="count-btn bg-gray-100 px-6 py-3 rounded-lg font-bold hover:bg-gray-200">5</button>
+            <button onclick="setQuestionCount(10, this)" class="count-btn bg-gray-100 px-6 py-3 rounded-lg font-bold hover:bg-gray-200">10</button>
+            <button onclick="setQuestionCount(15, this)" class="count-btn bg-gray-100 px-6 py-3 rounded-lg font-bold hover:bg-gray-200">15</button>
+            <button onclick="setQuestionCount(20, this)" class="count-btn bg-gray-100 px-6 py-3 rounded-lg font-bold hover:bg-gray-200">20</button>
+          </div>
+        </div>
+
+        <button id="startQuizBtn" onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          🚀 בואו נתחיל!
+        </button>
+        <p class="text-sm text-gray-500 mt-4">סה"כ <span id="totalQuestions">0</span> שאלות זמינות</p>
       </div>
     </div>
 
@@ -290,6 +289,7 @@
     function showStartScreen() {
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('startScreen').classList.remove('hidden');
+      updateQuestionCount();
     }
 
     // שאלות לדוגמה במקרה של כשל
@@ -325,33 +325,66 @@
           difficulty: 'medium',
           category: 'Stations',
           explanation: 'תחנת Commercial-Broadway היא נקודת החיבור העיקרית בין קו האקספו לקו המילניום.'
+        },
+        {
+          question_id: 'DEMO4',
+          type: 'MC',
+          question_text: 'איזה קו מחבר בין ונקובר לנמל התעופה?',
+          option_a: 'קו האקספו',
+          option_b: 'קו המילניום',
+          option_c: 'קו קנדה',
+          option_d: 'כל הקווים',
+          correct_answer: 'קו קנדה',
+          difficulty: 'easy',
+          category: 'Lines',
+          explanation: 'קו קנדה (Canada Line) מחבר בין מרכז ונקובר לנמל התעופה YVR.'
+        },
+        {
+          question_id: 'DEMO5',
+          type: 'TF',
+          question_text: 'יש 3 קווי סקייטריין עיקריים בונקובר.',
+          correct_answer: 'True',
+          difficulty: 'easy',
+          category: 'Lines',
+          explanation: 'נכון. יש שלושה קווים: קו האקספו, קו המילניום וקו קנדה.'
         }
       ];
     }
 
-    // פונקציות הגדרת החידון
-    function setDifficulty(difficulty) {
+    // פונקציות הגדרת החידון - עם תיקון בעיית האירוע
+    function setDifficulty(difficulty, buttonElement = null) {
       quizSettings.difficulty = difficulty;
       document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('border-4'));
-      event.target.closest('.difficulty-btn').classList.add('border-4');
+      
+      if (buttonElement) {
+        buttonElement.classList.add('border-4');
+      }
       updateStartButton();
+      updateQuestionCount();
     }
 
-    function setCategory(category) {
+    function setCategory(category, buttonElement = null) {
       quizSettings.category = category;
       document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('border-4'));
-      event.target.closest('.category-btn').classList.add('border-4');
+      
+      if (buttonElement) {
+        buttonElement.classList.add('border-4');
+      }
       updateStartButton();
+      updateQuestionCount();
     }
 
-    function setQuestionCount(count) {
+    function setQuestionCount(count, buttonElement = null) {
       quizSettings.questionCount = count;
       document.querySelectorAll('.count-btn').forEach(btn => {
         btn.classList.remove('bg-blue-500', 'text-white');
         btn.classList.add('bg-gray-100');
       });
-      event.target.classList.remove('bg-gray-100');
-      event.target.classList.add('bg-blue-500', 'text-white');
+      
+      if (buttonElement) {
+        buttonElement.classList.remove('bg-gray-100');
+        buttonElement.classList.add('bg-blue-500', 'text-white');
+      }
       updateStartButton();
     }
 
@@ -360,6 +393,21 @@
       if (quizSettings.difficulty && quizSettings.category && quizSettings.questionCount) {
         btn.disabled = false;
       }
+    }
+
+    function updateQuestionCount() {
+      // סינון השאלות לפי הגדרות נוכחיות
+      let availableQuestions = allQuestions.filter(q => {
+        if (quizSettings.category !== 'all' && q.category !== quizSettings.category) return false;
+        if (q.difficulty !== quizSettings.difficulty) return false;
+        return true;
+      });
+
+      if (quizSettings.category === 'all') {
+        availableQuestions = allQuestions.filter(q => q.difficulty === quizSettings.difficulty);
+      }
+
+      document.getElementById('totalQuestions').textContent = availableQuestions.length;
     }
 
     // התחלת החידון
@@ -393,7 +441,6 @@
       // עדכון ממשק
       document.getElementById('startScreen').classList.add('hidden');
       document.getElementById('quizScreen').classList.remove('hidden');
-      document.getElementById('totalQuestions').textContent = currentQuiz.questions.length;
       document.getElementById('totalQuestionsDisplay').textContent = currentQuiz.questions.length;
 
       showQuestion();
@@ -423,87 +470,81 @@
       document.getElementById('nextBtn').classList.add('hidden');
       document.getElementById('submitBtn').disabled = true;
 
-      // יצירת אפשרויות תשובה לפי סוג השאלה
+      // הצגת אפשרויות תשובה לפי סוג השאלה
       if (question.type === 'MC') {
-        createMultipleChoiceOptions(question);
+        showMultipleChoice(question);
       } else if (question.type === 'TF') {
-        createTrueFalseOptions();
+        showTrueFalse(question);
       } else if (question.type === 'SA' || question.type === 'NUM') {
-        createTextAnswer();
+        showShortAnswer(question);
       }
     }
 
-    // יצירת אפשרויות רב-ברירה
-    function createMultipleChoiceOptions(question) {
+    // הצגת שאלת אמריקאי
+    function showMultipleChoice(question) {
       const container = document.getElementById('optionsContainer');
       const options = [
-        { key: 'option_a', text: question.option_a },
-        { key: 'option_b', text: question.option_b },
-        { key: 'option_c', text: question.option_c },
-        { key: 'option_d', text: question.option_d }
-      ].filter(opt => opt.text); // מסנן אפשרויות ריקות
+        { key: 'A', text: question.option_a },
+        { key: 'B', text: question.option_b },
+        { key: 'C', text: question.option_c },
+        { key: 'D', text: question.option_d }
+      ];
 
-      options.forEach((option, index) => {
-        const div = document.createElement('div');
-        div.className = 'quiz-option bg-white border-2 border-gray-200 rounded-lg p-4 cursor-pointer';
-        div.onclick = () => selectOption(div, option.text);
-        
-        const letter = String.fromCharCode(65 + index); // A, B, C, D
-        div.innerHTML = `
-          <div class="flex items-center gap-4">
-            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center">${letter}</div>
-            <div class="text-lg">${option.text}</div>
-          </div>
-        `;
-        
-        container.appendChild(div);
+      options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'quiz-option w-full text-right p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300';
+        button.innerHTML = `<strong>${option.key}.</strong> ${option.text}`;
+        button.onclick = () => selectOption(button, option.text);
+        container.appendChild(button);
       });
     }
 
-    // יצירת אפשרויות נכון/לא נכון
-    function createTrueFalseOptions() {
+    // הצגת שאלת נכון/לא נכון
+    function showTrueFalse(question) {
       const container = document.getElementById('optionsContainer');
-      
-      const trueDiv = document.createElement('div');
-      trueDiv.className = 'quiz-option bg-white border-2 border-gray-200 rounded-lg p-4 cursor-pointer';
-      trueDiv.onclick = () => selectOption(trueDiv, 'True');
-      trueDiv.innerHTML = `
-        <div class="flex items-center gap-4">
-          <div class="w-8 h-8 rounded-full bg-green-100 text-green-800 font-bold flex items-center justify-center">✓</div>
-          <div class="text-lg">נכון</div>
-        </div>
-      `;
-      
-      const falseDiv = document.createElement('div');
-      falseDiv.className = 'quiz-option bg-white border-2 border-gray-200 rounded-lg p-4 cursor-pointer';
-      falseDiv.onclick = () => selectOption(falseDiv, 'False');
-      falseDiv.innerHTML = `
-        <div class="flex items-center gap-4">
-          <div class="w-8 h-8 rounded-full bg-red-100 text-red-800 font-bold flex items-center justify-center">✗</div>
-          <div class="text-lg">לא נכון</div>
-        </div>
-      `;
-      
-      container.appendChild(trueDiv);
-      container.appendChild(falseDiv);
+      const options = [
+        { key: 'נכון', text: 'True' },
+        { key: 'לא נכון', text: 'False' }
+      ];
+
+      options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'quiz-option w-full text-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300';
+        button.innerHTML = `<strong>${option.key}</strong>`;
+        button.onclick = () => selectOption(button, option.text);
+        container.appendChild(button);
+      });
     }
 
-    // יצירת תשובה טקסטואלית
-    function createTextAnswer() {
+    // הצגת שאלה קצרה
+    function showShortAnswer(question) {
       document.getElementById('textAnswerContainer').classList.remove('hidden');
       const input = document.getElementById('textAnswer');
       input.value = '';
-      input.oninput = () => {
-        document.getElementById('submitBtn').disabled = input.value.trim() === '';
-      };
       input.focus();
+      
+      input.addEventListener('input', function() {
+        document.getElementById('submitBtn').disabled = this.value.trim() === '';
+      });
+
+      // אפשרות לשלוח עם Enter
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !document.getElementById('submitBtn').disabled) {
+          submitAnswer();
+        }
+      });
     }
 
     // בחירת אפשרות
-    function selectOption(element, value) {
+    function selectOption(button, value) {
+      // איפוס בחירות קודמות
       document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
-      element.classList.add('selected');
-      element.setAttribute('data-value', value);
+      
+      // סימון הבחירה החדשה
+      button.classList.add('selected');
+      button.setAttribute('data-answer', value);
+      
+      // הפעלת כפתור השליחה
       document.getElementById('submitBtn').disabled = false;
     }
 
@@ -511,20 +552,24 @@
     function submitAnswer() {
       const question = currentQuiz.questions[currentQuiz.currentIndex];
       let userAnswer = '';
-      
+      let isCorrect = false;
+
       // קבלת התשובה של המשתמש
-      if (question.type === 'SA' || question.type === 'NUM') {
-        userAnswer = document.getElementById('textAnswer').value.trim();
+      if (question.type === 'MC' || question.type === 'TF') {
+        const selectedOption = document.querySelector('.quiz-option.selected');
+        if (selectedOption) {
+          userAnswer = selectedOption.getAttribute('data-answer');
+        }
       } else {
-        const selected = document.querySelector('.quiz-option.selected');
-        userAnswer = selected ? selected.getAttribute('data-value') : '';
+        userAnswer = document.getElementById('textAnswer').value.trim();
       }
 
       // בדיקת נכונות התשובה
-      const isCorrect = checkAnswer(userAnswer, question.correct_answer, question.type);
-      
+      isCorrect = checkAnswer(userAnswer, question.correct_answer);
+
+      // עדכון ניקוד
       if (isCorrect) {
-        currentQuiz.score++;
+        currentQuiz.score += getDifficultyPoints(question.difficulty);
       }
 
       // שמירת התשובה
@@ -532,60 +577,65 @@
         question: question.question_text,
         userAnswer: userAnswer,
         correctAnswer: question.correct_answer,
-        isCorrect: isCorrect
+        isCorrect: isCorrect,
+        explanation: question.explanation
       });
 
-      // הצגת תוצאה
-      showAnswerResult(isCorrect, question.explanation);
-      
-      // עדכון ממשק
-      document.getElementById('submitBtn').classList.add('hidden');
-      document.getElementById('nextBtn').classList.remove('hidden');
-      document.getElementById('currentScore').textContent = currentQuiz.score;
-    }
-
-    // בדיקת נכונות תשובה
-    function checkAnswer(userAnswer, correctAnswer, questionType) {
-      // עבור תשובות מספריות
-      if (questionType === 'NUM') {
-        const userNum = parseInt(userAnswer);
-        const correctNum = parseInt(correctAnswer);
-        return !isNaN(userNum) && userNum === correctNum;
-      }
-      
-      // עבור תשובות טקסטואליות - בדיקה לא רגישה לרווחים ואותיות
-      if (typeof userAnswer === 'string' && typeof correctAnswer === 'string') {
-        const userClean = userAnswer.toLowerCase().trim().replace(/[-\s]/g, '');
-        const correctClean = correctAnswer.toLowerCase().trim().replace(/[-\s]/g, '');
-        
-        return userClean === correctClean || 
-               userClean.includes(correctClean) || 
-               correctClean.includes(userClean);
-      }
-      
-      return userAnswer === correctAnswer;
-    }
-
-    // הצגת תוצאת התשובה
-    function showAnswerResult(isCorrect, explanation) {
-      // צביעת האפשרויות
-      document.querySelectorAll('.quiz-option').forEach(opt => {
-        opt.style.pointerEvents = 'none';
-        const value = opt.getAttribute('data-value');
-        if (value === currentQuiz.questions[currentQuiz.currentIndex].correct_answer) {
-          opt.classList.add('correct');
-        } else if (opt.classList.contains('selected') && !isCorrect) {
-          opt.classList.add('incorrect');
-        }
-      });
+      // הצגת תוצאה ויזואלית
+      showAnswerResult(isCorrect);
 
       // הצגת הסבר
-      if (explanation) {
-        document.getElementById('explanationText').textContent = explanation;
+      if (question.explanation) {
+        document.getElementById('explanationText').textContent = question.explanation;
         document.getElementById('explanationContainer').classList.remove('hidden');
       }
 
-      // אנימציית חגיגה אם נכון
+      // הסתרת כפתור השליחה והצגת כפתור המשך
+      document.getElementById('submitBtn').classList.add('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+    }
+
+    // בדיקת נכונות התשובה
+    function checkAnswer(userAnswer, correctAnswer) {
+      // נורמליזציה של התשובות
+      const normalizeAnswer = (answer) => {
+        return answer.toString().toLowerCase().trim()
+          .replace(/[־–-]/g, '-') // נורמליזציה של מקפים
+          .replace(/\s+/g, ' '); // נורמליזציה של רווחים
+      };
+
+      return normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer);
+    }
+
+    // קבלת נקודות לפי רמת קושי
+    function getDifficultyPoints(difficulty) {
+      const points = {
+        'easy': 10,
+        'medium': 20,
+        'hard': 30
+      };
+      return points[difficulty] || 10;
+    }
+
+    // הצגת תוצאת התשובה
+    function showAnswerResult(isCorrect) {
+      const options = document.querySelectorAll('.quiz-option');
+      const question = currentQuiz.questions[currentQuiz.currentIndex];
+
+      options.forEach(option => {
+        const optionAnswer = option.getAttribute('data-answer');
+        
+        if (optionAnswer === question.correct_answer) {
+          option.classList.add('correct');
+        } else if (option.classList.contains('selected') && !isCorrect) {
+          option.classList.add('incorrect');
+        }
+        
+        // ביטול יכולת לחיצה
+        option.style.pointerEvents = 'none';
+      });
+
+      // אנימציה קצרה
       if (isCorrect) {
         document.getElementById('questionCard').classList.add('celebration');
         setTimeout(() => {
@@ -598,10 +648,10 @@
     function nextQuestion() {
       currentQuiz.currentIndex++;
       
-      if (currentQuiz.currentIndex >= currentQuiz.questions.length) {
-        showResults();
-      } else {
+      if (currentQuiz.currentIndex < currentQuiz.questions.length) {
         showQuestion();
+      } else {
+        showResults();
       }
     }
 
@@ -610,69 +660,81 @@
       document.getElementById('quizScreen').classList.add('hidden');
       document.getElementById('resultsScreen').classList.remove('hidden');
 
-      const score = currentQuiz.score;
-      const total = currentQuiz.questions.length;
-      const percentage = Math.round((score / total) * 100);
+      const totalQuestions = currentQuiz.questions.length;
+      const correctAnswers = currentQuiz.answers.filter(a => a.isCorrect).length;
+      const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
 
       // עדכון תוצאות
-      document.getElementById('finalScore').textContent = `${score}/${total}`;
-      document.getElementById('correctCount').textContent = score;
-      document.getElementById('incorrectCount').textContent = total - score;
-      document.getElementById('accuracyPercent').textContent = percentage + '%';
+      document.getElementById('finalScore').textContent = `${currentQuiz.score}`;
+      document.getElementById('correctCount').textContent = correctAnswers;
+      document.getElementById('incorrectCount').textContent = totalQuestions - correctAnswers;
+      document.getElementById('accuracyPercent').textContent = `${accuracy}%`;
 
-      // הודעה והתאמת אייקון לפי ביצועים
-      let message, icon, title;
-      if (percentage >= 90) {
-        title = '🏆 מומחה סקייטריין!';
-        icon = '🌟';
-        message = 'ביצועים מדהימים! אתם באמת מכירים את הסקייטריין!';
-      } else if (percentage >= 70) {
-        title = '👍 עבודה טובה!';
-        icon = '😊';
-        message = 'ביצועים טובים! יש לכם ידע מוצק על הסקייטריין.';
-      } else if (percentage >= 50) {
-        title = '📚 צריך עוד לימוד';
-        icon = '🤔';
-        message = 'לא רע! קצת יותר לימוד ותהיו מומחים.';
+      // הודעה והצגה לפי ביצועים
+      let title, message, icon;
+      
+      if (accuracy >= 90) {
+        title = 'מעולה! 🏆';
+        message = 'אתם מומחי סקייטריין אמיתיים!';
+        icon = '🏆';
+      } else if (accuracy >= 70) {
+        title = 'כל הכבוד! 🎉';
+        message = 'ביצועים טובים מאוד!';
+        icon = '🎉';
+      } else if (accuracy >= 50) {
+        title = 'לא רע! 👍';
+        message = 'יש מקום לשיפור, אבל אתם בדרך הנכונה!';
+        icon = '👍';
       } else {
-        title = '💪 אל תוותרו!';
-        icon = '📖';
-        message = 'תתרגלו עוד קצת ותשתפרו בוודאי!';
+        title = 'נסו שוב! 💪';
+        message = 'אל תתייאשו, תרגול עושה שלמות!';
+        icon = '💪';
       }
 
       document.getElementById('resultsTitle').textContent = title;
-      document.getElementById('celebrationIcon').textContent = icon;
       document.getElementById('resultsMessage').textContent = message;
+      document.getElementById('celebrationIcon').textContent = icon;
 
-      // יצירת תגי הישגים
-      createAchievementBadges(percentage, score, total);
+      // תגי הישג
+      showAchievements(accuracy, correctAnswers, totalQuestions);
     }
 
-    // יצירת תגי הישגים
-    function createAchievementBadges(percentage, score, total) {
+    // הצגת הישגים
+    function showAchievements(accuracy, correctAnswers, totalQuestions) {
       const container = document.getElementById('achievementBadges');
       container.innerHTML = '';
 
       const achievements = [];
 
-      if (percentage === 100) achievements.push({ text: '💯 מושלם!', color: 'bg-yellow-100 text-yellow-800' });
-      if (percentage >= 90) achievements.push({ text: '🏆 מומחה', color: 'bg-purple-100 text-purple-800' });
-      if (percentage >= 80) achievements.push({ text: '⭐ כוכב', color: 'bg-blue-100 text-blue-800' });
-      if (score >= 10) achievements.push({ text: '🔥 סדרה חמה', color: 'bg-red-100 text-red-800' });
-      if (currentQuiz.questions.some(q => q.difficulty === 'hard')) achievements.push({ text: '🎓 אתגר קשה', color: 'bg-gray-100 text-gray-800' });
-      if (quizSettings.category !== 'all') achievements.push({ text: '🎯 מתמחה', color: 'bg-green-100 text-green-800' });
+      if (accuracy === 100) achievements.push({ text: '💯 מושלם!', color: 'bg-yellow-100 text-yellow-800' });
+      if (accuracy >= 90) achievements.push({ text: '🌟 מומחה', color: 'bg-purple-100 text-purple-800' });
+      if (accuracy >= 80) achievements.push({ text: '🎯 מדויק', color: 'bg-blue-100 text-blue-800' });
+      if (correctAnswers >= 10) achievements.push({ text: '🔥 עשר נכונות!', color: 'bg-orange-100 text-orange-800' });
+      if (totalQuestions >= 20) achievements.push({ text: '⚡ סבלני', color: 'bg-green-100 text-green-800' });
+
+      if (achievements.length === 0) {
+        achievements.push({ text: '🌱 מתחיל', color: 'bg-gray-100 text-gray-800' });
+      }
 
       achievements.forEach(achievement => {
         const badge = document.createElement('span');
-        badge.className = `${achievement.color} px-3 py-1 rounded-full text-sm font-medium`;
+        badge.className = `px-3 py-1 rounded-full text-sm font-medium ${achievement.color}`;
         badge.textContent = achievement.text;
         container.appendChild(badge);
       });
 
-      if (achievements.length === 0) {
-        const encouragement = document.createElement('span');
-        encouragement.className = 'bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium';
-        encouragement.textContent = '🌱 התחלה טובה!';
+      // הודעות עידוד נוספות
+      if (accuracy < 70) {
+        const encouragement = document.createElement('div');
+        encouragement.className = 'mt-4 p-4 bg-blue-50 rounded-lg';
+        encouragement.innerHTML = `
+          <p class="text-blue-800 font-medium">💡 טיפים לשיפור:</p>
+          <ul class="text-blue-700 text-sm mt-2 space-y-1">
+            <li>• נסו לקרוא על ההיסטוריה של הסקייטריין</li>
+            <li>• הכירו את שמות התחנות המרכזיות</li>
+            <li>• למדו על שלושת הקווים השונים</li>
+          </ul>
+        `;
         container.appendChild(encouragement);
       }
     }
@@ -727,13 +789,6 @@
     // טעינה ראשונית
     document.addEventListener('DOMContentLoaded', function() {
       loadQuestions();
-      
-      // הגדרות ברירת מחדל
-      setTimeout(() => {
-        setDifficulty('medium');
-        setCategory('all');
-        setQuestionCount(10);
-      }, 100);
     });
   </script>
 </body>
