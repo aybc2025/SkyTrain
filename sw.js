@@ -1,8 +1,8 @@
 // Service Worker לאפליקציית מפת סקייטריין ונקובר לילדים
-// גרסה 1.0 - אוגוסט 2025
+// גרסה 1.1 - ספטמבר 2025 - עם שאלות חידון מעודכנות
 
-const CACHE_NAME = 'skytrain-kids-v1.0';
-const OFFLINE_CACHE_NAME = 'skytrain-offline-v1.0';
+const CACHE_NAME = 'skytrain-kids-v1.1';
+const OFFLINE_CACHE_NAME = 'skytrain-offline-v1.1';
 
 // קבצים לשמירה במטמון
 const STATIC_CACHE_FILES = [
@@ -10,7 +10,9 @@ const STATIC_CACHE_FILES = [
   './index.html',
   './map.html', 
   './calculator.html',
-  './knowledge.html',  // ← הוסף את הקובץ הזה
+  './knowledge.html',
+  './quiz.html',  // ← עודכן לגרסה החדשה
+  './questions.json',  // ← קובץ השאלות החדש
   './manifest.webmanifest',
   './icons/icon.svg',
   // Tailwind CSS מCDN
@@ -23,12 +25,14 @@ const STATIC_CACHE_FILES = [
 const OFFLINE_DATA = {
   message: 'האפליקציה פועלת במצב לא מקוון',
   routes: 'נתוני הקווים והתחנות זמינים',
-  calculator: 'מחשבון המסלולים זמין'
+  calculator: 'מחשבון המסלולים זמין',
+  quiz: 'החידון עם 50 שאלות זמין',  // ← נוסף
+  knowledge: 'כל המידע על הסקייטריין זמין'
 };
 
 // התקנת Service Worker
 self.addEventListener('install', event => {
-  console.log('🚇 Service Worker: התקנה החלה');
+  console.log('🚇 Service Worker v1.1: התקנה החלה');
   
   event.waitUntil(
     Promise.all([
@@ -50,7 +54,7 @@ self.addEventListener('install', event => {
         );
       })
     ]).then(() => {
-      console.log('✅ Service Worker: התקנה הושלמה');
+      console.log('✅ Service Worker v1.1: התקנה הושלמה עם 50 שאלות חידון');
       self.skipWaiting(); // אקטיבציה מיידית
     })
   );
@@ -58,7 +62,7 @@ self.addEventListener('install', event => {
 
 // אקטיבציה של Service Worker
 self.addEventListener('activate', event => {
-  console.log('🚀 Service Worker: אקטיבציה החלה');
+  console.log('🚀 Service Worker v1.1: אקטיבציה החלה');
   
   event.waitUntil(
     Promise.all([
@@ -76,7 +80,17 @@ self.addEventListener('activate', event => {
       // השתלטות על כל הלקוחות
       self.clients.claim()
     ]).then(() => {
-      console.log('✅ Service Worker: אקטיבציה הושלמה');
+      console.log('✅ Service Worker v1.1: אקטיבציה הושלמה');
+      
+      // הודעה ללקוחות על עדכון חדש
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_UPDATED',
+            message: 'חידון מעודכן עם 50 שאלות חדשות!'
+          });
+        });
+      });
     })
   );
 });
@@ -113,17 +127,22 @@ async function handleRequest(request) {
       return await cacheFirst(request);
     }
     
-    // 2. CDN (Tailwind) - Stale While Revalidate  
+    // 2. קבצי JSON (כולל questions.json) - Stale While Revalidate
+    if (isJSONFile(url)) {
+      return await staleWhileRevalidate(request);
+    }
+    
+    // 3. CDN (Tailwind) - Stale While Revalidate  
     if (isCDNResource(url)) {
       return await staleWhileRevalidate(request);
     }
     
-    // 3. דפי HTML - Network First
+    // 4. דפי HTML - Network First
     if (isHTMLPage(url)) {
       return await networkFirst(request);
     }
     
-    // 4. ברירת מחדל - Cache First
+    // 5. ברירת מחדל - Cache First
     return await cacheFirst(request);
     
   } catch (error) {
@@ -191,6 +210,7 @@ async function staleWhileRevalidate(request) {
     if (response.ok) {
       const cache = caches.open(CACHE_NAME);
       cache.then(c => c.put(request, response.clone()));
+      console.log('🔄 Service Worker: עדכן ברקע:', request.url);
     }
     return response;
   }).catch(() => {
@@ -204,6 +224,36 @@ async function staleWhileRevalidate(request) {
 // תגובה למצב offline
 async function getOfflineResponse(request) {
   const url = new URL(request.url);
+  
+  // אם זה קובץ JSON (כמו questions.json), נסה למצוא במטמון
+  if (isJSONFile(url)) {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // אם זה questions.json ואין במטמון, החזר שאלות בסיסיות
+    if (url.pathname.includes('questions.json')) {
+      return new Response(JSON.stringify({
+        questions: [
+          {
+            id: "OFFLINE1",
+            type: "MC",
+            question_text: "מה שם מערכת הרכבות המהירות של ונקובר?",
+            options: ["SkyTrain", "Metro", "Subway", "LRT"],
+            correct_answer: "SkyTrain",
+            difficulty: "easy",
+            category: "בסיסי",
+            explanation: "SkyTrain הוא השם של מערכת הרכבות האוטומטיות של ונקובר."
+          }
+        ]
+      }), {
+        status: 200,
+        statusText: 'OK (Offline)',
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+  }
   
   // אם זה דף HTML, החזר דף offline מותאם אישית
   if (isHTMLPage(url)) {
@@ -236,6 +286,11 @@ function isStaticFile(url) {
   return staticExtensions.some(ext => url.pathname.includes(ext)) ||
          url.pathname.includes('/icons/') ||
          url.pathname === '/manifest.webmanifest';
+}
+
+function isJSONFile(url) {
+  return url.pathname.endsWith('.json') || 
+         url.pathname.includes('.json');
 }
 
 function isCDNResource(url) {
@@ -275,7 +330,7 @@ function getOfflineHTML() {
     </h1>
     
     <p class="text-gray-600 mb-6">
-      האפליקציה עובדת גם בלי אינטרנט! כל המפות והמחשבון זמינים.
+      האפליקציה עובדת גם בלי אינטרנט! כל המפות, המחשבון והחידון זמינים.
     </p>
     
     <div class="space-y-4">
@@ -290,6 +345,13 @@ function getOfflineHTML() {
         <div class="flex items-center justify-center gap-3">
           <span class="text-blue-600">✅</span>
           <span class="font-medium text-blue-800">מחשבון המסלולים זמין</span>
+        </div>
+      </div>
+      
+      <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+        <div class="flex items-center justify-center gap-3">
+          <span class="text-purple-600">✅</span>
+          <span class="font-medium text-purple-800">חידון 50 שאלות זמין</span>
         </div>
       </div>
       
@@ -333,7 +395,8 @@ self.addEventListener('message', event => {
     case 'GET_VERSION':
       event.ports[0].postMessage({
         version: CACHE_NAME,
-        offline: !navigator.onLine
+        offline: !navigator.onLine,
+        features: ['quiz-50-questions', 'interactive-map', 'route-calculator', 'knowledge-base']
       });
       break;
       
@@ -342,6 +405,14 @@ self.addEventListener('message', event => {
         return Promise.all(cacheNames.map(name => caches.delete(name)));
       }).then(() => {
         event.ports[0].postMessage({ success: true });
+      });
+      break;
+      
+    case 'UPDATE_QUIZ':
+      // עדכון מיוחד לחידון
+      caches.open(CACHE_NAME).then(cache => {
+        cache.delete('./questions.json');
+        console.log('🔄 Service Worker: מחדש שאלות חידון');
       });
       break;
       
@@ -357,4 +428,4 @@ self.addEventListener('sync', event => {
   }
 });
 
-console.log('🚇 Service Worker: נטען בהצלחה - מפת סקייטריין ונקובר לילדים');
+console.log('🚇 Service Worker v1.1: נטען בהצלחה - מפת סקייטריין ונקובר לילדים עם חידון 50 שאלות!');
