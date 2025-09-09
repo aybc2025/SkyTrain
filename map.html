@@ -130,6 +130,8 @@
   </footer>
 
   <script>
+    let enrichedStationsData = {};
+    
     /* Navigation functions */
     function goHome() {
       window.location.href = './index.html';
@@ -157,6 +159,20 @@
     window.addEventListener('offline', updateOfflineBadge);
     updateOfflineBadge();
 
+    async function loadEnrichedStationsData() {
+  try {
+    const response = await fetch('./stations.json');
+    if (response.ok) {
+      enrichedStationsData = await response.json();
+      console.log('נטען מידע מועשר על', Object.keys(enrichedStationsData).length, 'תחנות');
+    } else {
+      console.warn('לא נמצא קובץ stations.json - ממשיך עם המידע הבסיסי');
+    }
+  } catch (error) {
+    console.warn('שגיאה בטעינת מידע מועשר על תחנות:', error);
+  }
+}
+    
     /* Data: lines & stations - מעודכן עם קווים מרובים */
     const lines = {
       expo: {
@@ -316,72 +332,173 @@
     }
 
     /* ===== מודל תחנה ===== */
-    function getStationInfo(stationId){
-      // יצירת מערך של כל הקווים שעוברים בתחנה
-      const stationLines = [];
-      let stationData = {};
-      let busLines = [];
-      
-      Object.entries(lines).forEach(([lineKey, lineData]) => {
-        const station = lineData.stations.find(s => s.id === stationId);
-        if (station) {
-          if (!stationData.nameHe) {
-            Object.assign(stationData, station);
-            busLines = station.busLines || [];
-          }
-          stationLines.push({
-            key: lineKey,
-            nameHe: lineData.nameHe,
-            nameEn: lineData.nameEn,
-            color: lineData.color
-          });
-        }
-      });
-      
-      if (stationLines.length > 0) {
-        return { ...stationData, lines: stationLines, busLines: busLines };
+    function getStationInfo(stationId) {
+  // יצירת מערך של כל הקווים שעוברים בתחנה
+  const stationLines = [];
+  let stationData = {};
+  let busLines = [];
+  
+  Object.entries(lines).forEach(([lineKey, lineData]) => {
+    const station = lineData.stations.find(s => s.id === stationId);
+    if (station) {
+      if (!stationData.nameHe) {
+        Object.assign(stationData, station);
+        busLines = station.busLines || [];
       }
-      
-      return null;
+      stationLines.push({
+        key: lineKey,
+        nameHe: lineData.nameHe,
+        nameEn: lineData.nameEn,
+        color: lineData.color
+      });
     }
+  });
+  
+  if (stationLines.length > 0) {
+    // שלב מידע מועשר אם קיים
+    const enrichedData = enrichedStationsData[stationId] || {};
+    
+    return { 
+      ...stationData, 
+      lines: stationLines, 
+      busLines: busLines,
+      enriched: enrichedData // הוסף את כל המידע המועשר
+    };
+  }
+  
+  return null;
+}
 
     const stationModal = document.getElementById('stationModal');
     const stationContent = document.getElementById('stationContent');
 
-    function handleStationClick(stationId){
-      const st = getStationInfo(stationId);
-      if (!st) return;
-      
-      stationContent.innerHTML = `
-        <div><h4 class="font-bold text-lg text-gray-800 mb-1">${st.nameHe}</h4><p class="text-gray-600">${st.nameEn}</p></div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="bg-blue-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-blue-800">אזור תעריף</div><p class="text-xl font-bold text-blue-600">אזור ${st.zone}</p></div>
-          <div class="bg-green-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-green-800">רציפים</div><p class="text-xl font-bold text-green-600">${st.platforms}</p></div>
+    function handleStationClick(stationId) {
+  const st = getStationInfo(stationId);
+  if (!st) return;
+  
+  // בניית תוכן מועשר
+  let enrichedContent = '';
+  
+  if (st.enriched && Object.keys(st.enriched).length > 0) {
+    const e = st.enriched;
+    
+    // מידע בסיסי מועשר
+    enrichedContent += `
+      <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+        <h5 class="font-bold text-blue-800 mb-2">📍 מידע מפורט</h5>
+        ${e.official_name ? `<p><strong>שם רשמי:</strong> ${e.official_name}</p>` : ''}
+        ${e.municipality ? `<p><strong>עיר:</strong> ${e.municipality}</p>` : ''}
+        ${e.opened_date ? `<p><strong>נפתח:</strong> ${e.opened_date}</p>` : ''}
+        ${e.platform_type ? `<p><strong>סוג רציפים:</strong> ${e.platform_type}</p>` : ''}
+        ${e.platforms_count ? `<p><strong>מספר רציפים:</strong> ${e.platforms_count}</p>` : ''}
+      </div>
+    `;
+    
+    // נגישות ושירותים
+    if (e.accessibility_features || e.bike_facilities || e.park_and_ride) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-green-50 rounded-lg">
+          <h5 class="font-bold text-green-800 mb-2">♿ נגישות ושירותים</h5>
+          ${e.accessibility_features ? `<p><strong>נגישות:</strong> ${e.accessibility_features}</p>` : ''}
+          ${e.bike_facilities ? `<p><strong>אופניים:</strong> ${e.bike_facilities}</p>` : ''}
+          ${e.park_and_ride ? `<p><strong>חניה:</strong> ${e.park_and_ride ? 'זמינה' : 'לא זמינה'}</p>` : ''}
         </div>
-        <div>
-          <h5 class="font-medium text-gray-800 mb-2">קווים העוברים בתחנה:</h5>
-          <div class="space-y-2">
-            ${st.lines.map(l=>`<div class="flex items-center gap-3 p-2 bg-gray-50 rounded">
-              <span class="w-4 h-4 rounded-full inline-block" style="background:${l.color}"></span>
-              <span class="font-medium">${l.nameHe}</span><span class="text-sm text-gray-600">(${l.nameEn})</span>
-            </div>`).join('')}
-          </div>
-        </div>
-        ${st.busLines && st.busLines.length ? `<div>
-          <h5 class="font-medium text-gray-800 mb-2">קווי אוטובוס:</h5>
-          <div class="flex flex-wrap gap-1">
-            ${st.busLines.map(bus => `<span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">${bus}</span>`).join('')}
-          </div>
-        </div>` : ''}
-        ${st.transfers && st.transfers.length?`<div><h5 class="font-medium text-gray-800 mb-2">חיבורים:</h5>
-          <div class="flex flex-wrap gap-2">${st.transfers.map(t=>`<span class="text-sm text-blue-700 bg-blue-50 px-2 py-1 rounded">${transferTypeMap[t]||t}</span>`).join('')}</div></div>`:''}
-        <div class="flex items-center gap-2 ${st.accessibility?'text-green-600':'text-red-600'}"><span>♿︎</span>
-          <span class="text-sm font-medium">${st.accessibility?'נגיש לכיסאות גלגלים':'לא נגיש'}</span></div>
-        <div class="bg-yellow-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-yellow-800">מידע כללי</div>
-          <p class="text-xs text-yellow-700">הסקייטריין פועל בקירוב 05:00–01:30 (ש׳ ~06:00, א׳/חגים ~07:00–00:30). תדירות ~2–7 דק׳ בשעות העומס.</p></div>`;
-      stationModal.classList.remove('hidden'); 
-      stationModal.classList.add('flex');
+      `;
     }
+    
+    // חיבורי תחבורה
+    if (e.bus_connections && e.bus_connections.length > 0) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-yellow-50 rounded-lg">
+          <h5 class="font-bold text-yellow-800 mb-2">🚌 קווי אוטובוס</h5>
+          <p>${e.bus_connections.join(', ')}</p>
+        </div>
+      `;
+    }
+    
+    if (e.notable_transfers) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-orange-50 rounded-lg">
+          <h5 class="font-bold text-orange-800 mb-2">🔄 חיבורים מיוחדים</h5>
+          <p>${e.notable_transfers}</p>
+        </div>
+      `;
+    }
+    
+    // אטרקציות
+    if (e.nearby_attractions && e.nearby_attractions.length > 0) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-purple-50 rounded-lg">
+          <h5 class="font-bold text-purple-800 mb-2">🎯 אטרקציות בקרבת מקום</h5>
+          <ul class="list-disc list-inside">
+            ${e.nearby_attractions.map(attraction => `<li>${attraction}</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    }
+    
+    // אמנות ואדריכלות
+    if (e.public_art_notes) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-pink-50 rounded-lg">
+          <h5 class="font-bold text-pink-800 mb-2">🎨 אמנות ואדריכלות</h5>
+          <p>${e.public_art_notes}</p>
+        </div>
+      `;
+    }
+    
+    // נתוני שימוש
+    if (e.ridership_indicator) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+          <h5 class="font-bold text-gray-800 mb-2">📊 נתוני שימוש</h5>
+          <p>${e.ridership_indicator}</p>
+        </div>
+      `;
+    }
+    
+    // כתובת (אם קיימת)
+    if (e.address) {
+      enrichedContent += `
+        <div class="mb-4 p-3 bg-indigo-50 rounded-lg">
+          <h5 class="font-bold text-indigo-800 mb-2">📍 כתובת משוערת</h5>
+          <p>${e.address}</p>
+        </div>
+      `;
+    }
+  }
+  
+  // התוכן המקורי + המועשר
+  stationContent.innerHTML = `
+    <div><h4 class="font-bold text-lg text-gray-800 mb-1">${st.nameHe}</h4><p class="text-gray-600">${st.nameEn}</p></div>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="bg-blue-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-blue-800">אזור תעריף</div><p class="text-xl font-bold text-blue-600">אזור ${st.zone}</p></div>
+      <div class="bg-green-50 p-3 rounded-lg"><div class="mb-1 text-sm font-medium text-green-800">רציפים</div><p class="text-xl font-bold text-green-600">${st.platforms}</p></div>
+    </div>
+    <div class="mb-4">
+      <h5 class="font-medium text-gray-800 mb-2">קווים העוברים בתחנה:</h5>
+      <div class="space-y-2">
+        ${st.lines.map(l=>`<div class="flex items-center gap-3 p-2 bg-gray-50 rounded">
+          <span class="w-4 h-4 rounded-full inline-block" style="background:${l.color}"></span>
+          <span class="font-medium">${l.nameHe}</span><span class="text-sm text-gray-600">(${l.nameEn})</span>
+        </div>`).join('')}
+      </div>
+    </div>
+    ${st.busLines && st.busLines.length ? `
+      <div class="mb-4">
+        <h5 class="font-medium text-gray-800 mb-2">🚌 קווי אוטובוס:</h5>
+        <div class="flex flex-wrap gap-1">
+          ${st.busLines.slice(0,10).map(bus=>`<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">${bus}</span>`).join('')}
+          ${st.busLines.length > 10 ? `<span class="text-gray-500 text-xs">+${st.busLines.length-10} נוספים</span>` : ''}
+        </div>
+      </div>
+    ` : ''}
+    ${enrichedContent}
+  `;
+  
+  stationModal.classList.remove('hidden');
+  stationModal.style.display = 'flex';
+}
 
     function closeStationInfo(){
       stationModal.classList.add('hidden'); 
@@ -665,6 +782,9 @@
       drawMap();
       renderLines();
     });
+
+    
+    
   </script>
 </body>
 </html>
