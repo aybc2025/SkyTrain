@@ -1,334 +1,540 @@
 {
   "questions": [
     {
-      "question_id": "Q001",
+      "id": "Q1",
       "type": "MC",
-      "question_text": "באיזו שנה נפתח קו האקספו לראשונה?",
-      "option_a": "1983",
-      "option_b": "1985",
-      "option_c": "1986",
-      "option_d": "1988",
+      "question_text": "באיזו שנה נפתח קו האקספו של הסקייטריין לציבור?",
+      "options": ["1983", "1985", "1986", "1988"],
       "correct_answer": "1985",
       "difficulty": "easy",
-      "category": "Timeline",
-      "explanation": "קו האקספו נפתח בדצמבר 1985 לקראת אקספו 86."
+      "category": "ציר זמן",
+      "explanation": "קו האקספו נפתח בדצמבר 1985 בזמן לתערוכה Expo '86."
     },
     {
-      "question_id": "Q002",
-      "type": "MC", 
-      "question_text": "איזה קו נבנה במיוחד כדי להתחבר לנמל התעופה YVR?",
-      "option_a": "קו האקספו",
-      "option_b": "קו המילניום", 
-      "option_c": "קו קנדה",
-      "option_d": "קו האוורגרין",
-      "correct_answer": "קו קנדה",
-      "difficulty": "easy",
-      "category": "Lines",
-      "explanation": "קו קנדה נפתח ב-2009 ומחבר בין מרכז ונקובר, ריצ'מונד ונמל התעופה YVR."
-    },
-    {
-      "question_id": "Q003",
+      "id": "Q2",
       "type": "MC",
-      "question_text": "איזו תחנה היא נקודת העברה עיקרית בין קו האקספו לקו המילניום?", 
-      "option_a": "מטרוטאון",
-      "option_b": "Commercial-Broadway",
-      "option_c": "בריגפורט",
-      "option_d": "קינג ג'ורג'",
-      "correct_answer": "Commercial-Broadway",
+      "question_text": "איזה קו סקייטריין נפתח ב-2002?",
+      "options": ["קו אקספו", "קו מילניום", "קו קנדה", "הרחבת אברגרין"],
+      "correct_answer": "קו מילניום",
       "difficulty": "easy",
-      "category": "Stations",
-      "explanation": "תחנת Commercial-Broadway היא נקודת ההעברה היחידה הישירה עם רציפים צולבים בין הקווים."
-    },
-    {
-      "question_id": "Q004", 
-      "type": "MC",
-      "question_text": "איזה טכנולוגיית הנעה משתמשות רכבות האקספו והמילניום?",
-      "option_a": "מנועים חשמליים רגילים עם חוטי עילי",
-      "option_b": "מנועי השראה ליניאריים עם מסילת תגובה",
-      "option_c": "מנועי דיזל-חשמל",
-      "option_d": "מגלב (ריחוף מגנטי)",
-      "correct_answer": "מנועי השראה ליניאריים עם מסילת תגובה",
-      "difficulty": "medium",
-      "category": "Fleet",
-      "explanation": "רכבות האקספו/מילניום משתמשות בטכנולוגיית LIM המופעלת על ידי מסילת 600V."
-    },
-    {
-      "question_id": "Q005",
-      "type": "MC",
-      "question_text": "איזה קו סקייטריין פועל באופן עצמאי לחלותין (ללא מסילות משותפות עם אחרים)?",
-      "option_a": "קו האקספו",
-      "option_b": "קו המילניום", 
-      "option_c": "קו קנדה",
-      "option_d": "אף אחד - כולם חולקים מסילות",
-      "correct_answer": "קו קנדה",
-      "difficulty": "medium",
-      "category": "Lines",
-      "explanation": "קו קנדה נפרד (טכנולוגיה שונה); האקספו והמילניום חולקים במפגשים מסוימים."
-    },
-    {
-      "question_id": "Q006",
-      "type": "TF",
-      "question_text": "תחנת ווטרפרונט מתחברת גם ל-SeaBus וגם ל-West Coast Express.",
-      "correct_answer": "True",
-      "difficulty": "easy", 
-      "category": "Stations",
-      "explanation": "נכון. תחנת ווטרפרונט מקשרת את הסקייטריין עם SeaBus ו-WCE."
-    },
-    {
-      "question_id": "Q007",
-      "type": "TF",
-      "question_text": "תחנת ברארד נסגרה לרוב 2023 לעבור שדרוגים גדולים.",
-      "correct_answer": "True", 
-      "difficulty": "medium",
-      "category": "Stations",
-      "explanation": "נכון. תחנת ברארד נסגרה בפברואר 2023 ונפתחה מחדש בתחילת 2024 לאחר שדרוגי מעליות ומדרגות נעות."
-    },
-    {
-      "question_id": "Q008",
-      "type": "TF",
-      "question_text": "תחנת Joyce–Collingwood נקראה במקור פשוט 'תחנת Joyce'.",
-      "correct_answer": "True",
-      "difficulty": "easy",
-      "category": "Stations", 
-      "explanation": "נכון. התחנה שונתה שמה כדי לכלול את השכונה Collingwood."
-    },
-    {
-      "question_id": "Q009",
-      "type": "MC",
-      "question_text": "כמה קווי סקייטריין עיקריים יש בונקובר?",
-      "option_a": "2",
-      "option_b": "3", 
-      "option_c": "4",
-      "option_d": "5",
-      "correct_answer": "3",
-      "difficulty": "easy",
-      "category": "Lines",
-      "explanation": "יש שלושה קווים עיקריים: קו האקספו, קו המילניום וקו קנדה."
-    },
-    {
-      "question_id": "Q010",
-      "type": "TF",
-      "question_text": "הסקייטריין פועל ללא נהג מאז היום הראשון.",
-      "correct_answer": "True",
-      "difficulty": "medium",
-      "category": "Operations", 
-      "explanation": "נכון. הסקייטריין היה אוטומטי (ללא נהג) מאז שנפתח ב-1985."
-    },
-    {
-      "question_id": "Q011",
-      "type": "SA",
-      "question_text": "מה השם של התחנה שמחברת בין קו האקספו לקו המילניום?",
-      "correct_answer": "Commercial-Broadway",
-      "difficulty": "medium",
-      "category": "Stations",
-      "explanation": "תחנת Commercial-Broadway היא נקודת החיבור העיקרית בין קו האקספו לקו המילניום."
-    },
-    {
-      "question_id": "Q012",
-      "type": "MC",
-      "question_text": "איזה קו נפתח ב-2002?",
-      "option_a": "קו האקספו",
-      "option_b": "קו המילניום",
-      "option_c": "קו קנדה", 
-      "option_d": "הרחבת האוורגרין",
-      "correct_answer": "קו המילניום",
-      "difficulty": "easy",
-      "category": "Timeline",
+      "category": "קווים",
       "explanation": "קו המילניום נפתח ב-2002 כקו השני של הסקייטריין."
     },
     {
-      "question_id": "Q013",
+      "id": "Q3",
       "type": "MC",
-      "question_text": "איזו תחנה רואה את הנוסעים הרבים ביותר בשנה?",
-      "option_a": "ווטרפרונט",
-      "option_b": "Commercial-Broadway",
-      "option_c": "מטרוטאון",
-      "option_d": "סורי סנטרל",
-      "correct_answer": "Commercial-Broadway",
-      "difficulty": "medium",
-      "category": "Stations",
-      "explanation": "Commercial-Broadway היא בדרך כלל התחנה העמוסה ביותר (~11 מיליון כניסות ב-2024)."
+      "question_text": "איזה קו מחבר את מרכז ונקובר עם ריצ'מונד והנמל התעופה?",
+      "options": ["קו אקספו", "קו מילניום", "קו קנדה", "ווסט קוסט אקספרס"],
+      "correct_answer": "קו קנדה",
+      "difficulty": "easy",
+      "category": "קווים",
+      "explanation": "קו קנדה (שנפתח ב-2009) נוסע ממרכז ונקובר לריצ'מונד ולנמל התעופה YVR."
     },
     {
-      "question_id": "Q014",
+      "id": "Q4",
+      "type": "MC",
+      "question_text": "איזו תחנה מתחברת ישירות גם ל-SeaBus וגם ל-West Coast Express?",
+      "options": ["בוררד", "ווטרפרונט", "ברידג'פורט", "קינג ג'ורג'"],
+      "correct_answer": "ווטרפרונט",
+      "difficulty": "easy",
+      "category": "תחנות",
+      "explanation": "תחנת ווטרפרונט מקשרת את הסקייטריין עם ה-SeaBus ורכבת הפרברים WCE."
+    },
+    {
+      "id": "Q5",
+      "type": "MC",
+      "question_text": "איזו תחנת סקייטריין רואה את הנסיעות השנתיות הגבוהות ביותר?",
+      "options": ["ווטרפרונט", "קומרשל-ברודווי", "מטרוטאון", "סורי סנטרל"],
+      "correct_answer": "קומרשל-ברודווי",
+      "difficulty": "medium",
+      "category": "תחנות",
+      "explanation": "קומרשל-ברודווי היא בדרך כלל התחנה העמוסה ביותר (כ-11 מיליון כניסות ב-2024)."
+    },
+    {
+      "id": "Q6",
       "type": "TF",
-      "question_text": "קו קנדה נפתח במיוחד לקראת אולימפיאדת החורף 2010.",
-      "correct_answer": "True",
+      "question_text": "תחנת בוררד הייתה סגורה ברוב 2023 לשדרוגים גדולים.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
       "difficulty": "medium",
-      "category": "Timeline",
-      "explanation": "נכון. קו קנדה נפתח ב-2009 לקראת אולימפיאדת החורף של ונקובר 2010."
+      "category": "תחנות",
+      "explanation": "נכון. תחנת בוררד נסגרה בפברואר 2023 ונפתחה מחדש בתחילת 2024 לאחר שדרוגי מעליות ומדרגות נעות."
     },
     {
-      "question_id": "Q015",
-      "type": "MC",
-      "question_text": "כמה תחנות יש בקו האקספו (כולל הארכות)?",
-      "option_a": "20",
-      "option_b": "25",
-      "option_c": "30",
-      "option_d": "35",
-      "correct_answer": "25",
+      "id": "Q7",
+      "type": "TF",
+      "question_text": "תחנת ג'ויס-קולינגווד נקראה במקור רק 'תחנת ג'ויס'.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
+      "difficulty": "easy",
+      "category": "תחנות",
+      "explanation": "נכון. היא הייתה ידועה כתחנת ג'ויס עד ששמה שונה ב-2016 לכלול את 'קולינגווד'."
+    },
+    {
+      "id": "Q8",
+      "type": "TF",
+      "question_text": "לתחנת 'סטיידיום-צ'יינהטאון' תמיד היה 'צ'יינהטאון' בשם.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "לא נכון",
+      "difficulty": "medium",
+      "category": "תחנות",
+      "explanation": "לא נכון. היא הייתה רק 'סטיידיום' עד 2004, כאשר נוסף 'צ'יינהטאון'."
+    },
+    {
+      "id": "Q9",
+      "type": "TF",
+      "question_text": "תחנת קומרשל-ברודווי נוצרה על ידי איחוד שתי תחנות נפרדות.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
       "difficulty": "hard",
-      "category": "Stations",
-      "explanation": "קו האקספו כולל כ-25 תחנות מווטרפרונט ועד קינג ג'ורג'."
+      "category": "תחנות",
+      "explanation": "נכון. ב-2009 תחנת ברודווי של קו האקספו ותחנת קומרשל דרייב של המילניום אוחדו לקומרשל-ברודווי."
     },
     {
-      "question_id": "Q016",
+      "id": "Q10",
       "type": "TF",
-      "question_text": "רכבות הסקייטריין משתמשות בחשמל מרשת עילית כמו רכבות רגילות.",
-      "correct_answer": "False",
+      "question_text": "תחנת קפסטן החדשה בקו קנדה מומנה באמצעות תרומות של מפתחי נדל\"ן.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
       "difficulty": "medium",
-      "category": "Fleet",
-      "explanation": "לא נכון. הסקייטריין משתמש במסילת חשמל צדדית 600V, לא בחוטים עיליים."
+      "category": "תחנות",
+      "explanation": "נכון. מפתחים שילמו היטלים למימון תחנת קפסטן, שנפתחה בדצמבר 2024."
     },
     {
-      "question_id": "Q017",
+      "id": "Q11",
       "type": "MC",
-      "question_text": "איזה צבע מייצג את קו המילניום במפות?",
-      "option_a": "כחול",
-      "option_b": "צהוב",
-      "option_c": "ירוק",
-      "option_d": "אדום",
-      "correct_answer": "צהוב",
+      "question_text": "איזו תחנת סקייטריין היא הטרמינל במרכז העיר עבור קווי האקספו וקנדה?",
+      "options": ["בוררד", "ווטרפרונט", "גרנוויל", "ונקובר סיטי סנטר"],
+      "correct_answer": "ווטרפרונט",
       "difficulty": "easy",
-      "category": "Lines",
-      "explanation": "קו המילניום מיוצג בצבע צהוב במפות הרשמיות."
+      "category": "תחנות",
+      "explanation": "ווטרפרונט היא התחנה הסופית עבור קווי האקספו וקנדה במרכז העיר."
     },
     {
-      "question_id": "Q018",
+      "id": "Q12",
       "type": "MC",
-      "question_text": "איזה צבע מייצג את קו האקספו?",
-      "option_a": "כחול",
-      "option_b": "צהוב", 
-      "option_c": "ירוק",
-      "option_d": "סגול",
-      "correct_answer": "כחול",
+      "question_text": "מה הטרמינל המזרחי של קו האקספו (נכון ל-2025)?",
+      "options": ["תחנת קינג ג'ורג'", "תחנת פרודקשן וויי-יוניברסיטי", "תחנת סורי סנטרל", "תחנת לאפארג' לייק-דאגלס"],
+      "correct_answer": "תחנת קינג ג'ורג'",
       "difficulty": "easy",
-      "category": "Lines",
-      "explanation": "קו האקספו מיוצג בכחול במפות."
+      "category": "תחנות",
+      "explanation": "תחנת קינג ג'ורג' בסורי היא הטרמינל הנוכחי של קו האקספו עד שתיפתח הרחבת לנגלי."
     },
     {
-      "question_id": "Q019",
-      "type": "SA",
-      "question_text": "איך נקרא הקו שמחבר לנמל התעופה?",
-      "correct_answer": "Canada Line",
-      "difficulty": "easy",
-      "category": "Lines",
-      "explanation": "Canada Line (קו קנדה) מחבר לנמל התעופה YVR."
-    },
-    {
-      "question_id": "Q020",
-      "type": "TF",
-      "question_text": "הסקייטריין פועל 24 שעות ביממה כל יום.",
-      "correct_answer": "False",
-      "difficulty": "easy",
-      "category": "Operations",
-      "explanation": "לא נכון. הסקייטריין פועל בערך מ-5:00 בבוקר עד 1:30 לאחר חצות."
-    },
-    {
-      "question_id": "Q021",
+      "id": "Q13",
       "type": "MC",
-      "question_text": "איזו עיר במטרו ונקובר היא התחנה הסופית הדרומית של קו קנדה?",
-      "option_a": "ונקובר",
-      "option_b": "ברנבי",
-      "option_c": "ריצ'מונד", 
-      "option_d": "סורי",
-      "correct_answer": "ריצ'מונד",
-      "difficulty": "medium",
-      "category": "Geography",
-      "explanation": "קו קנדה מסתיים בתחנת ריצ'מונד-בריגהאוס בריצ'מונד."
-    },
-    {
-      "question_id": "Q022",
-      "type": "TF",
-      "question_text": "ניתן לקחת את הסקייטריין ישירות מנמל התעופה למרכז ונקובר.",
-      "correct_answer": "True",
+      "question_text": "איפה הטרמינל של קו המילניום בקצה הצפון-מזרחי?",
+      "options": ["ווטרפרונט", "ניו ווסטמינסטר", "לאפארג' לייק-דאגלס", "קוקיטלם סנטרל"],
+      "correct_answer": "לאפארג' לייק-דאגלס",
       "difficulty": "easy",
-      "category": "Operations",
-      "explanation": "נכון. קו קנדה מחבר ישירות בין נמל התעופה YVR למרכז ונקובר."
+      "category": "תחנות",
+      "explanation": "קו המילניום מסתיים בתחנת לאפארג' לייק-דאגלס בקוקיטלם (מאז שנפתחה אברגרין)."
     },
     {
-      "question_id": "Q023",
+      "id": "Q14",
       "type": "MC",
-      "question_text": "איזו תחנה ממוקמת ליד האוניברסיטה של קולומביה הבריטית (UBC)?",
-      "option_a": "University",
-      "option_b": "UBC",
-      "option_c": "אין תחנה ליד UBC",
-      "option_d": "Point Grey",
-      "correct_answer": "אין תחנה ליד UBC",
-      "difficulty": "medium",
-      "category": "Geography",
-      "explanation": "כרגע אין קו סקייטריין שמגיע ל-UBC, אך יש תוכניות עתידיות להרחבה."
+      "question_text": "מה התחנה הסופית של ענף ריצ'מונד בקו קנדה?",
+      "options": ["YVR-נמל תעופה", "ריצ'מונד-ברייטהאוס", "ווטרפרונט", "ברידג'פורט"],
+      "correct_answer": "ריצ'מונד-ברייטהאוס",
+      "difficulty": "easy",
+      "category": "תחנות",
+      "explanation": "ריצ'מונד-ברייטהאוס היא הטרמינל הדרומי של ענף ריצ'מונד בקו קנדה."
     },
     {
-      "question_id": "Q024",
-      "type": "NUM",
-      "question_text": "כמה דקות בערך לוקח לנסוע מווטרפרונט לנמל התעופה בקו קנדה?",
-      "correct_answer": "25",
-      "difficulty": "medium",
-      "category": "Operations",
-      "explanation": "הנסיעה מווטרפרונט לנמל התעופה בקו קנדה לוקחת בערך 25 דקות."
-    },
-    {
-      "question_id": "Q025",
-      "type": "TF",
-      "question_text": "הרחבת האוורגרין פתחה ב-2016.",
-      "correct_answer": "True",
-      "difficulty": "medium",
-      "category": "Timeline",
-      "explanation": "נכון. הרחבת האוורגרין של קו המילניום נפתחה בדצמבר 2016."
-    },
-    {
-      "question_id": "Q026",
+      "id": "Q15",
       "type": "MC",
-      "question_text": "איזה סוג רכבות נמצא בקו קנדה?",
-      "option_a": "Mark I",
-      "option_b": "Mark II", 
-      "option_c": "Mark III",
-      "option_d": "רכבות מסוג שונה לגמרי",
-      "correct_answer": "רכבות מסוג שונה לגמרי",
+      "question_text": "התאימו כל תחנת סקייטריין לעירייה שלה: 1) מטרוטאון, 2) קינג ג'ורג', 3) ריצ'מונד-ברייטהאוס, 4) לאפארג' לייק-דאגלס",
+      "options": [
+        "1-ברנבי; 2-סורי; 3-ריצ'מונד; 4-קוקיטלם",
+        "1-ונקובר; 2-סורי; 3-ריצ'מונד; 4-ברנבי", 
+        "1-ברנבי; 2-קוקיטלם; 3-ריצ'מונד; 4-סורי",
+        "1-ניו ווסטמינסטר; 2-סורי; 3-ונקובר; 4-קוקיטלם"
+      ],
+      "correct_answer": "1-ברנבי; 2-סורי; 3-ריצ'מונד; 4-קוקיטלם",
+      "difficulty": "easy",
+      "category": "תחנות",
+      "explanation": "מטרוטאון בברנבי; קינג ג'ורג' בסורי; ריצ'מונד-ברייטהאוס בריצ'מונד; לאפארג' לייק-דאגלס בקוקיטלם."
+    },
+    {
+      "id": "Q16",
+      "type": "MC",
+      "question_text": "איזה שתי תחנות עברו משירות קו המילניום לשירות קו האקספו ב-2016?",
+      "options": ["בוררד וגרנוויל", "ווטרפרונט וברודווי", "ספרטון ובריד", "לאוהיד וקולומביה"],
+      "correct_answer": "ספרטון ובריד",
       "difficulty": "hard",
-      "category": "Fleet",
-      "explanation": "קו קנדה משתמש בטכנולוגיה שונה לחלוטין מקוויי האקספו/מילניום."
+      "category": "תחנות",
+      "explanation": "כאשר הקווים הוגדרו מחדש ב-2016, ספרטון ובריד עברו ממילניום לשירות קו האקספו."
     },
     {
-      "question_id": "Q027",
-      "type": "TF",
-      "question_text": "ניתן להעביר כרטיסים בין כל קווי הסקייטריין.",
-      "correct_answer": "True",
-      "difficulty": "easy",
-      "category": "Operations",
-      "explanation": "נכון. כרטיס Compass Card פועל בכל קווי הסקייטריין והתחבורה הציבורית."
-    },
-    {
-      "question_id": "Q028",
-      "type": "SA",
-      "question_text": "איך נקרא מערכת הכרטיסים של TransLink?",
-      "correct_answer": "Compass Card",
-      "difficulty": "easy",
-      "category": "Operations",
-      "explanation": "Compass Card היא מערכת הכרטיסים הדיגיטלית של TransLink."
-    },
-    {
-      "question_id": "Q029",
+      "id": "Q17",
       "type": "MC",
-      "question_text": "באיזו שנה צפויה להיפתח הרחבת Broadway?",
-      "option_a": "2025",
-      "option_b": "2026",
-      "option_c": "2027",
-      "option_d": "2028",
-      "correct_answer": "2027",
-      "difficulty": "medium",
-      "category": "Projects",
-      "explanation": "הרחבת Broadway Line צפויה להיפתח בסביבות 2027."
+      "question_text": "איזו תחנה מחוברת ישירות לקניון גדול?",
+      "options": ["סורי סנטרל", "מטרוטאון", "בריד", "סקוט רואד"],
+      "correct_answer": "מטרוטאון",
+      "difficulty": "easy",
+      "category": "תחנות",
+      "explanation": "תחנת מטרוטאון משולבת עם קניון מטרופוליס את מטרוטאון בברנבי."
     },
     {
-      "question_id": "Q030",
-      "type": "TF",
-      "question_text": "הסקייטריין הוא מערכת הרכבת הקלה הארוכה ביותר בעולם ללא נהג.",
-      "correct_answer": "True",
+      "id": "Q18",
+      "type": "MC",
+      "question_text": "תחנת סורי סנטרל ממוקמת ליד אילו ציוני דרך?",
+      "options": ["SFU סורי וסנטרל סיטי מול", "מטרוטאון מול וספרייה", "עירייה ו-BCIT", "ריצ'מונד סנטר ומינורו פארק"],
+      "correct_answer": "SFU סורי וסנטרל סיטי מול",
+      "difficulty": "medium",
+      "category": "תחנות",
+      "explanation": "סורי סנטרל נמצאת ליד סנטרל סיטי מול (שמכיל את SFU סורי) וקרוב לעירייה."
+    },
+    {
+      "id": "Q19",
+      "type": "MC",
+      "question_text": "איזו תחנה היא צומת בין קווי האקספו והמילניום עם העברות חוצות רציף?",
+      "options": ["קומרשל-ברודווי", "ווטרפרונט", "לאוהיד טאון סנטר", "קולומביה"],
+      "correct_answer": "קומרשל-ברודווי",
+      "difficulty": "medium",
+      "category": "תחנות",
+      "explanation": "קומרשל-ברודווי היא נקודת ההעברה העיקרית בין אקספו-מילניום (חוצה רציף)."
+    },
+    {
+      "id": "Q20",
+      "type": "MC",
+      "question_text": "איזה בניין היסטורי מכיל את תחנת ווטרפרונט?",
+      "options": ["בית דואר לשעבר", "מגדל ארט דקו משנות ה-30", "תחנת הרכבת הישנה של CPR", "מחסן שהוסב"],
+      "correct_answer": "תחנת הרכבת הישנה של CPR",
       "difficulty": "hard",
-      "category": "Trivia",
-      "explanation": "נכון. הסקייטריין הוא מערכת הרכבת האוטומטית הארוכה ביותר בעולם."
+      "category": "תחנות",
+      "explanation": "תחנת ווטרפרונט היא תחנת הרכבת הניאו-קלאסית הגדולה של CPR מ-1914."
+    },
+    {
+      "id": "Q21",
+      "type": "MC",
+      "question_text": "למה קו האקספו נקרא 'קו אקספו'?",
+      "options": ["נקרא על שם תערוכת Expo 86", "נקרא על שם גנים Expo בברנבי", "קיצור ל-'Express Passenger Operation'", "זה היה קו ניסיוני"],
+      "correct_answer": "נקרא על שם תערוכת Expo 86",
+      "difficulty": "easy",
+      "category": "טריוויה",
+      "explanation": "הוא נבנה עבור Expo '86, לכן נקרא קו האקספו לזכר האירוע."
+    },
+    {
+      "id": "Q22",
+      "type": "MC",
+      "question_text": "קו המילניום קיבל את שמו כי:",
+      "options": ["הוא עובר לאורך שדרת המילניום", "הוא נפתח בסביבות שנת 2000", "הוא 1000 מטר מעל פני הים", "הוא נקרא על שם פוליטיקאי מ-BC"],
+      "correct_answer": "הוא נפתח בסביבות שנת 2000",
+      "difficulty": "easy",
+      "category": "טריוויה",
+      "explanation": "הוא נפתח ב-2002 (המילניום החדש), ומכאן 'קו המילניום'."
+    },
+    {
+      "id": "Q23",
+      "type": "MC",
+      "question_text": "איך נקרא קו קנדה בדרך כלל במהלך התכנון?",
+      "options": ["קו אברגרין", "קו RAV", "קו פסיפיק", "קו Expo 2010"],
+      "correct_answer": "קו RAV",
+      "difficulty": "medium",
+      "category": "טריוויה",
+      "explanation": "במהלך התכנון זה היה קו RAV (Richmond-Airport-Vancouver), אבל הושק כ-'קו קנדה'."
+    },
+    {
+      "id": "Q24",
+      "type": "MC",
+      "question_text": "באיזה רוחב מסילה נוסעות רכבות הסקייטריין?",
+      "options": ["רוחב צר (1,000 מ\"מ)", "רוחב סטנדרטי (1,435 מ\"מ)", "רוחב רחב (1,676 מ\"מ)", "הן משתמשות בגלגלי גומי על בטון"],
+      "correct_answer": "רוחב סטנדרטי (1,435 מ\"מ)",
+      "difficulty": "hard",
+      "category": "קווים",
+      "explanation": "הסקייטריין משתמש במסילות רוחב סטנדרטי בכל הקווים."
+    },
+    {
+      "id": "Q25",
+      "type": "MC",
+      "question_text": "איזו טכנולוגיה משתמשות רכבות קווי האקספו והמילניום להנעה?",
+      "options": ["מנועי דיזל-חשמל", "מנועי אינדוקציה ליניאריים (LIM)", "פנטוגרף עילי עם מנועי AC", "מגלב (ריחוף מגנטי)"],
+      "correct_answer": "מנועי אינדוקציה ליניאריים (LIM)",
+      "difficulty": "easy",
+      "category": "קווים",
+      "explanation": "אקספו/מילניום משתמשים בהנעת LIM עם כוח מהמסילה השלישית."
+    },
+    {
+      "id": "Q26",
+      "type": "MC",
+      "question_text": "איך מופעלות רכבות קו קנדה?",
+      "options": ["מסילה שלישית", "חוט עילי (קטנרי)", "סוללות", "גנרטור דיזל"],
+      "correct_answer": "חוט עילי (קטנרי)",
+      "difficulty": "medium",
+      "category": "קווים",
+      "explanation": "קו קנדה משתמש במנועים חשמליים קונבנציונליים המופעלים על ידי חוטים עיליים של 750V DC."
+    },
+    {
+      "id": "Q27",
+      "type": "MC",
+      "question_text": "מה המהירות המקסימלית של הסקייטריין?",
+      "options": ["60 קמ\"ש", "80 קמ\"ש", "100 קמ\"ש", "130 קמ\"ש"],
+      "correct_answer": "80 קמ\"ש",
+      "difficulty": "easy",
+      "category": "תפעול",
+      "explanation": "רכבות הסקייטריין מגיעות לכ-80 קמ\"ש במהירות מלאה בקטעים ישרים."
+    },
+    {
+      "id": "Q28",
+      "type": "MC",
+      "question_text": "איזו מערכת בקרת רכבות משתמש הסקייטריין?",
+      "options": ["איתותים בלוק קבוע", "SelTrac moving-block CBTC", "ראייה ורדיו של הנהג", "בקרה סינכרונית ליניארית"],
+      "correct_answer": "SelTrac moving-block CBTC",
+      "difficulty": "medium",
+      "category": "תפעול",
+      "explanation": "הסקייטריין משתמש במערכת SelTrac המבוססת תקשורת עם בלוק נע לאוטומציה."
+    },
+    {
+      "id": "Q29",
+      "type": "MC",
+      "question_text": "איך מובנים תעריפי הסקייטריין?",
+      "options": ["תעריף שטוח לכל הנסיעות", "אזורים לפי שטח שנסעו", "תעריפים לפי מרחק בלבד", "חינם במרכז העיר"],
+      "correct_answer": "אזורים לפי שטח שנסעו",
+      "difficulty": "easy",
+      "category": "תפעול",
+      "explanation": "TransLink משתמש באזורי תעריף: ונקובר היא אזור 1; פרברים פנימיים אזור 2; פרברים חיצוניים אזור 3."
+    },
+    {
+      "id": "Q30",
+      "type": "MC",
+      "question_text": "אספקת השירות בזמן של הסקייטריין היא בערך:",
+      "options": ["75%", "85%", "96%", "100%"],
+      "correct_answer": "96%",
+      "difficulty": "medium",
+      "category": "תפעול",
+      "explanation": "BCRTC מדווחת על ביצועי זמן של סקייטריין בסביבות 96.5% בשנים האחרונות."
+    },
+    {
+      "id": "Q31",
+      "type": "MC",
+      "question_text": "איזה קווי סקייטריין מופעלים על ידי BCRTC (TransLink) ישירות?",
+      "options": ["אקספו ומילניום", "קנדה ומילניום", "אקספו וקנדה", "כל שלושת הקווים"],
+      "correct_answer": "אקספו ומילניום",
+      "difficulty": "easy",
+      "category": "תפעול",
+      "explanation": "BCRTC של TransLink מפעילה את קווי האקספו והמילניום, בעוד קו קנדה מופעל על ידי ProTrans BC."
+    },
+    {
+      "id": "Q32",
+      "type": "MC",
+      "question_text": "איזו תחנת סקייטריין יש לה דלתות מסך רציף?",
+      "options": ["ווטרפרונט", "YVR-נמל תעופה", "קומרשל-ברודווי", "אף תחנה"],
+      "correct_answer": "YVR-נמל תעופה",
+      "difficulty": "hard",
+      "category": "תפעול",
+      "explanation": "רק לתחנת YVR-נמל התעופה יש דלתות מסך רציף (לבטיחות ואקלים של נמל התעופה) - לאף תחנה אחרת אין."
+    },
+    {
+      "id": "Q33",
+      "type": "MC",
+      "question_text": "איזה עיריות יש להן שירות סקייטריין?",
+      "options": [
+        "ונקובר, ברנבי, ניו ווסט, ריצ'מונד, סורי, קוקיטלם, פורט מודי",
+        "רק ונקובר וברנבי",
+        "כל ערי מטרו ונקובר",
+        "רק ונקובר, ריצ'מונד, סורי"
+      ],
+      "correct_answer": "ונקובר, ברנבי, ניו ווסט, ריצ'מונד, סורי, קוקיטלם, פורט מודי",
+      "difficulty": "medium",
+      "category": "גיאוגרפיה",
+      "explanation": "54 התחנות של הסקייטריין נמצאות בונקובר, ברנבי, ניו ווסטמינסטר, ריצ'מונד, סורי, קוקיטלם ופורט מודי."
+    },
+    {
+      "id": "Q34",
+      "type": "MC",
+      "question_text": "קו האקספו נוסע דרך איזה ארבע ערים?",
+      "options": [
+        "ונקובר, ברנבי, ניו ווסט, סורי",
+        "ונקובר, קוקיטלם, ריצ'מונד, סורי",
+        "ונקובר, ברנבי, ריצ'מונד, לנגלי",
+        "ונקובר, ברנבי, ניו ווסט, קוקיטלם"
+      ],
+      "correct_answer": "ונקובר, ברנבי, ניו ווסט, סורי",
+      "difficulty": "easy",
+      "category": "גיאוגרפיה",
+      "explanation": "קו האקספו מחבר את ונקובר, ברנבי, ניו ווסטמינסטר וסורי."
+    },
+    {
+      "id": "Q35",
+      "type": "MC",
+      "question_text": "קו המילניום עובר בעיקר דרך איזה אזורים?",
+      "options": [
+        "מזרח ונקובר, ברנבי, ערי השלישייה",
+        "צפון ונקובר ומערב ונקובר",
+        "ריצ'מונד ודלתא",
+        "סורי ולנגלי"
+      ],
+      "correct_answer": "מזרח ונקובר, ברנבי, ערי השלישייה",
+      "difficulty": "easy",
+      "category": "גיאוגרפיה",
+      "explanation": "קו המילניום הולך ממזרח ונקובר דרך ברנבי לפורט מודי וקוקיטלם (ערי השלישייה)."
+    },
+    {
+      "id": "Q36",
+      "type": "MC",
+      "question_text": "קו קנדה משרת בעיקר איזה שתי ערים?",
+      "options": ["ונקובר וריצ'מונד", "ברנבי וניו ווסט", "סורי ולנגלי", "קוקיטלם ופורט מודי"],
+      "correct_answer": "ונקובר וריצ'מונד",
+      "difficulty": "easy",
+      "category": "גיאוגרפיה",
+      "explanation": "קו קנדה מחבר את מרכז ונקובר עם ריצ'מונד (ו-YVR)."
+    },
+    {
+      "id": "Q37",
+      "type": "MC",
+      "question_text": "תחנת ווטרפרונט צמודה לאיזה ציון דרך מרכזי?",
+      "options": ["פסיפיק סנטרל סטיישן", "קנדה פלייס וטרמינל השייט", "אצטדיון BC פלייס", "מטרוטאון מול"],
+      "correct_answer": "קנדה פלייס וטרמינל השייט",
+      "difficulty": "medium",
+      "category": "גיאוגרפיה",
+      "explanation": "ווטרפרונט נמצאת ישירות ליד קנדה פלייס וטרמינל ספינות השייט על בוררד אינלט."
+    },
+    {
+      "id": "Q38",
+      "type": "TF",
+      "question_text": "קווי האקספו והמילניום המשולבים היו פעם המערכת הארוכה ביותר ללא נהג בעולם.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
+      "difficulty": "hard",
+      "category": "טריוויה",
+      "explanation": "נכון. בכ-79 ק\"מ, לונקובר הייתה המטרו הארוכה ביותר ללא נהג עד שמערכות מאוחרות יותר עברו אותה."
+    },
+    {
+      "id": "Q39",
+      "type": "TF",
+      "question_text": "הסקייטריין מופיע בכמה סרטים/תוכניות טלוויזיה בגלל המראה העתידני שלו.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
+      "difficulty": "hard",
+      "category": "טריוויה",
+      "explanation": "נכון. לדוגמה, 'SkyTrackers' מ-1986 הציג באופן בולט את הסקייטריין של ונקובר."
+    },
+    {
+      "id": "Q40",
+      "type": "MC",
+      "question_text": "מתי התחיל שירות הכנסות של הסקייטריין?",
+      "options": ["1983", "1984", "1985", "1986"],
+      "correct_answer": "1985",
+      "difficulty": "medium",
+      "category": "ציר זמן",
+      "explanation": "11 בדצמבר 1985 הוא תאריך הפתיחה הרשמי לשירות הסקייטריין."
+    },
+    {
+      "id": "Q41",
+      "type": "MC",
+      "question_text": "במהלך אולימפיאדת 2010, הסקייטריין פעל:",
+      "options": ["שעות מצומצמות", "שעות רגילות", "24 שעות", "רק לאנשים מוסמכים"],
+      "correct_answer": "24 שעות",
+      "difficulty": "medium",
+      "category": "ציר זמן",
+      "explanation": "הסקייטריין פעל בעיקר 24/7 במהלך אולימפיאדת החורף 2010 כדי להכיל צופים (פעם ראשונה שעשה זאת)."
+    },
+    {
+      "id": "Q42",
+      "type": "MC",
+      "question_text": "איזו הרחבה גדולה נפתחה בסוף 2016?",
+      "options": ["סורי-לנגלי", "אברגרין (קוקיטלם)", "קו קנדה YVR", "קו UBC"],
+      "correct_answer": "אברגרין (קוקיטלם)",
+      "difficulty": "easy",
+      "category": "ציר זמן",
+      "explanation": "הרחבת אברגרין (קו המילניום לקוקיטלם) נפתחה בדצמבר 2016."
+    },
+    {
+      "id": "Q43",
+      "type": "MC",
+      "question_text": "איזה פרויקט בוטל ב-2018 לטובת הארכת הסקייטריין בסורי?",
+      "options": ["פרויקט LRT סורי", "ברודווי סאבוויי", "UBC BRT", "גונדולה הר ברנבי"],
+      "correct_answer": "פרויקט LRT סורי",
+      "difficulty": "hard",
+      "category": "מדיניות",
+      "explanation": "ב-2018 ה-LRT המתוכנן של סורי בוטל, והמשאבים הוקצו מחדש לסקייטריין ללנגלי."
+    },
+    {
+      "id": "Q44",
+      "type": "MC",
+      "question_text": "איזה חלק מהנסיעות לפני המגפה החזיר הסקייטריין עד אמצע 2025?",
+      "options": ["~60%", "~75%", "~95%", "מעל 100%"],
+      "correct_answer": "~95%",
+      "difficulty": "medium",
+      "category": "נסיעות",
+      "explanation": "עד רבעון שני 2025, הסקייטריין הסיע שוב ~95% מהנסיעות של 2019."
+    },
+    {
+      "id": "Q45",
+      "type": "MC",
+      "question_text": "איזה שתי תחנות עזבו את קו המילניום והפכו לתחנות קו האקספו ב-2016?",
+      "options": ["בריד וספרטון", "לאוהיד וקולומביה", "מודי סנטר וברקיטלם", "סטיידיום וגרנוויל"],
+      "correct_answer": "בריד וספרטון",
+      "difficulty": "hard",
+      "category": "תחנות",
+      "explanation": "ב-2016, תחנות בריד וספרטון עברו ממילניום לשירות אקספו."
+    },
+    {
+      "id": "Q46",
+      "type": "MC",
+      "question_text": "איזו חברה מפעילה את קו קנדה בחוזה?",
+      "options": ["BC Rapid Transit Company", "ProTrans BC", "בומברדייה", "Metrolinx"],
+      "correct_answer": "ProTrans BC",
+      "difficulty": "easy",
+      "category": "תפעול",
+      "explanation": "ProTrans BC (חברת בת של SNC-Lavalin) מפעילה את קו קנדה בחוזה P3."
+    },
+    {
+      "id": "Q47",
+      "type": "MC",
+      "question_text": "איזו תחנת סקייטריין משולבת במתחם קניון בניו ווסטמינסטר?",
+      "options": ["22nd Street", "קולומביה", "ניו ווסטמינסטר", "אדמונדס"],
+      "correct_answer": "ניו ווסטמינסטר",
+      "difficulty": "medium",
+      "category": "תחנות",
+      "explanation": "תחנת ניו ווסטמינסטר בנויה לתוך מתחם קניות (Shops at New West) ברציף."
+    },
+    {
+      "id": "Q48",
+      "type": "TF",
+      "question_text": "מעולם לא התרחשו התנגשויות סקייטריין בגלל הבקרות האוטומטיות שלו.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
+      "difficulty": "medium",
+      "category": "תקריות",
+      "explanation": "נכון. למרות כיבויים נדירים, מערכת הבלוק הנע של הסקייטריין מנעה התנגשויות רכבת לרכבת."
+    },
+    {
+      "id": "Q49",
+      "type": "TF",
+      "question_text": "כיבויי הסקייטריין ב-2014 הביאו את TransLink להציע כרטיסי תחבורה חינם כפיצוי.",
+      "options": ["נכון", "לא נכון"],
+      "correct_answer": "נכון",
+      "difficulty": "medium",
+      "category": "תקריות",
+      "explanation": "נכון. לאחר שני כיבויים גדולים ביולי 2014, TransLink הציעה כרטיסים חינם והזמינה סקירה עצמאית."
+    },
+    {
+      "id": "Q50",
+      "type": "MC",
+      "question_text": "איזה פרויקט תחבורה ביטלו ראשי ערים של מטרו ונקובר לטובת הרחבת הסקייטריין סורי-לנגלי?",
+      "options": ["LRT סורי", "חשמלית UBC", "גונדולה הר ברנבי", "BRT כביש מהיר ריצ'מונד"],
+      "correct_answer": "LRT סורי",
+      "difficulty": "hard",
+      "category": "מדיניות",
+      "explanation": "בנובמבר 2018 ה-LRT המתוכנן של סורי בוטל, והוחלט לבנות סקייטריין לאורך Fraser Hwy."
     }
-  ]
+  ],
+  "categories": {
+    "תחנות": "מידע על תחנות הסקייטריין השונות",
+    "קווים": "מידע על שלושת קווי הסקייטריין",
+    "ציר זמן": "אירועים היסטוריים ותאריכים חשובים",
+    "תפעול": "איך הסקייטריין עובד ומופעל",
+    "גיאוגרפיה": "מיקומים ועיריות",
+    "טריוויה": "עובדות מעניינות וייחודיות",
+    "מדיניות": "החלטות ופרויקטים עתידיים",
+    "תקריות": "אירועים מיוחדים ובעיות",
+    "נסיעות": "נתונים על שימוש בסקייטריין"
+  },
+  "difficulties": {
+    "easy": "שאלות בסיסיות מתאימות לכל הגילאים",
+    "medium": "שאלות בינוניות הדורשות ידע כללי על הסקייטריין",
+    "hard": "שאלות מאתגרות לחובבי הסקייטריין"
+  }
 }
